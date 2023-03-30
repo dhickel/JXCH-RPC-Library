@@ -1,10 +1,15 @@
 package io.mindspice.util;
 
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.mindspice.schemas.fullnode.Block;
+import io.mindspice.schemas.fullnode.BlockRecords;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -13,6 +18,7 @@ public class JsonUtils {
     private static ObjectMapper mapper;
     private static final Map<Class<?>, ObjectReader> readerCache = new ConcurrentHashMap<>(10);
     private static final Map<Class<?>, ObjectWriter> writerCache = new ConcurrentHashMap<>(10);
+    private static final Map<TypeReference, ObjectReader> typeRefCache = new ConcurrentHashMap<>(10);
     private static final ObjectNode emptyNode;
 
     static {
@@ -36,6 +42,11 @@ public class JsonUtils {
 
     private static ObjectWriter writerFor(Class<?> objClass) {
         return writerCache.computeIfAbsent(objClass, mapper::writerFor);
+    }
+
+
+    private static <T>  ObjectReader writerForRef(TypeReference<T> typeRef) {
+        return typeRefCache.computeIfAbsent(typeRef, mapper::readerFor);
     }
 
 
@@ -104,6 +115,7 @@ public class JsonUtils {
     }
 
 
+
     public static JsonNode readTree(byte[] json) throws IOException {
         return mapper.readTree(json);
     }
@@ -117,6 +129,11 @@ public class JsonUtils {
 
     public static ObjectNode emptyNode() {
         return emptyNode;
+    }
+
+
+    public static <T> T readJson(JsonParser json, TypeReference<T> typeRef) throws IOException {
+        return writerForRef(typeRef).readValue(json, typeRef);
     }
 
 

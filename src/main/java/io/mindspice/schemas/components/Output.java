@@ -1,4 +1,4 @@
-package io.mindspice.schemas.common;
+package io.mindspice.schemas.components;
 
 public record Output(
         String data

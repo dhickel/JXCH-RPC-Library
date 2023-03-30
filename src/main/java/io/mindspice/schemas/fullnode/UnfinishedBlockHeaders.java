@@ -5,18 +5,17 @@ import io.mindspice.enums.ResponseType;
 import io.mindspice.enums.endpoints.Endpoint;
 import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.schemas.ApiResponse;
-import io.mindspice.schemas.components.CoinRecord;
+import io.mindspice.schemas.components.*;
 
 import java.util.List;
 
 
-public record AdditionsAndRemovals(
-        List<CoinRecord> additions,
-        List<CoinRecord> removals,
+public record UnfinishedBlockHeaders (
+        List<Headers> headers,
         boolean success,
         String error
-) implements ApiResponse {
 
+) implements ApiResponse {
 
     @Override
     public ChiaService getService() {
@@ -26,12 +25,13 @@ public record AdditionsAndRemovals(
 
     @Override
     public ChiaService.SubService getSubService() {
-        return ChiaService.SubService.COINS;
+        return ChiaService.SubService.BLOCKS;
     }
 
 
     @Override
     public ResponseType getResponseType() {
-        return ResponseType.COIN_RECORD;
+        return ResponseType.BLOCK_HEADER;
     }
 }
+

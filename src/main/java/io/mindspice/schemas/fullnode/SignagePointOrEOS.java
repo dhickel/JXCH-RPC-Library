@@ -2,19 +2,18 @@ package io.mindspice.schemas.fullnode;
 
 import io.mindspice.enums.ChiaService;
 import io.mindspice.enums.ResponseType;
-import io.mindspice.enums.endpoints.Endpoint;
-import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.schemas.ApiResponse;
-import io.mindspice.schemas.components.CoinRecord;
-
-import java.util.List;
+import io.mindspice.schemas.components.*;
 
 
-public record AdditionsAndRemovals(
-        List<CoinRecord> additions,
-        List<CoinRecord> removals,
+public record SignagePointOrEOS(
+        long time_received,
+        boolean reverted,
         boolean success,
-        String error
+        String error,
+        SignagePoint signage_point,
+        SubSlot eos
+
 ) implements ApiResponse {
 
 
@@ -26,12 +25,12 @@ public record AdditionsAndRemovals(
 
     @Override
     public ChiaService.SubService getSubService() {
-        return ChiaService.SubService.COINS;
+        return ChiaService.SubService.BLOCKS;
     }
 
 
     @Override
     public ResponseType getResponseType() {
-        return ResponseType.COIN_RECORD;
+        return signage_point == null ? ResponseType.END_OF_SUB_SLOT : ResponseType.SIGNAGE_POINT;
     }
 }

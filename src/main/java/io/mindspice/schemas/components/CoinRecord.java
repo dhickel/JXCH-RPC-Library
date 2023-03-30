@@ -1,4 +1,4 @@
-package io.mindspice.schemas.common;
+package io.mindspice.schemas.components;
 
 public record CoinRecord(
         Coin coin,
@@ -7,5 +7,7 @@ public record CoinRecord(
         boolean spent,
         boolean coinbase,
         long timestamp
-) { }
+)  {
+
+}
 

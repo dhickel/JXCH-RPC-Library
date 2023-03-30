@@ -43,9 +43,9 @@ public class RPCClient {
         }
         try {
             RequestConfig requestConfig = RequestConfig.custom()
-                    .setConnectTimeout(30_000)
-                    .setConnectionRequestTimeout(30_000)
-                    .setSocketTimeout(30_000).build();
+                    .setConnectTimeout(60_000)
+                    .setConnectionRequestTimeout(60_000)
+                    .setSocketTimeout(60_000).build();
 
             SSLContext sslContext = SSLContexts.custom()
                     .loadKeyMaterial(pairStore.getKeyStore(), "".toCharArray())
@@ -77,20 +77,12 @@ public class RPCClient {
                 InputStream content = response.getEntity().getContent();
                // System.out.println(new String(content.readAllBytes()));
                 return content.readAllBytes();
-            } catch (IOException e) {
-                throw e;
             }
-
-        } catch (URISyntaxException e){
+        } catch (URISyntaxException e) {
             throw new RPCException("URI error on RPC request", e);
-        } catch (IOException e) { {
-            throw  new RPCException("Byte read error on RPC request", e);
+        } catch (IOException e) {
+            throw new RPCException("Byte read error on RPC request", e);
+
         }
-
     }
-
-
-    }
-
-
 }

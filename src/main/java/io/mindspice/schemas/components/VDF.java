@@ -1,6 +1,4 @@
-package io.mindspice.schemas.common;
-
-import io.mindspice.schemas.fullnode.Block;
+package io.mindspice.schemas.components;
 
 
 public record VDF(

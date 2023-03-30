@@ -1,16 +1,17 @@
 package io.mindspice;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import io.mindspice.enums.ChiaService;
+import io.mindspice.enums.endpoints.Endpoint;
+import io.mindspice.enums.endpoints.Multi;
 import io.mindspice.http.RPCClient;
-import io.mindspice.http.requests.DaemonClient;
 import io.mindspice.http.requests.FullNodeAPI;
+import io.mindspice.schemas.fullnode.Blocks;
 import io.mindspice.util.RPCException;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 
 public class Main {
@@ -22,8 +23,17 @@ public class Main {
 
         RPCClient rpcClient = new RPCClient(nodeConfig);
         FullNodeAPI node = new FullNodeAPI(rpcClient);
+        //0x69f9ac19521afef52745eedf81f000eb55d74a5c4aa493a83721b87ef3c71b1f
+//        System.out.println(node.getCoinRecordsByPuzzleHashes(
+//                Collections.singletonList("0x29fcff2cf974a34fb86d32883e7859bd37266db5f6e6f0042dd8e785327606c3"),
+//                3436588,
+//                3436590,
+//                true
+//
+//                ));
+//    }
 
-        System.out.println(node.getBlock("0x74a4cef4ab25ef67164138318d940ab7875348d740757ecaebf2980b730668eb"));
+        System.out.println(node.getBlockRecords(5,10));
 
     }
 }

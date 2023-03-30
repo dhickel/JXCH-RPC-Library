@@ -7,5 +7,16 @@ public enum ChiaService {
     FARMER,
     FULL_NODE,
     HARVESTER,
-    WALLET
+    WALLET;
+
+    public enum SubService {
+        BLOCKS,
+        COINS,
+        SHARED,
+        FULL_NODE,
+        MEMPOOL,
+        FEES
+
+
+    }
 }

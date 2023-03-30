@@ -1,7 +1,8 @@
-package io.mindspice.schemas.common;
+package io.mindspice.schemas.components;
 
-public record Coin(
+public record Coin (
         String parent_coin_info,
         String puzzle_hash,
         long amount
-) { }
+) {
+}

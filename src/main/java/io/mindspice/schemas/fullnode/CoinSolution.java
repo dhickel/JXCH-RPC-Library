@@ -5,17 +5,15 @@ import io.mindspice.enums.ResponseType;
 import io.mindspice.enums.endpoints.Endpoint;
 import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.schemas.ApiResponse;
-import io.mindspice.schemas.components.CoinRecord;
-
-import java.util.List;
+import io.mindspice.schemas.components.Coin;
 
 
-public record AdditionsAndRemovals(
-        List<CoinRecord> additions,
-        List<CoinRecord> removals,
-        boolean success,
-        String error
+public record CoinSolution(
+        Coin coin,
+        String puzzle_reveal,
+        String solution
 ) implements ApiResponse {
+    private static final Endpoint endpoint = FullNode.GET_PUZZLE_AND_SOLUTION;
 
 
     @Override
@@ -32,6 +30,6 @@ public record AdditionsAndRemovals(
 
     @Override
     public ResponseType getResponseType() {
-        return ResponseType.COIN_RECORD;
+        return ResponseType.COIN_SOLUTION;
     }
 }

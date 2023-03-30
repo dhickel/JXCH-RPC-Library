@@ -1,17 +1,16 @@
 package io.mindspice.schemas.fullnode;
 
-
 import io.mindspice.enums.ChiaService;
 import io.mindspice.enums.ResponseType;
-import io.mindspice.enums.endpoints.Endpoint;
-import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.schemas.ApiResponse;
-import io.mindspice.schemas.components.*;
+import io.mindspice.schemas.components.Coin;
+import io.mindspice.schemas.components.Output;
+
 
 import java.util.List;
 
 
-public record Block(
+public record BlockRecord(
         String challenge_block_info_hash,
         Output challenge_vdf_output,
         int deficit,
@@ -34,11 +33,10 @@ public record Block(
         int signage_point_index,
         boolean sub_epoch_summary_included,
         long sub_slot_iters,
-        int timestamp,
+        long timestamp,
         long total_iters,
         long weight
 ) implements ApiResponse {
-
 
     @Override
     public ChiaService getService() {
@@ -54,16 +52,6 @@ public record Block(
 
     @Override
     public ResponseType getResponseType() {
-        return ResponseType.BLOCK;
+        return ResponseType.BLOCK_RECORD;
     }
-
 }
-
-
-
-
-
-
-
-
-

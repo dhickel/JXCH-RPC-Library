@@ -2,19 +2,14 @@ package io.mindspice.schemas.fullnode;
 
 import io.mindspice.enums.ChiaService;
 import io.mindspice.enums.ResponseType;
-import io.mindspice.enums.endpoints.Endpoint;
-import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.schemas.ApiResponse;
-import io.mindspice.schemas.components.CoinRecord;
-
-import java.util.List;
 
 
-public record AdditionsAndRemovals(
-        List<CoinRecord> additions,
-        List<CoinRecord> removals,
-        boolean success,
-        String error
+public record Metrics(
+        int compact_blocks,
+        int uncompact_blocks,
+        int hint_count
+
 ) implements ApiResponse {
 
 
@@ -26,12 +21,12 @@ public record AdditionsAndRemovals(
 
     @Override
     public ChiaService.SubService getSubService() {
-        return ChiaService.SubService.COINS;
+        return ChiaService.SubService.BLOCKS;
     }
 
 
     @Override
     public ResponseType getResponseType() {
-        return ResponseType.COIN_RECORD;
+        return ResponseType.METRICS;
     }
 }
