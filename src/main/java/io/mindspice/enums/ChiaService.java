@@ -13,9 +13,9 @@ public enum ChiaService {
         BLOCKS,
         COINS,
         SHARED,
-        FULL_NODE,
+        METRICS,
         MEMPOOL,
-        FEES
+        FEES,
 
 
     }

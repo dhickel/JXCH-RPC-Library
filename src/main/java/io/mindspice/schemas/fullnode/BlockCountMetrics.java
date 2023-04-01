@@ -1,19 +1,16 @@
 package io.mindspice.schemas.fullnode;
 
 import io.mindspice.enums.ChiaService;
+
 import io.mindspice.enums.endpoints.Endpoint;
 import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.schemas.ApiResponse;
-import io.mindspice.schemas.Objects.*;
 
 
-public record SignagePointOrEOS(
-        long time_received,
-        boolean reverted,
-        boolean success,
-        String error,
-        SignagePoint signage_point,
-        SubSlot eos
+public record BlockCountMetrics(
+        int compact_blocks,
+        int uncompact_blocks,
+        int hint_count
 
 ) implements ApiResponse {
 
@@ -32,6 +29,6 @@ public record SignagePointOrEOS(
 
     @Override
     public Endpoint getEndPoint() {
-        return FullNode.GET_RECENT_SIGNAGE_POINT_OR_EOS;
+        return FullNode.GET_BLOCK_COUNT_METRICS;
     }
 }

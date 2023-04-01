@@ -3,7 +3,7 @@ package io.mindspice.http.requests;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.mindspice.enums.endpoints.Daemon;
 import io.mindspice.http.RPCClient;
-import io.mindspice.schemas.daemon.*;
+import io.mindspice.schemas.daemon.Status;
 import io.mindspice.util.JsonUtils;
 import io.mindspice.util.RPCException;
 
@@ -24,7 +24,7 @@ public class DaemonClient {
 
     public byte[] get_status_bytes() throws RPCException {
         try {
-            var req = new Request(Daemon.GET_STATUS, JsonUtils.writeBytes(JsonUtils.emptyNode()));
+            var req = new Request(Daemon.GET_STATUS, JsonUtils.emptyNodeAsBytes());
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);

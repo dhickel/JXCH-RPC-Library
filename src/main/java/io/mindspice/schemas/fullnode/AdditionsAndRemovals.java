@@ -1,12 +1,13 @@
 package io.mindspice.schemas.fullnode;
 
 import io.mindspice.enums.ChiaService;
-import io.mindspice.enums.ResponseType;
+import io.mindspice.enums.endpoints.Daemon;
 import io.mindspice.enums.endpoints.Endpoint;
 import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.schemas.ApiResponse;
-import io.mindspice.schemas.components.CoinRecord;
+import io.mindspice.schemas.Objects.CoinRecord;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -16,6 +17,11 @@ public record AdditionsAndRemovals(
         boolean success,
         String error
 ) implements ApiResponse {
+
+    public AdditionsAndRemovals {
+        additions = additions == null ? List.of() : Collections.unmodifiableList(additions);
+        removals = removals == null ? List.of() : Collections.unmodifiableList(removals);
+    }
 
 
     @Override
@@ -31,7 +37,7 @@ public record AdditionsAndRemovals(
 
 
     @Override
-    public ResponseType getResponseType() {
-        return ResponseType.COIN_RECORD;
+    public Endpoint getEndPoint() {
+        return FullNode.GET_ADDITIONS_AND_REMOVALS;
     }
 }
