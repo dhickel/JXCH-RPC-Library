@@ -2,7 +2,6 @@ package io.mindspice.http;
 
 import io.mindspice.NodeConfig;
 import io.mindspice.enums.ChiaService;
-import io.mindspice.http.requests.Request;
 import io.mindspice.util.CertPairStore;
 import io.mindspice.util.RPCException;
 import org.apache.http.HttpHeaders;
@@ -22,7 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.*;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 
 
 public class RPCClient {
@@ -67,7 +69,7 @@ public class RPCClient {
     public byte[] makeRequest(Request req) throws RPCException {
 
         try {
-            URI uri = new URI(config.addressOf(req.service) + req.endpoint);
+            URI uri = new URI(config.getAddressOf(req.service) + req.endpoint);
             System.out.println(uri.toString());
             var httpPost = new HttpPost(uri);
             httpPost.setEntity(new ByteArrayEntity(req.data));
@@ -75,7 +77,7 @@ public class RPCClient {
 
             try (CloseableHttpResponse response = client.execute(httpPost)) {
                 InputStream content = response.getEntity().getContent();
-               // System.out.println(new String(content.readAllBytes()));
+                // System.out.println(new String(content.readAllBytes()));
                 return content.readAllBytes();
             }
         } catch (URISyntaxException e) {
@@ -84,5 +86,10 @@ public class RPCClient {
             throw new RPCException("Byte read error on RPC request", e);
 
         }
+    }
+
+
+    public String getAddressFor(ChiaService cs) {
+        return config.getAddressOf(cs);
     }
 }

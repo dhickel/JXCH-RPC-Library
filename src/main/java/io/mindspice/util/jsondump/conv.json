@@ -1,0 +1,21 @@
+
+{
+  "node_id": "string",
+  "page": 0,
+  "page_count": 0,
+  "total_count": 0,
+  "plots": [
+    {
+      "file_size": 0,
+      "filename": "string",
+      "plot_id": "string",
+      "plot_public_key": "string",
+      "pool_contract_puzzle_hash": "string",
+      "pool_public_key": "string",
+      "size": 32,
+      "time_modified": 0
+    }
+  ],
+  "success": true,
+  "error": "string"
+}

@@ -1,24 +1,18 @@
 package io.mindspice;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-
-import io.mindspice.enums.endpoints.Endpoint;
-import io.mindspice.enums.endpoints.FullNode;
+import io.mindspice.http.FullNodeAPI;
 import io.mindspice.http.RPCClient;
-import io.mindspice.http.requests.FullNodeAPI;
-
-import io.mindspice.schemas.Objects.MempoolItem;
-import io.mindspice.schemas.Objects.SpendBundle;
-import io.mindspice.schemas.fullnode.AdditionsAndRemovals;
-import io.mindspice.schemas.fullnode.BlockCountMetrics;
+import io.mindspice.http.FarmerAPI;
+import io.mindspice.http.SharedAPI;
+import io.mindspice.schemas.ApiResponse;
+import io.mindspice.schemas.object.Output;
 import io.mindspice.util.RPCException;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLOutput;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 public class Main {
@@ -29,7 +23,7 @@ public class Main {
                 NodeConfig.class);
 
         RPCClient rpcClient = new RPCClient(nodeConfig);
-        FullNodeAPI node = new FullNodeAPI(rpcClient);
+        FarmerAPI farmer = new FarmerAPI(rpcClient);
         //0x69f9ac19521afef52745eedf81f000eb55d74a5c4aa493a83721b87ef3c71b1f
 //        System.out.println(node.getCoinRecordsByPuzzleHashes(
 //                Collections.singletonList("0x29fcff2cf974a34fb86d32883e7859bd37266db5f6e6f0042dd8e785327606c3"),
@@ -63,6 +57,18 @@ public class Main {
                 "  \"spend_count\": 1\n" +
                 "}";
 
-        System.out.println(node.getAllMempoolItems());
+
+        // harvesters
+        //  0x34d24ed90f25e00f664eca457f1299ab29f824624f0498a3a624d41e9ba25a43
+        //  0x8185f5b89f0e5bfa329b76fd4ec253d69e1906f3499cb579dc2149b6136265f8
+
+       var node = new FullNodeAPI(rpcClient);
+       node.getAllMempoolTxIds().data().ifPresent((Main::print));
+
+
+    }
+
+    public static void print(Object o) {
+        System.out.println(o);
     }
 }

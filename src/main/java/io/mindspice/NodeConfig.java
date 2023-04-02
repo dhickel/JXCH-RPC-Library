@@ -3,8 +3,6 @@ package io.mindspice;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import io.mindspice.enums.ChiaService;
 
-import static io.mindspice.enums.ChiaService.*;
-
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class NodeConfig {
@@ -58,6 +56,7 @@ public class NodeConfig {
         this.walletKey = b.walletKey;
     }
 
+
     // Needed for jackson
     private NodeConfig() {
     }
@@ -82,7 +81,7 @@ public class NodeConfig {
     }
 
 
-    public String addressOf(ChiaService service) {
+    public String getAddressOf(ChiaService service) {
         String addr = "https://" + address + ":";
         switch (service) {
             case CRAWLER -> addr += crawlerPort;
@@ -95,6 +94,9 @@ public class NodeConfig {
         }
         return addr;
     }
+
+
+    public String getAddress() { return address; }
 
 
     @Override

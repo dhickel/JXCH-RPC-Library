@@ -16,6 +16,8 @@ public enum ChiaService {
         METRICS,
         MEMPOOL,
         FEES,
+        FARMER,
+
 
 
     }

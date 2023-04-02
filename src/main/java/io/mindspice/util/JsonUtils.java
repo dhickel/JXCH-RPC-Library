@@ -16,15 +16,17 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class JsonUtils {
     private static ObjectMapper mapper;
-    private static Map<Class<?>, ObjectReader> readerCache = new ConcurrentHashMap<>(10);
-    private static Map<Class<?>, ObjectWriter> writerCache = new ConcurrentHashMap<>(10);
-    private static Map<TypeReference, ObjectReader> typeRefCache = new ConcurrentHashMap<>(10);
+    private static Map<Class<?>, ObjectReader> readerCache;
+    private static Map<Class<?>, ObjectWriter> writerCache;
+    private static Map<TypeReference, ObjectReader> typeRefCache; // Raw type use is necessary evil for caching
     private static ObjectNode emptyNode;
 
     static {
         mapper = new ObjectMapper();//.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        readerCache  = new ConcurrentHashMap<>(10);
+        writerCache = new ConcurrentHashMap<>(10);
+        typeRefCache = new ConcurrentHashMap<>(10);
         emptyNode = mapper.createObjectNode();
-
     }
 
 
