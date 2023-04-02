@@ -119,13 +119,13 @@ public abstract class JsonUtils {
     }
 
 
-    public static <T> ObjectNode singleNode(String field, T value) {
+    public static <T> ObjectNode newSingleNode(String field, T value) {
         ObjectNode node = mapper.createObjectNode();
         return (node.putPOJO(field, value));
     }
 
 
-    public static <T> byte[] singleNodeAsBytes(String field, T value) throws JsonProcessingException {
+    public static <T> byte[] newSingleNodeAsBytes(String field, T value) throws JsonProcessingException {
         ObjectNode node = mapper.createObjectNode();
         return (mapper.writeValueAsBytes(node.putPOJO(field, value)));
     }
@@ -135,11 +135,11 @@ public abstract class JsonUtils {
         return emptyNode;
     }
 
-    public static String emptyNodeAsString() throws JsonProcessingException {
+    public static String getEmptyNodeAsString() throws JsonProcessingException {
         return mapper.writeValueAsString(emptyNode);
     }
 
-    public static byte[] emptyNodeAsBytes() throws JsonProcessingException {
+    public static byte[] getEmptyNodeAsBytes() throws JsonProcessingException {
         return mapper.writeValueAsBytes(emptyNode);
     }
 

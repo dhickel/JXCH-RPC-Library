@@ -63,7 +63,7 @@ public class Main {
         //  0x8185f5b89f0e5bfa329b76fd4ec253d69e1906f3499cb579dc2149b6136265f8
 
        var node = new FullNodeAPI(rpcClient);
-       node.getAllMempoolTxIds().data().ifPresent((Main::print));
+       farmer.getHarvesterPlotsDuplicates("0x8185f5b89f0e5bfa329b76fd4ec253d69e1906f3499cb579dc2149b6136265f8").data().ifPresent((Main::print));
 
 
     }

@@ -9,7 +9,6 @@ import io.mindspice.schemas.fullnode.*;
 import io.mindspice.schemas.object.*;
 import io.mindspice.util.JsonUtils;
 import io.mindspice.util.RPCException;
-import io.mindspice.util.Utils;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -27,7 +26,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getAdditionsAndRemovalsAsBytes(String headerHash) throws RPCException {
         try {
-            var data = JsonUtils.singleNodeAsBytes("header_hash", headerHash);
+            var data = JsonUtils.newSingleNodeAsBytes("header_hash", headerHash);
             var req = new Request(FullNode.GET_ADDITIONS_AND_REMOVALS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -48,7 +47,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getBlockAsBytes(String headerHash) throws RPCException {
         try {
-            var data = JsonUtils.singleNodeAsBytes("header_hash", headerHash);
+            var data = JsonUtils.newSingleNodeAsBytes("header_hash", headerHash);
             var req = new Request(FullNode.GET_BLOCK, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -69,7 +68,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getBlockCountMetricsAsBytes() throws RPCException {
         try {
-            var data = JsonUtils.emptyNodeAsBytes();
+            var data = JsonUtils.getEmptyNodeAsBytes();
             var req = new Request(FullNode.GET_BLOCK_COUNT_METRICS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -81,9 +80,7 @@ public class FullNodeAPI extends SharedAPI {
     public ApiResponse<BlockCountMetrics> getBlockCountMetrics() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getBlockCountMetricsAsBytes());
-            return newResponse(
-                    jsonNode, "metrics", BlockCountMetrics.class, FullNode.GET_BLOCK_COUNT_METRICS
-            );
+            return newResponse(jsonNode, "metrics", BlockCountMetrics.class, FullNode.GET_BLOCK_COUNT_METRICS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -92,7 +89,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getBlockRecordAsBytes(String headerHash) throws RPCException {
         try {
-            var data = JsonUtils.singleNodeAsBytes("header_hash", headerHash);
+            var data = JsonUtils.newSingleNodeAsBytes("header_hash", headerHash);
             var req = new Request(FullNode.GET_BLOCK_RECORD, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -104,9 +101,7 @@ public class FullNodeAPI extends SharedAPI {
     public ApiResponse<BlockRecord> getBlockRecord(String headerHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getBlockRecordAsBytes(headerHash));
-            return newResponse(
-                    jsonNode, "block_records", BlockRecord.class, FullNode.GET_BLOCK_RECORD
-            );
+            return newResponse(jsonNode, "block_records", BlockRecord.class, FullNode.GET_BLOCK_RECORD);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -115,7 +110,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getBlockRecordByHeightAsBytes(int height) throws RPCException {
         try {
-            var data = JsonUtils.singleNodeAsBytes("height", height);
+            var data = JsonUtils.newSingleNodeAsBytes("height", height);
             var req = new Request(FullNode.GET_BLOCK_RECORD_BY_HEIGHT, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -164,7 +159,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getBlockSpendsAsBytes(String headerHash) throws RPCException {
         try {
-            var data = JsonUtils.singleNodeAsBytes("header_hash", headerHash);
+            var data = JsonUtils.newSingleNodeAsBytes("header_hash", headerHash);
             var req = new Request(FullNode.GET_BLOCK_SPENDS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -205,12 +200,8 @@ public class FullNodeAPI extends SharedAPI {
     public ApiResponse<List<Block>> getBlocks(int start, int end, boolean excludeHeaderHash, boolean excludeReorged)
             throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(
-                    getBlocksAsBytes(start, end, excludeHeaderHash, excludeReorged)
-            );
-            return newResponseList(
-                    jsonNode, "blocks", TypeRefs.BLOCK_LIST, FullNode.GET_BLOCKS
-            );
+            var jsonNode = JsonUtils.readTree(getBlocksAsBytes(start, end, excludeHeaderHash, excludeReorged));
+            return newResponseList(jsonNode, "blocks", TypeRefs.BLOCK_LIST, FullNode.GET_BLOCKS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -219,7 +210,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getRecentSignagePointOrEOSAsByes(String hash, boolean isChallengeHash) throws RPCException {
         try {
-            var data = JsonUtils.singleNode(isChallengeHash ? "challenge_hash" : "sp_hash", hash);
+            var data = JsonUtils.newSingleNode(isChallengeHash ? "challenge_hash" : "sp_hash", hash);
             var req = new Request(FullNode.GET_RECENT_SIGNAGE_POINT_OR_EOS, JsonUtils.writeBytes(data));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -241,7 +232,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getUnfinishedBlockHeadersAsBytes() throws RPCException {
         try {
-            var data = JsonUtils.emptyNodeAsBytes();
+            var data = JsonUtils.getEmptyNodeAsBytes();
             var req = new Request(FullNode.GET_UNFINISHED_BLOCK_HEADERS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -264,7 +255,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getCoinRecordByNameAsBytes(String name) throws RPCException {
         try {
-            var data = JsonUtils.singleNodeAsBytes("name", name);
+            var data = JsonUtils.newSingleNodeAsBytes("name", name);
             var req = new Request(FullNode.GET_COIN_RECORD_BY_NAME, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -448,7 +439,6 @@ public class FullNodeAPI extends SharedAPI {
             var data = new JsonUtils.ObjectBuilder()
                     .put("coin_id", coinId)
                     .put("height", height)
-
                     .buildBytes();
             var req = new Request(FullNode.GET_PUZZLE_AND_SOLUTION, data);
             return client.makeRequest(req);
@@ -461,9 +451,7 @@ public class FullNodeAPI extends SharedAPI {
     public ApiResponse<CoinRecord> getPuzzleAndSolutionAs(String coinId, int height) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getPuzzleAndSolutionAsBytes(coinId, height));
-            return newResponse(
-                    jsonNode, "coin_solution", CoinRecord.class, FullNode.GET_PUZZLE_AND_SOLUTION
-            );
+            return newResponse(jsonNode, "coin_solution", CoinRecord.class, FullNode.GET_PUZZLE_AND_SOLUTION);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -472,7 +460,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] pushTxAsBytes(SpendBundle spendBundle) throws RPCException {
         try {
-            var data = JsonUtils.singleNodeAsBytes("spend_bundle", spendBundle);
+            var data = JsonUtils.newSingleNodeAsBytes("spend_bundle", spendBundle);
             var req = new Request(FullNode.PUSH_TX, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -494,7 +482,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getBlockChainStateAsBytes() throws RPCException {
         try {
-            var data = JsonUtils.emptyNodeAsBytes();
+            var data = JsonUtils.getEmptyNodeAsBytes();
             var req = new Request(FullNode.GET_BLOCKCHAIN_STATE, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -517,7 +505,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getNetworkInfoAsBytes() throws RPCException {
         try {
-            var data = JsonUtils.emptyNodeAsBytes();
+            var data = JsonUtils.getEmptyNodeAsBytes();
             var req = new Request(FullNode.GET_NETWORK_INFO, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -571,7 +559,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getAllMempoolItemsAsBytes() throws RPCException {
         try {
-            var data = JsonUtils.emptyNodeAsBytes();
+            var data = JsonUtils.getEmptyNodeAsBytes();
             var req = new Request(FullNode.GET_ALL_MEMPOOL_ITEMS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -586,7 +574,6 @@ public class FullNodeAPI extends SharedAPI {
             return newResponseMap(
                     jsonNode, "mempool_items", TypeRefs.MEMPOOL_MAP, FullNode.GET_ALL_MEMPOOL_ITEMS
             );
-
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -595,7 +582,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getAllMempoolTxIdsAsBytes() throws RPCException {
         try {
-            var data = JsonUtils.emptyNodeAsBytes();
+            var data = JsonUtils.getEmptyNodeAsBytes();
             var req = new Request(FullNode.GET_ALL_MEMPOOL_TX_IDS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -618,7 +605,7 @@ public class FullNodeAPI extends SharedAPI {
 
     public byte[] getMempoolItemByTxIdAsBytes(String txId) throws RPCException {
         try {
-            var data = JsonUtils.singleNodeAsBytes("tx_id", txId);
+            var data = JsonUtils.newSingleNodeAsBytes("tx_id", txId);
             var req = new Request(FullNode.GET_MEMPOOL_ITEM_BY_TX_ID, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -630,9 +617,7 @@ public class FullNodeAPI extends SharedAPI {
     public ApiResponse<MempoolItem> getMempoolItemByTxId(String txId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getMempoolItemByTxIdAsBytes(txId));
-            return newResponse(
-                    jsonNode, "mempool_items", MempoolItem.class, FullNode.GET_ALL_MEMPOOL_ITEMS
-            );
+            return newResponse(jsonNode, "mempool_items", MempoolItem.class, FullNode.GET_ALL_MEMPOOL_ITEMS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -688,9 +673,7 @@ public class FullNodeAPI extends SharedAPI {
     public ApiResponse<FeeEstimate> getFeeEstimateForCost(long cost, List<Integer> targetTimes,
             int spendCount) throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(getFeeEstimateForCostAsBytes(
-                    cost, targetTimes, spendCount)
-            );
+            var jsonNode = JsonUtils.readTree(getFeeEstimateForCostAsBytes(cost, targetTimes, spendCount));
             return newResponse(jsonNode, FeeEstimate.class, FullNode.GET_FEE_ESTIMATE);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -698,7 +681,6 @@ public class FullNodeAPI extends SharedAPI {
     }
 
     // Note fee estimate can also take spend_type, but it seems to not be used atm
-
 }
 
 

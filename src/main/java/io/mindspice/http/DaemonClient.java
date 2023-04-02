@@ -23,7 +23,7 @@ public class DaemonClient {
 
     public byte[] get_status_bytes() throws RPCException {
         try {
-            var req = new Request(Daemon.GET_STATUS, JsonUtils.emptyNodeAsBytes());
+            var req = new Request(Daemon.GET_STATUS, JsonUtils.getEmptyNodeAsBytes());
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);

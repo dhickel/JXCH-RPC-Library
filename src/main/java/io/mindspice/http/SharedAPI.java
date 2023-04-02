@@ -81,11 +81,25 @@ public abstract class SharedAPI {
     }
 
 
-    protected <T,U> ApiResponse<Map<T,U>> newResponseMap(JsonNode jsonNode, String dataField,
-            TypeReference<Map<T,U>> typeRef, Endpoint endpoint) throws IOException {
+    protected <T> ApiResponse<List<T>> newResponseList(JsonNode jsonNode, List<T> list,
+            Endpoint endpoint) throws IOException {
 
         var success = jsonNode.get("success").asBoolean();
-        Optional<Map<T,U>> data;
+        Optional<List<T>> data = Optional.of(Collections.unmodifiableList(list));
+        return new ApiResponse<>(
+                data,
+                success,
+                jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
+                address + endpoint.getPath()
+        );
+    }
+
+
+    protected <T, U> ApiResponse<Map<T, U>> newResponseMap(JsonNode jsonNode, String dataField,
+            TypeReference<Map<T, U>> typeRef, Endpoint endpoint) throws IOException {
+
+        var success = jsonNode.get("success").asBoolean();
+        Optional<Map<T, U>> data;
         if (success) {
             var map = JsonUtils.readJson(jsonNode.get(dataField).traverse(), typeRef);
             data = Optional.of(Collections.unmodifiableMap(map));

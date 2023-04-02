@@ -2,17 +2,16 @@ package io.mindspice.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.mindspice.enums.ChiaService;
+import io.mindspice.enums.endpoints.Endpoint;
 import io.mindspice.enums.endpoints.Farmer;
 import io.mindspice.schemas.ApiResponse;
 import io.mindspice.schemas.TypeRefs;
 import io.mindspice.schemas.farmer.*;
 import io.mindspice.util.JsonUtils;
 import io.mindspice.util.RPCException;
-import io.mindspice.util.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -24,8 +23,33 @@ public class FarmerAPI extends SharedAPI {
     }
 
 
-    public byte[] getHarvesterPlotsDuplicatesAsBytes(String nodeId, List<String> filter, int page,
-            int pageSize, boolean reverse) throws RPCException {
+    // Shared method for reading plot pages
+    private ApiResponse<List<String>> processPlotPages(String nodeId, List<String> filter, int pageSize,
+            boolean reverse, Endpoint endpoint) throws RPCException {
+        try {
+            var responseBytes = makePlotRequest(nodeId, filter, 0, pageSize, reverse, endpoint);
+            var jsonNode = JsonUtils.readTree(responseBytes);
+            if (!jsonNode.get("success").asBoolean()) { return newFailedResponse(jsonNode, endpoint); }
+
+            List<String> plotList = new ArrayList<>(
+                    JsonUtils.readJson(jsonNode.get("plots").traverse(), TypeRefs.STRING_LIST)
+            );
+
+            for (int i = jsonNode.get("page").asInt(); i < jsonNode.get("page_count").asInt(); ++i) {
+                var nextBytes = makePlotRequest(nodeId, filter, i, pageSize, reverse, endpoint);
+                var nextNode = JsonUtils.readTree(nextBytes);
+                plotList.addAll(JsonUtils.readJson(nextNode.get("plots").traverse(), TypeRefs.STRING_LIST));
+            }
+            return newResponseList(jsonNode, plotList, endpoint);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+
+    // Shared method for making plot request
+    private byte[] makePlotRequest(String nodeId, List<String> filter, int page, int pageSize,
+            boolean reverse, Endpoint endpoint) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("node_id", nodeId)
@@ -34,7 +58,7 @@ public class FarmerAPI extends SharedAPI {
                     .put("filter", filter)
                     .put("reverse", reverse)
                     .buildBytes();
-            var req = new Request(Farmer.GET_HARVESTER_PLOTS_DUPLICATES, data);
+            var req = new Request(endpoint, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -42,31 +66,19 @@ public class FarmerAPI extends SharedAPI {
     }
 
 
-    public List<String> getHarvesterPlotsDuplicates(String nodeId, List<String> filter, int pageSize,
-            boolean reverse) throws RPCException {
-        try {
-            var jsonNode = JsonUtils.readTree(
-                    getHarvesterPlotsDuplicatesAsBytes(nodeId, filter, 0, pageSize, reverse)
-            );
-            Utils.checkRpcSuccess(address, Farmer.GET_HARVESTER_PLOTS_DUPLICATES, jsonNode);
-
-            var dupeList = new ArrayList<String>(JsonUtils.readJson(jsonNode.get("plots").traverse(), TypeRefs.STRING_LIST));
-            for (int i = jsonNode.get("page").asInt(); i < jsonNode.get("page_count").asInt(); ++i) {
-                var nextNode = JsonUtils.readTree(
-                        getHarvesterPlotsDuplicatesAsBytes(nodeId, filter, i, pageSize, reverse)
-                );
-                Utils.checkRpcSuccess(address, Farmer.GET_HARVESTER_PLOTS_DUPLICATES, nextNode);
-                dupeList.addAll(JsonUtils.readJson(nextNode.get("plots").traverse(), TypeRefs.STRING_LIST));
-            }
-
-            return Collections.unmodifiableList(dupeList);
-        } catch (IOException e) {
-            throw new RPCException("Error reading response JSON", e);
-        }
+    public byte[] getHarvesterPlotsDuplicatesAsBytes(String nodeId, List<String> filter, int page,
+            int pageSize, boolean reverse) throws RPCException {
+        return makePlotRequest(nodeId, filter, page, pageSize, reverse, Farmer.GET_HARVESTER_PLOTS_DUPLICATES);
     }
 
 
-    public List<String> getHarvesterPlotsDuplicates(String nodeId)
+    public ApiResponse<List<String>> getHarvesterPlotsDuplicates(String nodeId, List<String> filter, int pageSize,
+            boolean reverse) throws RPCException {
+        return processPlotPages(nodeId, filter, pageSize, reverse, Farmer.GET_HARVESTER_PLOTS_DUPLICATES);
+    }
+
+
+    public ApiResponse<List<String>> getHarvesterPlotsDuplicates(String nodeId)
             throws RPCException {
         return getHarvesterPlotsDuplicates(nodeId, List.of(), 500, false);
     }
@@ -74,47 +86,17 @@ public class FarmerAPI extends SharedAPI {
 
     public byte[] getHarvesterPlotsInvalidAsBytes(String nodeId, List<String> filter, int page, int pageSize,
             boolean reverse) throws RPCException {
-        try {
-            var data = new JsonUtils.ObjectBuilder()
-                    .put("node_id", nodeId)
-                    .put("page", page)
-                    .put("page_size", pageSize)
-                    .put("filter", filter)
-                    .put("reverse", reverse)
-                    .buildBytes();
-            var req = new Request(Farmer.GET_HARVESTER_PLOTS_INVALID, data);
-            return client.makeRequest(req);
-        } catch (JsonProcessingException e) {
-            throw new RPCException("Error writing request JSON", e);
-        }
+        return makePlotRequest(nodeId, filter, page, pageSize, reverse, Farmer.GET_HARVESTER_PLOTS_INVALID);
     }
 
 
-    public List<String> getHarvesterPlotsInvalid(String nodeId, List<String> filter, int pageSize,
+    public ApiResponse<List<String>> getHarvesterPlotsInvalid(String nodeId, List<String> filter, int pageSize,
             boolean reverse) throws RPCException {
-        try {
-            var jsonNode = JsonUtils.readTree(
-                    getHarvesterPlotsInvalidAsBytes(nodeId, filter, 0, pageSize, reverse)
-            );
-            Utils.checkRpcSuccess(address, Farmer.GET_HARVESTER_PLOTS_INVALID, jsonNode);
-
-            var dupeList = new ArrayList<String>(JsonUtils.readJson(jsonNode.get("plots").traverse(), TypeRefs.STRING_LIST));
-            for (int i = jsonNode.get("page").asInt(); i < jsonNode.get("page_count").asInt(); ++i) {
-                var nextNode = JsonUtils.readTree(
-                        getHarvesterPlotsDuplicatesAsBytes(nodeId, filter, i, pageSize, reverse)
-                );
-                Utils.checkRpcSuccess(address, Farmer.GET_HARVESTER_PLOTS_INVALID, nextNode);
-                dupeList.addAll(JsonUtils.readJson(nextNode.get("plots").traverse(), TypeRefs.STRING_LIST));
-            }
-
-            return Collections.unmodifiableList(dupeList);
-        } catch (IOException e) {
-            throw new RPCException("Error reading response JSON", e);
-        }
+        return processPlotPages(nodeId, filter, pageSize, reverse, Farmer.GET_HARVESTER_PLOTS_INVALID);
     }
 
 
-    public List<String> getHarvesterPlotsInvalid(String nodeId)
+    public ApiResponse<List<String>> getHarvesterPlotsInvalid(String nodeId)
             throws RPCException {
         return getHarvesterPlotsDuplicates(nodeId, List.of(), 500, false);
     }
@@ -122,47 +104,17 @@ public class FarmerAPI extends SharedAPI {
 
     public byte[] getHarvesterPlotsKeysMissingAsBytes(String nodeId, List<String> filter, int page, int pageSize,
             boolean reverse) throws RPCException {
-        try {
-            var data = new JsonUtils.ObjectBuilder()
-                    .put("node_id", nodeId)
-                    .put("page", page)
-                    .put("page_size", pageSize)
-                    .put("filter", filter)
-                    .put("reverse", reverse)
-                    .buildBytes();
-            var req = new Request(Farmer.GET_HARVESTER_PLOTS_KEYS_MISSING, data);
-            return client.makeRequest(req);
-        } catch (JsonProcessingException e) {
-            throw new RPCException("Error writing request JSON", e);
-        }
+        return makePlotRequest(nodeId, filter, page, pageSize, reverse, Farmer.GET_HARVESTER_PLOTS_KEYS_MISSING);
     }
 
 
-    public List<String> getHarvesterPlotsKeysMissing(String nodeId, List<String> filter, int pageSize,
+    public ApiResponse<List<String>> getHarvesterPlotsKeysMissing(String nodeId, List<String> filter, int pageSize,
             boolean reverse) throws RPCException {
-        try {
-            var jsonNode = JsonUtils.readTree(
-                    getHarvesterPlotsKeysMissingAsBytes(nodeId, filter, 0, pageSize, reverse)
-            );
-            Utils.checkRpcSuccess(address, Farmer.GET_HARVESTER_PLOTS_KEYS_MISSING, jsonNode);
-
-            var dupeList = new ArrayList<String>(JsonUtils.readJson(jsonNode.get("plots").traverse(), TypeRefs.STRING_LIST));
-            for (int i = jsonNode.get("page").asInt(); i < jsonNode.get("page_count").asInt(); ++i) {
-                var nextNode = JsonUtils.readTree(
-                        getHarvesterPlotsDuplicatesAsBytes(nodeId, filter, i, pageSize, reverse)
-                );
-                Utils.checkRpcSuccess(address, Farmer.GET_HARVESTER_PLOTS_KEYS_MISSING, nextNode);
-                dupeList.addAll(JsonUtils.readJson(nextNode.get("plots").traverse(), TypeRefs.STRING_LIST));
-            }
-
-            return Collections.unmodifiableList(dupeList);
-        } catch (IOException e) {
-            throw new RPCException("Error reading response JSON", e);
-        }
+        return processPlotPages(nodeId, filter, pageSize, reverse, Farmer.GET_HARVESTER_PLOTS_KEYS_MISSING);
     }
 
 
-    public List<String> getHarvesterPlotsKeysMissing(String nodeId)
+    public ApiResponse<List<String>> getHarvesterPlotsKeysMissing(String nodeId)
             throws RPCException {
         return getHarvesterPlotsKeysMissing(nodeId, List.of(), 500, false);
     }
@@ -170,47 +122,17 @@ public class FarmerAPI extends SharedAPI {
 
     public byte[] getHarvesterPlotsValidAsBytes(String nodeId, List<String> filter, int page, int pageSize,
             boolean reverse) throws RPCException {
-        try {
-            var data = new JsonUtils.ObjectBuilder()
-                    .put("node_id", nodeId)
-                    .put("page", page)
-                    .put("page_size", pageSize)
-                    .put("filter", filter)
-                    .put("reverse", reverse)
-                    .buildBytes();
-            var req = new Request(Farmer.GET_HARVESTER_PLOTS_VALID, data);
-            return client.makeRequest(req);
-        } catch (JsonProcessingException e) {
-            throw new RPCException("Error writing request JSON", e);
-        }
+        return makePlotRequest(nodeId, filter, page, pageSize, reverse, Farmer.GET_HARVESTER_PLOTS_VALID);
     }
 
 
-    public List<Plot> getHarvesterPlotsValid(String nodeId, List<String> filter, int pageSize,
+    public ApiResponse<List<String>> getHarvesterPlotsValid(String nodeId, List<String> filter, int pageSize,
             boolean reverse) throws RPCException {
-        try {
-            var jsonNode = JsonUtils.readTree(
-                    getHarvesterPlotsValidAsBytes(nodeId, filter, 0, pageSize, reverse)
-            );
-            Utils.checkRpcSuccess(address, Farmer.GET_HARVESTER_PLOTS_VALID, jsonNode);
-
-            var dupeList = new ArrayList<Plot>(JsonUtils.readJson(jsonNode.get("plots").traverse(), TypeRefs.PLOT_LIST));
-            for (int i = jsonNode.get("page").asInt(); i < jsonNode.get("page_count").asInt(); ++i) {
-                var nextNode = JsonUtils.readTree(
-                        getHarvesterPlotsDuplicatesAsBytes(nodeId, filter, i, pageSize, reverse)
-                );
-                Utils.checkRpcSuccess(address, Farmer.GET_HARVESTER_PLOTS_VALID, nextNode);
-                dupeList.addAll(JsonUtils.readJson(nextNode.get("plots").traverse(), TypeRefs.PLOT_LIST));
-            }
-
-            return Collections.unmodifiableList(dupeList);
-        } catch (IOException e) {
-            throw new RPCException("Error reading response JSON", e);
-        }
+        return processPlotPages(nodeId, filter, pageSize, reverse, Farmer.GET_HARVESTER_PLOTS_VALID);
     }
 
 
-    public List<Plot> getHarvesterPlotsValid(String nodeId)
+    public ApiResponse<List<String>> getHarvesterPlotsValid(String nodeId)
             throws RPCException {
         return getHarvesterPlotsValid(nodeId, List.of(), 500, false);
     }
@@ -218,7 +140,7 @@ public class FarmerAPI extends SharedAPI {
 
     public byte[] getHarvestersAsBytes() throws RPCException {
         try {
-            var data = JsonUtils.emptyNodeAsBytes();
+            var data = JsonUtils.getEmptyNodeAsBytes();
             var req = new Request(Farmer.GET_HARVESTERS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -227,12 +149,11 @@ public class FarmerAPI extends SharedAPI {
     }
 
 
-    public List<HarvesterDetails> getHarvesters() throws RPCException {
+    public ApiResponse<List<HarvesterDetails>> getHarvesters() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getHarvestersAsBytes());
-            Utils.checkRpcSuccess(address, Farmer.GET_HARVESTERS, jsonNode);
-            return Collections.unmodifiableList(
-                    JsonUtils.readJson(jsonNode.get("harvesters").traverse(), TypeRefs.HARVESTER_DETAILS_LIST)
+            return newResponseList(
+                    jsonNode, "harvesters", TypeRefs.HARVESTER_DETAILS_LIST, Farmer.GET_HARVESTERS
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -242,7 +163,7 @@ public class FarmerAPI extends SharedAPI {
 
     public byte[] getHarvestersSummaryAsBytes() throws RPCException {
         try {
-            var data = JsonUtils.emptyNodeAsBytes();
+            var data = JsonUtils.getEmptyNodeAsBytes();
             var req = new Request(Farmer.GET_HARVESTERS_SUMMARY, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -251,12 +172,11 @@ public class FarmerAPI extends SharedAPI {
     }
 
 
-    public List<HarvesterSummary> getHarvestersSummary() throws RPCException {
+    public ApiResponse<List<HarvesterSummary>> getHarvestersSummary() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getHarvestersSummaryAsBytes());
-            Utils.checkRpcSuccess(address, Farmer.GET_HARVESTERS_SUMMARY, jsonNode);
-            return Collections.unmodifiableList(
-                    JsonUtils.readJson(jsonNode.get("harvesters").traverse(), TypeRefs.HARVESTER_SUMMARY_LIST)
+            return newResponseList(
+                    jsonNode, "harvesters", TypeRefs.HARVESTER_SUMMARY_LIST, Farmer.GET_HARVESTERS_SUMMARY
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -266,7 +186,7 @@ public class FarmerAPI extends SharedAPI {
 
     public byte[] getPoolLoginLinkAsBytes(String launcherId) throws RPCException {
         try {
-            var data = JsonUtils.singleNodeAsBytes("launcher_id", launcherId);
+            var data = JsonUtils.newSingleNodeAsBytes("launcher_id", launcherId);
             var req = new Request(Farmer.GET_POOL_LOGIN_LINK, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -275,11 +195,10 @@ public class FarmerAPI extends SharedAPI {
     }
 
 
-    public String getPoolLoginLink(String launcherId) throws RPCException {
+    public ApiResponse<String> getPoolLoginLink(String launcherId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getPoolLoginLinkAsBytes(launcherId));
-            Utils.checkRpcSuccess(address, Farmer.GET_POOL_LOGIN_LINK, jsonNode);
-            return jsonNode.get("login_link").asText();
+            return newResponse(jsonNode, "login_link", String.class, Farmer.GET_POOL_LOGIN_LINK);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -288,7 +207,7 @@ public class FarmerAPI extends SharedAPI {
 
     public byte[] getPoolStateAsBytes() throws RPCException {
         try {
-            var data = JsonUtils.emptyNodeAsBytes();
+            var data = JsonUtils.getEmptyNodeAsBytes();
             var req = new Request(Farmer.GET_POOL_STATE, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -297,13 +216,11 @@ public class FarmerAPI extends SharedAPI {
     }
 
 
-    public List<PoolState> getPoolState() throws RPCException {
+    public ApiResponse<List<PoolState>> getPoolState() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getPoolStateAsBytes());
-            System.out.println(JsonUtils.writeString(jsonNode));
-            Utils.checkRpcSuccess(address, Farmer.GET_POOL_STATE, jsonNode);
-            return Collections.unmodifiableList(
-                    JsonUtils.readJson(jsonNode.get("pool_state").traverse(), TypeRefs.POOL_STATE_LIST)
+            return newResponseList(
+                    jsonNode, "pool_state", TypeRefs.POOL_STATE_LIST, Farmer.GET_POOL_STATE
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -329,11 +246,8 @@ public class FarmerAPI extends SharedAPI {
     public ApiResponse<RewardTarget> getRewardTargets(boolean searchForPrivateKey, int derivationDepth)
             throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(
-                    getRewardTargetsAsBytes(searchForPrivateKey, derivationDepth)
-            );
-            //return new ApiResponse<>(JsonUtils.readJson(jsonNode, RewardTarget.class), "", jsonNode.get("success").asBoolean(), "");
-            return newResponse(jsonNode, RewardTarget.class, Farmer.SET_REWARD_TARGETS);
+            var jsonNode = JsonUtils.readTree(getRewardTargetsAsBytes(searchForPrivateKey, derivationDepth));
+            return newResponse(jsonNode, RewardTarget.class, Farmer.GET_REWARD_TARGETS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -354,25 +268,21 @@ public class FarmerAPI extends SharedAPI {
     }
 
 
-    public RewardTarget setRewardTargets(String farmerTarget, String poolTarget)
+    public ApiResponse<RewardTarget> setRewardTargets(String farmerTarget, String poolTarget)
             throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(setRewardTargetsAsBytes(farmerTarget, poolTarget));
-            Utils.checkRpcSuccess(address, Farmer.SET_REWARD_TARGETS, jsonNode);
-            return JsonUtils.readJson(jsonNode, RewardTarget.class);
+            return newResponse(jsonNode, RewardTarget.class, Farmer.SET_REWARD_TARGETS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
     }
 
 
-    public byte[] getSignagePointAsBytes(String farmerTarget, String poolTarget) throws RPCException {
+    public byte[] getSignagePointAsBytes(String spHash) throws RPCException {
         try {
-            var data = new JsonUtils.ObjectBuilder()
-                    .put("farmer_target", farmerTarget)
-                    .put("pool_target", poolTarget)
-                    .buildBytes();
-            var req = new Request(Farmer.SET_REWARD_TARGETS, data);
+            var data = JsonUtils.newSingleNodeAsBytes("sp_hash", spHash);
+            var req = new Request(Farmer.GET_SIGNAGE_POINT, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -380,19 +290,14 @@ public class FarmerAPI extends SharedAPI {
     }
 
 
-    public RewardTarget getSignagePoint(String farmerTarget, String poolTarget)
+    public ApiResponse<SignagePointBundle> getSignagePoint(String spHash)
             throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(
-                    getSignagePointAsBytes(farmerTarget, poolTarget)
-            );
+            var jsonNode = JsonUtils.readTree(getSignagePointAsBytes(spHash));
             System.out.println(JsonUtils.writeString(jsonNode));
-            Utils.checkRpcSuccess(address, Farmer.SET_REWARD_TARGETS, jsonNode);
-            return JsonUtils.readJson(jsonNode, RewardTarget.class);
+            return newResponse(jsonNode, SignagePointBundle.class, Farmer.GET_SIGNAGE_POINT);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
     }
-
-
 }
