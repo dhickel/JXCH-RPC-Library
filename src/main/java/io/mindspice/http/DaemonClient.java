@@ -16,14 +16,13 @@ public class DaemonClient {
         client = rpcClient;
     }
 
-
     public static Request exit() {
         return null;
     }
 
     public byte[] get_status_bytes() throws RPCException {
         try {
-            var req = new Request(Daemon.GET_STATUS, JsonUtils.getEmptyNodeAsBytes());
+            var req = new Request(Daemon.GET_STATUS, JsonUtils.newEmptyNodeAsBytes());
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);

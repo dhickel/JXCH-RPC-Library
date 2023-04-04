@@ -20,12 +20,10 @@ public abstract class SharedAPI {
     protected final RPCClient client;
     protected final String address;
 
-
     protected SharedAPI(RPCClient client, ChiaService chiaService) {
         this.client = client;
         this.address = client.getAddressFor(chiaService);
     }
-
 
     protected <T> ApiResponse<T> newResponse(JsonNode jsonNode, String dataField, Class<T> type,
             Endpoint endpoint) throws IOException {
@@ -39,10 +37,10 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath()
+                address + endpoint.getPath(),
+                endpoint
         );
     }
-
 
     protected <T> ApiResponse<T> newResponse(JsonNode jsonNode, Class<T> type,
             Endpoint endpoint) throws IOException {
@@ -56,10 +54,10 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath()
+                address + endpoint.getPath(),
+                endpoint
         );
     }
-
 
     protected <T> ApiResponse<List<T>> newResponseList(JsonNode jsonNode, String dataField,
             TypeReference<List<T>> typeRef, Endpoint endpoint) throws IOException {
@@ -76,10 +74,10 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath()
+                address + endpoint.getPath(),
+                endpoint
         );
     }
-
 
     protected <T> ApiResponse<List<T>> newResponseList(JsonNode jsonNode, List<T> list,
             Endpoint endpoint) throws IOException {
@@ -90,10 +88,10 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath()
+                address + endpoint.getPath(),
+                endpoint
         );
     }
-
 
     protected <T, U> ApiResponse<Map<T, U>> newResponseMap(JsonNode jsonNode, String dataField,
             TypeReference<Map<T, U>> typeRef, Endpoint endpoint) throws IOException {
@@ -110,27 +108,36 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath()
+                address + endpoint.getPath(),
+                endpoint
         );
     }
-
 
     protected <T> ApiResponse<T> newResponse(T object, Endpoint endpoint) throws IOException {
         return new ApiResponse<>(
                 Optional.of(object),
                 true,
                 "",
-                address + endpoint.getPath()
+                address + endpoint.getPath(),
+                endpoint
         );
     }
-
 
     protected <T> ApiResponse<T> newFailedResponse(JsonNode jsonNode, Endpoint endpoint) {
         return new ApiResponse<>(
                 Optional.empty(),
                 false,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath()
+                address + endpoint.getPath(),
+                endpoint
         );
     }
+
+//    protected <T> ApiResponse<T> newBasicResponse(JsonNode jsonNode, Endpoint endpoint) {
+//        return new ApiResponse<>(
+//                jsonNode.get("success").asBoolean(),
+//                jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
+//                address + endpoint.getPath()
+//        );
+//    }
 }

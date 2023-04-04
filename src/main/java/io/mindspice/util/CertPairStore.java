@@ -19,7 +19,6 @@ import java.security.cert.CertificateFactory;
 public class CertPairStore {
     private final KeyStore ks;
 
-
     public CertPairStore() throws IllegalStateException {
         try {
             ks = KeyStore.getInstance("JKS");
@@ -29,15 +28,12 @@ public class CertPairStore {
         }
     }
 
-
     public KeyStore getKeyStore() { return ks; }
-
 
     public void addKey(String alias, String[] certPaths)
             throws IllegalStateException, IllegalArgumentException {
         addKey(alias, certPaths[0], certPaths[1]);
     }
-
 
     public void addKey(String alias, String certPath, String keyPath)
             throws IllegalStateException, IllegalArgumentException {
@@ -62,7 +58,6 @@ public class CertPairStore {
             throw new IllegalStateException("Object state invalid, no keystore", e); // Should never happen
         }
     }
-
 
     private PrivateKey readPrivateKeyFromFile(Path keyPath) throws IOException {
         try (FileReader fileReader = new FileReader(keyPath.toFile());

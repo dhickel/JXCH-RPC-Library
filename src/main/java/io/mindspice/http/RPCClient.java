@@ -31,7 +31,6 @@ public class RPCClient {
     private CloseableHttpClient client;
     private NodeConfig config;
 
-
     public RPCClient(NodeConfig config) throws IllegalStateException {
         this.config = config;
         var pairStore = new CertPairStore();
@@ -65,11 +64,10 @@ public class RPCClient {
         }
     }
 
-
     public byte[] makeRequest(Request req) throws RPCException {
 
         try {
-            URI uri = new URI(config.getAddressOf(req.service) + req.endpoint);
+            var uri = new URI(config.getAddressOf(req.service) + req.endpoint);
             System.out.println(uri.toString());
             var httpPost = new HttpPost(uri);
             httpPost.setEntity(new ByteArrayEntity(req.data));
@@ -87,7 +85,6 @@ public class RPCClient {
 
         }
     }
-
 
     public String getAddressFor(ChiaService cs) {
         return config.getAddressOf(cs);
