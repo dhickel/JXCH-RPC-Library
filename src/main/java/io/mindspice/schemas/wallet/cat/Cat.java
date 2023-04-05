@@ -1,4 +1,4 @@
-package io.mindspice.schemas.wallet;
+package io.mindspice.schemas.wallet.cat;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

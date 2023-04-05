@@ -1,7 +1,6 @@
-package io.mindspice.schemas.wallet;
+package io.mindspice.schemas.wallet.offers;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

@@ -15,6 +15,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -25,6 +26,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.Arrays;
 
 
 public class RPCClient {
@@ -73,11 +75,20 @@ public class RPCClient {
             httpPost.setEntity(new ByteArrayEntity(req.data));
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 
+            System.out.println("Request method: " + httpPost.getMethod());
+            System.out.println("Request URI: " + httpPost.getURI());
+            System.out.println("Request headers: " + Arrays.toString(httpPost.getAllHeaders()));
+            System.out.println("Request payload: " + EntityUtils.toString(httpPost.getEntity()));
+
             try (CloseableHttpResponse response = client.execute(httpPost)) {
                 InputStream content = response.getEntity().getContent();
-                // System.out.println(new String(content.readAllBytes()));
-                return content.readAllBytes();
+                byte[] bytes = content.readAllBytes();
+                System.out.println(new String(bytes));
+                return bytes;
+                //return content.readAllBytes();
             }
+
+
         } catch (URISyntaxException e) {
             throw new RPCException("URI error on RPC request", e);
         } catch (IOException e) {

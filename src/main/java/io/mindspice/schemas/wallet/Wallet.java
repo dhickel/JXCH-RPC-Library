@@ -1,64 +1,35 @@
 package io.mindspice.schemas.wallet;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.mindspice.schemas.object.Coin;
 
-import java.util.Objects;
-import java.util.StringJoiner;
-
-
-public class Wallet {
-    @JsonProperty("type")
-    private final int type;
-    @JsonProperty("wallet_id")
-    private final int walletId;
-    @JsonProperty("success")
-    private final boolean success;
+import java.util.Collections;
+import java.util.List;
 
 
-    public Wallet(int type, int walletId, boolean success) {
-        this.type = type;
-        this.walletId = walletId;
-        this.success = success;
-    }
+public record Wallet(
+	@JsonProperty("data") String data,
+	@JsonProperty("name") String name,
+	@JsonProperty("id") int id,
+	@JsonProperty("type") int type
+) {
 
-
-    public int type() {
-        return type;
-    }
-
-
-    public int walletId() {
-        return walletId;
-    }
-
-
-    public boolean success() {
-        return success;
-    }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Wallet wallet = (Wallet) o;
-        return type == wallet.type && walletId == wallet.walletId && success == wallet.success;
-    }
-
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, walletId, success);
-    }
-
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Wallet.class.getSimpleName() + "[", "]")
-                .add("type=" + type)
-                .add("walletId=" + walletId)
-                .add("success=" + success)
-                .toString();
-    }
+	public record Data(
+			@JsonProperty("did_id") String didId,
+			@JsonProperty("temp_pubkey") String tempPubkey,
+			@JsonProperty("metadata") String metadata,
+			@JsonProperty("backup_ids") List<Object> backupIds,
+			@JsonProperty("current_inner") String currentInner,
+			@JsonProperty("temp_coin") Coin tempCoin,
+			@JsonProperty("sent_recovery_transaction") boolean sentRecoveryTransaction,
+			@JsonProperty("num_of_backup_ids_needed") int numOfBackupIdsNeeded,
+			@JsonProperty("parent_info") List<List<String>> parentInfo,
+			@JsonProperty("origin_coin") Coin originCoin,
+			@JsonProperty("temp_puzhash") String tempPuzhash
+	) {
+		public Data {
+			backupIds = backupIds() != null ? Collections.unmodifiableList(backupIds) : List.of();
+			parentInfo = parentInfo() != null ? Collections.unmodifiableList(parentInfo) : List.of();
+		}
+	}
 }
-

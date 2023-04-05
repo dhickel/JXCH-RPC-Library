@@ -1,4 +1,4 @@
-package io.mindspice.schemas.Harvester;
+package io.mindspice.schemas.harvester;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.mindspice.schemas.farmer.Plot;

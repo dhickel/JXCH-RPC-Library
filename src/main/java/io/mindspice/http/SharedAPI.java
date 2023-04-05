@@ -1,12 +1,10 @@
 package io.mindspice.http;
 
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.mindspice.enums.ChiaService;
 import io.mindspice.enums.endpoints.Endpoint;
 import io.mindspice.schemas.ApiResponse;
-import io.mindspice.schemas.TypeRefs;
 import io.mindspice.util.JsonUtils;
 
 import java.io.IOException;
@@ -18,11 +16,11 @@ import java.util.Optional;
 
 public abstract class SharedAPI {
     protected final RPCClient client;
-    protected final String address;
+    protected final String config_address;
 
     protected SharedAPI(RPCClient client, ChiaService chiaService) {
         this.client = client;
-        this.address = client.getAddressFor(chiaService);
+        this.config_address = client.getAddressFor(chiaService);
     }
 
     protected <T> ApiResponse<T> newResponse(JsonNode jsonNode, String dataField, Class<T> type,
@@ -37,10 +35,30 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath(),
+                config_address + endpoint.getPath(),
                 endpoint
         );
     }
+
+    protected  ApiResponse<JsonNode> newResponseNode(JsonNode jsonNode, String dataField,
+            Endpoint endpoint) throws IOException {
+
+        var success = jsonNode.get("success").asBoolean();
+        Optional<JsonNode> data = success
+                ? Optional.ofNullable(jsonNode.get(dataField))
+                : Optional.empty();
+
+        return new ApiResponse<>(
+                data,
+                success,
+                jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
+                config_address + endpoint.getPath(),
+                endpoint
+        );
+    }
+
+
+
 
     protected <T> ApiResponse<T> newResponse(JsonNode jsonNode, Class<T> type,
             Endpoint endpoint) throws IOException {
@@ -54,7 +72,7 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath(),
+                config_address + endpoint.getPath(),
                 endpoint
         );
     }
@@ -74,7 +92,7 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath(),
+                config_address + endpoint.getPath(),
                 endpoint
         );
     }
@@ -88,7 +106,7 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath(),
+                config_address + endpoint.getPath(),
                 endpoint
         );
     }
@@ -108,7 +126,7 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath(),
+                config_address + endpoint.getPath(),
                 endpoint
         );
     }
@@ -118,7 +136,7 @@ public abstract class SharedAPI {
                 Optional.of(object),
                 true,
                 "",
-                address + endpoint.getPath(),
+                config_address + endpoint.getPath(),
                 endpoint
         );
     }
@@ -128,7 +146,7 @@ public abstract class SharedAPI {
                 Optional.empty(),
                 false,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                address + endpoint.getPath(),
+                config_address + endpoint.getPath(),
                 endpoint
         );
     }

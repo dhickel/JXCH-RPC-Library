@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.mindspice.schemas.TypeRefs;
 
 import java.io.IOException;
 import java.util.Map;
@@ -23,9 +24,9 @@ public abstract class JsonUtils {
 
     static {
         mapper = new ObjectMapper();//.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        readerCache = new ConcurrentHashMap<>(10);
-        writerCache = new ConcurrentHashMap<>(10);
-        typeRefCache = new ConcurrentHashMap<>(10);
+        readerCache = new ConcurrentHashMap<>(20);
+        writerCache = new ConcurrentHashMap<>(20);
+        typeRefCache = new ConcurrentHashMap<>(20);
         emptyNode = mapper.createObjectNode();
     }
 
@@ -42,9 +43,9 @@ public abstract class JsonUtils {
 
     public void setMapperOverride(ObjectMapper mapper) {
         JsonUtils.mapper = mapper;
-        JsonUtils.readerCache = new ConcurrentHashMap<>(10);
-        JsonUtils.writerCache = new ConcurrentHashMap<>(10);
-        JsonUtils.typeRefCache = new ConcurrentHashMap<>(10);
+        JsonUtils.readerCache = new ConcurrentHashMap<>(20);
+        JsonUtils.writerCache = new ConcurrentHashMap<>(20);
+        JsonUtils.typeRefCache = new ConcurrentHashMap<>(20);
     }
 
     private static ObjectWriter writerFor(Class<?> objClass) {
@@ -86,6 +87,7 @@ public abstract class JsonUtils {
     public static String writeString(Class<?> json) throws JsonProcessingException {
         return JsonUtils.writerFor(json).writeValueAsString(json);
     }
+
 
     public static ObjectMapper getMapper() {
         return mapper;
