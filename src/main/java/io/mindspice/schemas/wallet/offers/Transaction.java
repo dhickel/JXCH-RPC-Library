@@ -1,16 +1,18 @@
 package io.mindspice.schemas.wallet.offers;
 
+import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.mindspice.schemas.object.Coin;
 import io.mindspice.schemas.object.SpendBundle;
 
 
 public record Transaction(
-        @JsonProperty("amount") int amount,
+        @JsonProperty("amount") long amount,
         @JsonProperty("spend_bundle") SpendBundle spendBundle,
         @JsonProperty("additions") List<Coin> additions,
         @JsonProperty("created_at_time") int createdAtTime,
@@ -25,13 +27,12 @@ public record Transaction(
         @JsonProperty("fee_amount") long feeAmount,
         @JsonProperty("wallet_id") int walletId,
         @JsonProperty("trade_id") Object tradeId,
-        @JsonProperty("memos") Map<String, String> memos,
+        @JsonProperty("memos") JsonNode memos,
         @JsonProperty("name") String name
 ) {
     public Transaction {
         additions = additions != null ? Collections.unmodifiableList(additions) : List.of();
         sentTo = sentTo != null ? Collections.unmodifiableList(sentTo) : List.of();
         removals = removals != null ? Collections.unmodifiableList(removals) : List.of();
-        memos = memos !=null ? Collections.unmodifiableMap(memos) : Map.of();
     }
 }

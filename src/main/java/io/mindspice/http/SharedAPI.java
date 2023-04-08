@@ -97,6 +97,26 @@ public abstract class SharedAPI {
         );
     }
 
+    protected <T> ApiResponse<List<T>> newResponseList(JsonNode jsonNode,
+            TypeReference<List<T>> typeRef, Endpoint endpoint) throws IOException {
+
+        var success = jsonNode.get("success").asBoolean();
+        Optional<List<T>> data;
+        if (success) {
+            var list = JsonUtils.readJson(jsonNode.traverse(), typeRef);
+            data = Optional.of(Collections.unmodifiableList(list));
+        } else {
+            data = Optional.empty();
+        }
+        return new ApiResponse<>(
+                data,
+                success,
+                jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
+                config_address + endpoint.getPath(),
+                endpoint
+        );
+    }
+
     protected <T> ApiResponse<List<T>> newResponseList(JsonNode jsonNode, List<T> list,
             Endpoint endpoint) throws IOException {
 
@@ -110,6 +130,7 @@ public abstract class SharedAPI {
                 endpoint
         );
     }
+
 
     protected <T, U> ApiResponse<Map<T, U>> newResponseMap(JsonNode jsonNode, String dataField,
             TypeReference<Map<T, U>> typeRef, Endpoint endpoint) throws IOException {
