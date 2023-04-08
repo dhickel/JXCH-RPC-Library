@@ -3,6 +3,7 @@ package io.mindspice.schemas;
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.mindspice.schemas.farmer.*;
 import io.mindspice.schemas.object.*;
+import io.mindspice.schemas.wallet.Notification;
 import io.mindspice.schemas.wallet.cat.Cat;
 import io.mindspice.schemas.wallet.cat.StrayCat;
 
@@ -27,4 +28,5 @@ public class TypeRefs {
     public static final TypeReference<List<Cat>> CAT_LIST = new TypeReference<>() { };
     public static final TypeReference<List<StrayCat>> STRAY_CAT_LIST = new TypeReference<>() { };
     public static final TypeReference<List<Coin>> COIN_LIST = new TypeReference<>() { };
+    public static final TypeReference<List<Notification>> NOTIFICATION_LIST = new TypeReference<>() { };
 }

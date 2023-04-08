@@ -30,9 +30,9 @@ public class WalletAPI extends SharedAPI {
 
     //TODO this wallet rpc, I scrapped everything needs to be more concise with slew of arguments
 
-
-
+    ////////////////////////
     /*  WALLET MANAGEMENT */
+    ////////////////////////
 
     public byte[] createNewWalletAsBytes(ObjectNode jsonObj) throws RPCException {
         try {
@@ -53,6 +53,7 @@ public class WalletAPI extends SharedAPI {
         }
     }
 
+    //  TODO doc that -1 is for all
     public byte[] getWalletsAsBytes(int type, boolean includeData) throws RPCException {
         try {
             var data = JsonUtils.newSingleNode("include_data", includeData);
@@ -77,9 +78,9 @@ public class WalletAPI extends SharedAPI {
         return getWallets(-1, includeData);
     }
 
-
-
+    /////////////////
     /* CAT WALLET */
+    ////////////////
 
     public byte[] cancelOfferAsBytes(String tradeId, long fee, boolean cancelOnChain) throws RPCException {
         try {
@@ -511,7 +512,9 @@ public class WalletAPI extends SharedAPI {
         }
     }
 
+    ////////////////
     /* DID WALLET */
+    ////////////////
 
     public byte[] didCreateAttestAsBytes(int walletId, String coinName, String pubKey,
             String puzHash) throws RPCException {
@@ -874,6 +877,10 @@ public class WalletAPI extends SharedAPI {
         }
     }
 
+    ////////////////////
+    /* KEY MANAGEMENT */
+    ////////////////////
+
     public ApiResponse<Boolean> didUpdateRecoveryIds(int walletId, List<String> newIds,
             int numVerificationsReq, boolean reusePuzHash) throws RPCException {
         try {
@@ -978,7 +985,7 @@ public class WalletAPI extends SharedAPI {
     public ApiResponse<List<String>> generateMnemonic() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(generateMnemonicAsBytes());
-            return newResponseList(jsonNode,"mnemonic", TypeRefs.STRING_LIST, Wallet.GENERATE_MNEMONIC);
+            return newResponseList(jsonNode, "mnemonic", TypeRefs.STRING_LIST, Wallet.GENERATE_MNEMONIC);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1069,6 +1076,10 @@ public class WalletAPI extends SharedAPI {
         }
     }
 
+    /////////////////
+    /* POOL WALLET */
+    /////////////////
+
     public byte[] pwStatusAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
@@ -1157,5 +1168,126 @@ public class WalletAPI extends SharedAPI {
             throw new RPCException("Error reading response JSON", e);
         }
     }
+
+    ///////////////////
+    /* NOTIFICATIONS */
+    ///////////////////
+
+    public byte[] deleteNotificationsAsBytes(List<String> ids) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("ids", ids);
+            var req = new Request(Wallet.DELETE_NOTIFICATIONS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> deleteNotifications(List<String> ids) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(deleteNotificationsAsBytes(ids));
+            return newResponse(jsonNode, "success", Boolean.class, Wallet.DELETE_NOTIFICATIONS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getNotificationsAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Wallet.GET_NOTIFICATIONS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<Notification>> getNotifications() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getNotificationsAsBytes());
+            return newResponseList(
+                    jsonNode, "notifications", TypeRefs.NOTIFICATION_LIST, Wallet.GET_NOTIFICATIONS
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] sendNotificationAsBytes(String address, String message, long amount,
+            long fee) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("address", address)
+                    .put("message", message)
+                    .put("amount", amount)
+                    .put("fee", fee)
+                    .buildBytes();
+            var req = new Request(Wallet.SEND_NOTIFICATION, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Transaction> sendNotification(String address, String message, long amount,
+            long fee) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(sendNotificationAsBytes(address, message, amount, fee));
+            return newResponse(jsonNode, "tx", Transaction.class, Wallet.SEND_NOTIFICATION);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] signMessageByAddressAsBytes(String address, String message, boolean isHex)
+            throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("address", address)
+                    .put("message", message)
+                    .put("is_hex", isHex)
+                    .buildBytes();
+            var req = new Request(Wallet.SIGN_MESSAGE_BY_ADDRESS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SignedMessage> signMessageByAddress(String address, String message,
+            boolean isHex) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(signMessageByAddressAsBytes(address, message, isHex));
+            return newResponse(jsonNode, SignedMessage.class, Wallet.SIGN_MESSAGE_BY_ADDRESS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] signMessageByIdAsBytes(String id, String message, boolean isHex)
+            throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("id", id)
+                    .put("message", message)
+                    .put("is_hex", isHex)
+                    .buildBytes();
+            var req = new Request(Wallet.SIGN_MESSAGE_BY_ID, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SignedMessage> signMessageById(String id, String message,
+            boolean isHex) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(signMessageByIdAsBytes(id, message, isHex));
+            return newResponse(jsonNode, SignedMessage.class, Wallet.SIGN_MESSAGE_BY_ID);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
 
 }
