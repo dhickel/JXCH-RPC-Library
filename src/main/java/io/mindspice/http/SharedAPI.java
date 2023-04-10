@@ -57,6 +57,22 @@ public abstract class SharedAPI {
         );
     }
 
+    protected  ApiResponse<JsonNode> newResponseNode(JsonNode jsonNode, Endpoint endpoint) throws IOException {
+
+        var success = jsonNode.get("success").asBoolean();
+        Optional<JsonNode> data = success
+                ? Optional.of(jsonNode)
+                : Optional.empty();
+
+        return new ApiResponse<>(
+                data,
+                success,
+                jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
+                config_address + endpoint.getPath(),
+                endpoint
+        );
+    }
+
 
 
 

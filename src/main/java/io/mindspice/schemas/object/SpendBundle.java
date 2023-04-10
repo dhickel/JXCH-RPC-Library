@@ -9,11 +9,8 @@ import java.util.List;
 
 public record SpendBundle(
         @JsonProperty("aggregated_signature") String aggregatedSignature,
-
         @JsonAlias({"coin_spends", "coin_solutions"})
-        @JsonProperty("coin_spends")
-        List<CoinSpend> coinSpends,
-
+        @JsonProperty("coin_spends") List<CoinSpend> coinSpends,
         @JsonProperty("puzzle_reveal") String puzzleReveal,
         @JsonProperty("solution") String solution
 ) {

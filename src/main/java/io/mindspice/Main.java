@@ -52,8 +52,7 @@ public class Main {
                 .setFee(1)
                 .build();
 
-        var mem = (wallet.generateMnemonic().data().get());
-        System.out.println(wallet.deleteKey(2951712719L));
+        System.out.println(wallet.getTransactions(1,730,736,false));
 
     }
 

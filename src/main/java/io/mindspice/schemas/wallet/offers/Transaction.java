@@ -7,8 +7,10 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.mindspice.schemas.object.Coin;
 import io.mindspice.schemas.object.SpendBundle;
+import io.mindspice.util.StringListDeserializer;
 
 
 public record Transaction(
@@ -17,7 +19,9 @@ public record Transaction(
         @JsonProperty("additions") List<Coin> additions,
         @JsonProperty("created_at_time") int createdAtTime,
         @JsonProperty("to_puzzle_hash") String toPuzzleHash,
-        @JsonProperty("sent_to") List<String> sentTo,
+       // @JsonDeserialize(using = StringListDeserializer.class)
+        @JsonProperty("sent_to")
+        List<List<String>> sentTo, //Fixme Not sure if this sometimes just returns an unested array? if so flatted with serializer?
         @JsonProperty("removals") List<Coin> removals,
         @JsonProperty("to_address") String toAddress,
         @JsonProperty("confirmed_at_height") int confirmedAtHeight,

@@ -6,6 +6,7 @@ import io.mindspice.schemas.object.*;
 import io.mindspice.schemas.wallet.Notification;
 import io.mindspice.schemas.wallet.cat.Cat;
 import io.mindspice.schemas.wallet.cat.StrayCat;
+import io.mindspice.schemas.wallet.offers.Transaction;
 
 import java.util.List;
 import java.util.Map;
@@ -29,4 +30,7 @@ public class TypeRefs {
     public static final TypeReference<List<StrayCat>> STRAY_CAT_LIST = new TypeReference<>() { };
     public static final TypeReference<List<Coin>> COIN_LIST = new TypeReference<>() { };
     public static final TypeReference<List<Notification>> NOTIFICATION_LIST = new TypeReference<>() { };
+    public static final TypeReference<List<Transaction>> TRANSACTIONS_LIST = new TypeReference<>() { };
+    public static final TypeReference<Map<String, List<String>>> MEMO_MAP = new TypeReference<>() { };
 }
+

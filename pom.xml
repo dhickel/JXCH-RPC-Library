@@ -84,6 +84,14 @@
             <artifactId>kotlin-stdlib</artifactId>
             <version>1.8.10</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.9.2</version>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 
