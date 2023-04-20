@@ -6,7 +6,7 @@ import io.mindspice.schemas.object.*;
 import io.mindspice.schemas.wallet.Notification;
 import io.mindspice.schemas.wallet.cat.Cat;
 import io.mindspice.schemas.wallet.cat.StrayCat;
-import io.mindspice.schemas.wallet.offers.Transaction;
+import io.mindspice.schemas.wallet.Transaction;
 
 import java.util.List;
 import java.util.Map;

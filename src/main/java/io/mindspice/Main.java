@@ -15,7 +15,7 @@ public class Main {
     public static void main(String[] args) throws IOException, RPCException {
         YAMLMapper mapper = new YAMLMapper();
         NodeConfig nodeConfig = mapper.readValue(
-                new File("/home/mindspice/code/Java/Projects/Fields/fields-monitor-server/chia-java-rpc-lib/config.yaml"),
+                new File("/home/mindspice/code/Java/Projects/chia-java-rpc-lib/config.yaml"),
                 NodeConfig.class);
 
         RPCClient rpcClient = new RPCClient(nodeConfig);
@@ -52,8 +52,7 @@ public class Main {
                 .setFee(1)
                 .build();
 
-        System.out.println(wallet.getTransactions(1,730,736,false));
-
+        System.out.println(wallet.setWalletReSyncOnStartup(true));
     }
 
     public static void print(Object o) {

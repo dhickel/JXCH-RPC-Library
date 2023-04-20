@@ -3,10 +3,11 @@ package io.mindspice.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.mindspice.schemas.object.Coin;
+import io.mindspice.schemas.object.CoinSpend;
+import io.mindspice.schemas.object.SpendBundle;
 import io.mindspice.schemas.wallet.Addition;
 import io.mindspice.schemas.wallet.CoinAnnouncement;
 import io.mindspice.schemas.wallet.PuzzleAnnouncement;
-import io.mindspice.schemas.wallet.offers.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -428,7 +429,6 @@ public class ChiaUtils {
             return this;
         }
 
-
         public SignedTransactionBuilder addAdditions(List<Addition> additions) {
             this.additions.addAll(additions);
             return this;
@@ -534,6 +534,7 @@ public class ChiaUtils {
         }
     }
 
+
     public static class TransactionBuilder {
         ObjectNode node = JsonUtils.newEmptyNode();
 
@@ -618,7 +619,6 @@ public class ChiaUtils {
             return this;
         }
 
-
         public MultiTransactionBuilder addCoin(String coinPuzzleHash, String parentPuzzleHash, long amount) {
             coins.add(new Coin(parentPuzzleHash, coinPuzzleHash, amount));
             return this;
@@ -655,6 +655,57 @@ public class ChiaUtils {
             return node;
         }
     }
+
+
+    public static class SpendBundleBuilder {
+        List<CoinSpend> coinSpends = new ArrayList<>();
+        String aggregatedSignature;
+        String solution;
+        String puzzleReveal;
+
+        public SpendBundleBuilder addCoinSpend(CoinSpend coinSpend) {
+            coinSpends.add(coinSpend);
+            return this;
+        }
+
+        public SpendBundleBuilder addCoinSpends(List<CoinSpend> coinSpends) {
+            this.coinSpends.addAll(coinSpends);
+            return this;
+        }
+
+        public SpendBundleBuilder addPuzzleReveal(String puzzleReveal) {
+            this.puzzleReveal = puzzleReveal;
+            return this;
+        }
+
+        public SpendBundleBuilder addSolution(String solution) {
+            this.solution = solution;
+            return this;
+        }
+
+        public SpendBundleBuilder addAggregatedSignature(String aggSig) {
+            this.aggregatedSignature = aggSig;
+            return this;
+        }
+
+        public SpendBundle build() {
+            if (coinSpends.isEmpty() || aggregatedSignature == null
+                    || solution == null || puzzleReveal == null) {
+                throw new IllegalStateException(
+                        "Must set all fields: coinSpends, puzzleReveal, solution and aggregatedSignature"
+                );
+            }
+
+            return new SpendBundle(
+                    aggregatedSignature,
+                    coinSpends,
+                    puzzleReveal,
+                    solution
+            );
+        }
+    }
+
+
 
 
 

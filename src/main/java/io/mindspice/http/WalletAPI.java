@@ -7,6 +7,7 @@ import io.mindspice.enums.ChiaService;
 import io.mindspice.enums.endpoints.Wallet;
 import io.mindspice.schemas.ApiResponse;
 import io.mindspice.schemas.TypeRefs;
+import io.mindspice.schemas.fullnode.Network;
 import io.mindspice.schemas.object.Coin;
 import io.mindspice.schemas.object.SpendBundle;
 import io.mindspice.schemas.wallet.*;
@@ -1611,6 +1612,156 @@ public class WalletAPI extends SharedAPI {
             throw new RPCException("Error reading response JSON", e);
         }
     }
+
+    public byte[] getHeightInfoAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Wallet.GET_HEIGHT_INFO, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Integer> getHeightInfo() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getHeightInfoAsBytes());
+            return newResponse(jsonNode, "height", Integer.class, Wallet.GET_HEIGHT_INFO);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getNetworkInfoAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Wallet.GET_NETWORK_INFO, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Network> getNetworkInfo() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getNetworkInfoAsBytes());
+            if (jsonNode.get("success").asBoolean()) {
+                var network = new Network(
+                        jsonNode.get("network_name").asText(),
+                        jsonNode.get("network_prefix").asText()
+                );
+                return newResponse(network, Wallet.GET_NETWORK_INFO);
+            } else {
+                return newFailedResponse(jsonNode, Wallet.GET_NETWORK_INFO);
+            }
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getSyncStatusAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Wallet.GET_SYNC_STATUS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SyncStatus> getSyncStatus() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getSyncStatusAsBytes());
+            return newResponse(jsonNode,  SyncStatus.class, Wallet.GET_SYNC_STATUS);
+        } catch (
+                IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    //FIXME cant test on giganode
+    public byte[] getTimestampForHeightAsBytes(int height) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("height", height);
+            var req = new Request(Wallet.GET_TIMESTAMP_FOR_HEIGHT, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<String> getTimestampForHeight(int height) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getTimestampForHeightAsBytes(height));
+            return newResponse(jsonNode,  "timestamp", String.class, Wallet.GET_TIMESTAMP_FOR_HEIGHT);
+        } catch (
+                IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    //TODO this need investigated more I think it can take memos as well, simpleTx is just add/rem and spendbundle
+    public byte[] pushTransactionsAsBytes(List<SimpleTransaction> transactions) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("transactions", transactions);
+            var req = new Request(Wallet.PUSH_TRANSACTIONS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> pushTransactions(List<SimpleTransaction> transactions) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(pushTransactionsAsBytes(transactions));
+            return newResponse(jsonNode,  "success", Boolean.class, Wallet.PUSH_TRANSACTIONS);
+        } catch (
+                IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] pushTxAsBytes(SpendBundle spendBundle) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("spend_bundle", spendBundle);
+            var req = new Request(Wallet.PUSH_TX, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> pushTx(SpendBundle spendBundle) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(pushTxAsBytes(spendBundle));
+            return newResponse(jsonNode,  "success", Boolean.class, Wallet.PUSH_TX);
+        } catch (
+                IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] setWalletReSyncOnStartupAsBytes(boolean enable) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("enable", enable);
+            var req = new Request(Wallet.SET_WALLET_RESYNC_ON_STARTUP, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> setWalletReSyncOnStartup(boolean enable) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(setWalletReSyncOnStartupAsBytes(enable));
+            return newResponse(jsonNode,  "success", Boolean.class, Wallet.SET_WALLET_RESYNC_ON_STARTUP);
+        } catch (
+                IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+
 
 
 }

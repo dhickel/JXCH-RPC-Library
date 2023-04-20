@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.mindspice.schemas.object.Coin;
-import io.mindspice.schemas.wallet.offers.Transaction;
 
 
 public record PoolWalletStatus(
