@@ -2,12 +2,14 @@ package io.mindspice.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import io.mindspice.schemas.object.Coin;
 import io.mindspice.schemas.object.CoinSpend;
 import io.mindspice.schemas.object.SpendBundle;
 import io.mindspice.schemas.wallet.Addition;
 import io.mindspice.schemas.wallet.CoinAnnouncement;
 import io.mindspice.schemas.wallet.PuzzleAnnouncement;
+import io.mindspice.schemas.wallet.nft.MetaData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +71,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public CatSpendBuilder setFee(long fee) {
+        public CatSpendBuilder addFee(long fee) {
             node.put("fee", fee);
             return this;
         }
@@ -142,7 +144,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public OfferBuilder setFee(long fee) {
+        public OfferBuilder addFee(long fee) {
             node.put("fee", fee);
             return this;
         }
@@ -266,7 +268,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public TakeOfferBuilder setFee(long fee) {
+        public TakeOfferBuilder addFee(long fee) {
             node.put("fee", fee);
             return this;
         }
@@ -294,7 +296,7 @@ public class ChiaUtils {
     public static class CatWalletBuilder {
         ObjectNode node = JsonUtils.newEmptyNode();
 
-        public CatWalletBuilder setFee(long fee) {
+        public CatWalletBuilder addFee(long fee) {
             node.put("fee", fee);
             return this;
         }
@@ -329,7 +331,7 @@ public class ChiaUtils {
     public static class DIDWalletBuilder {
         ObjectNode node = JsonUtils.newEmptyNode();
 
-        public DIDWalletBuilder setFee(long fee) {
+        public DIDWalletBuilder addFee(long fee) {
             node.put("fee", fee);
             return this;
         }
@@ -387,7 +389,7 @@ public class ChiaUtils {
     public static class NFTWalletBuilder {
         ObjectNode node = JsonUtils.newEmptyNode();
 
-        public NFTWalletBuilder setFee(long fee) {
+        public NFTWalletBuilder addFee(long fee) {
             node.put("fee", fee);
             return this;
         }
@@ -706,8 +708,319 @@ public class ChiaUtils {
     }
 
 
+    public static class BulkMintBuilder {
+        ObjectNode node = JsonUtils.newEmptyNode();
+        List<MetaData> metaList = new ArrayList<>();
+        List<String> targetList = new ArrayList<>();
+        List<String> coinList = new ArrayList<>();
+
+        public BulkMintBuilder setWalletId(int walletId) {
+            node.put("wallet_id", walletId);
+            return this;
+        }
+
+        public BulkMintBuilder addMetaData(MetaData metaData) {
+            metaList.add(metaData);
+            return this;
+        }
+
+        public BulkMintBuilder addMetaData(List<MetaData> metaData) {
+            metaList.addAll(metaData);
+            return this;
+        }
+
+        public BulkMintBuilder setRoyaltyPercentage(int royaltyPct) {
+            node.put("royalty_percentage", royaltyPct);
+            return this;
+        }
+
+        public BulkMintBuilder setRoyaltyAddress(String address) {
+            node.put("royalty_address", address);
+            return this;
+        }
+
+        public BulkMintBuilder addTargetAddress(String address) {
+            targetList.add(address);
+            return this;
+        }
+
+        public BulkMintBuilder addTargetAddress(List<String> addresses) {
+            targetList.addAll(addresses);
+            return this;
+        }
+
+        public BulkMintBuilder setMintNumberStart(int start) {
+            node.put("mint_number_start", start);
+            return this;
+        }
+
+        public BulkMintBuilder setMintTotal(int total) {
+            node.put("mint_total", total);
+            return this;
+        }
+
+        public BulkMintBuilder addXchCoin(String coinId) {
+            coinList.add(coinId);
+            return this;
+        }
+
+        public BulkMintBuilder addXchCoin(List<String> coinIds) {
+            coinList.addAll(coinIds);
+            return this;
+        }
+
+        public BulkMintBuilder setChangeTarget(String targetAddress) {
+            node.put("xch_change_target", targetAddress);
+            return this;
+        }
+
+        public BulkMintBuilder setNewInnerPuzzleHash(String puzzleHash) {
+            node.put("new_innerpuzhash", puzzleHash);
+            return this;
+        }
+
+        public BulkMintBuilder setNewP2PuzzleHash(String puzzleHash) {
+            node.put("new_p2_puzhash", puzzleHash);
+            return this;
+        }
+
+        public BulkMintBuilder addDidCoin(Coin coin) {
+            node.putPOJO("did_coin_dict", coin);
+            node.put("mint_from_did", true);
+            return this;
+        }
+
+        public BulkMintBuilder addFee(long amont) {
+            node.put("fee", amont);
+            return this;
+        }
+
+        public BulkMintBuilder setReusePuzHash(boolean bool) {
+            node.put("reuse_puzhash", bool);
+            return this;
+        }
+
+        public JsonNode build() {
+            if (!node.has("wallet_id")) { throw new IllegalStateException("Must Set Wallet Id"); }
+            if (metaList.isEmpty()) { throw new IllegalStateException("Must Add Meta Data To Mint"); }
+            node.putPOJO("metadata_list", metaList);
+            if (!targetList.isEmpty()) { node.putPOJO("target_address_list", targetList); }
+            if (!coinList.isEmpty()) { node.putPOJO("xch_coin_list", coinList); }
+
+            return node;
+        }
+    }
 
 
+    public static class MetaDataBuilder {
+        List<String> uris = new ArrayList<>();
+        List<String> metaUris = new ArrayList<>();
+        List<String> licenseUris = new ArrayList<>();
+        String hash;
+        String metaHash;
+        String licenseHash;
+        int editionNumber = 1;
+        int editionTotal = 1;
+
+        public MetaDataBuilder addUri(String uri) {
+            uris.add(uri);
+            return this;
+        }
+
+        public MetaDataBuilder addUris(List<String> uris) {
+            uris.addAll(uris);
+            return this;
+        }
+
+        public MetaDataBuilder addMetaUri(String uri) {
+            metaUris.add(uri);
+            return this;
+        }
+
+        public MetaDataBuilder addMetaUris(List<String> uris) {
+            metaUris.addAll(uris);
+            return this;
+        }
+
+        public MetaDataBuilder addLicenseUri(String uri) {
+            licenseUris.add(uri);
+            return this;
+        }
+
+        public MetaDataBuilder addLicenseUris(List<String> uris) {
+            licenseUris.addAll(uris);
+            return this;
+        }
+
+        public MetaDataBuilder addHash(String hash) {
+            this.hash = hash;
+            return this;
+        }
+
+        public MetaDataBuilder addMetaDataHash(String hash) {
+            this.metaHash = hash;
+            return this;
+        }
+
+        public MetaDataBuilder addLicenseHash(String hash) {
+            this.licenseHash = hash;
+            return this;
+        }
+
+        public MetaDataBuilder setEditionNumber(int edition, int total) {
+            editionNumber = edition;
+            editionTotal = total;
+            return this;
+        }
+
+        public MetaData build() {
+            if (uris.isEmpty()) {
+                throw new IllegalStateException("Must include at least one uri");
+            }
+
+            if (hash == null) {
+                throw new IllegalStateException("Must include a uri hash");
+            }
+
+            return new MetaData(
+                    uris,
+                    metaUris,
+                    licenseUris,
+                    hash,
+                    metaHash,
+                    licenseHash,
+                    editionNumber,
+                    editionTotal
+            );
+        }
+    }
 
 
+    public static class SingleMintBuilder {
+        ObjectNode node = JsonUtils.newEmptyNode();
+        MetaData metaData;
+        int walletId = -1;
+
+        public SingleMintBuilder setWalletId(int id) {
+            walletId = id;
+            return this;
+        }
+
+        public SingleMintBuilder addMetaData(MetaData metaData) {
+            this.metaData = metaData;
+            return this;
+        }
+
+        public SingleMintBuilder setDid(String did) {
+            node.put("did_id", did);
+            return this;
+        }
+
+        public SingleMintBuilder addRoyaltyAddress(String address) {
+            node.put("royalty_address", address);
+            return this;
+        }
+
+        public SingleMintBuilder setRoyaltyPercentage(int amount) {
+            node.put("royalty_percentage", amount);
+            return this;
+        }
+
+        public SingleMintBuilder setTargetAddress(String address) {
+            node.put("target_address", address);
+            return this;
+        }
+
+        public SingleMintBuilder addFee(long amount) {
+            node.put("fee", amount);
+            return this;
+        }
+
+        public SingleMintBuilder setReusePuzHash(boolean bool) {
+            node.put("reuse_puzhash", bool);
+            return this;
+        }
+
+        public JsonNode build() {
+            if (metaData == null) { throw new IllegalStateException("Must Set Meta Data"); }
+            if (walletId == -1) { throw new IllegalStateException("Must Set Wallet Id"); }
+            node.put("wallet_id", walletId);
+            return JsonUtils.merge(node, JsonUtils.getMapper().valueToTree(metaData));
+        }
+    }
+
+
+    public static class SetDidBulkBuilder {
+        ObjectNode node = JsonUtils.newEmptyNode();
+        List<NftCoin> nftCoins = new ArrayList<>();
+
+        public SetDidBulkBuilder addNft(String coinId, int walletId) {
+            nftCoins.add(new NftCoin(coinId, walletId));
+            return this;
+        }
+
+        public SetDidBulkBuilder setDid(String did) {
+            node.put("did_id", did);
+            return this;
+        }
+
+        public SetDidBulkBuilder addFee(long fee) {
+            node.put("fee", fee);
+            return this;
+        }
+
+        public SetDidBulkBuilder setReusePuzHash(boolean bool) {
+            node.put("reuse_puzhash", bool);
+            return this;
+        }
+
+        public JsonNode build() {
+            if (!node.has("did_id")) { throw new IllegalStateException("Must Set a DID"); }
+            if (nftCoins.isEmpty()) { throw new IllegalStateException("Must Add NFTs"); }
+            node.putPOJO("nft_coin_list", nftCoins);
+            return node;
+        }
+
+
+    }
+
+
+    public static class NftBulkTransferBuilder {
+        ObjectNode node = JsonUtils.newEmptyNode();
+        List<NftCoin> nftCoins = new ArrayList<>();
+
+        public NftBulkTransferBuilder addNft(String coinId, int walletId) {
+            nftCoins.add(new NftCoin(coinId, walletId));
+            return this;
+        }
+
+        public NftBulkTransferBuilder setTargetAddress(String address) {
+            node.put("target_address", address);
+            return this;
+        }
+
+        public NftBulkTransferBuilder addFee(long fee) {
+            node.put("fee", fee);
+            return this;
+        }
+
+        public NftBulkTransferBuilder setReusePuzHash(boolean bool) {
+            node.put("reuse_puzhash", bool);
+            return this;
+        }
+
+        public JsonNode build() {
+            if (nftCoins.isEmpty()) { throw new IllegalStateException("Must Add NFT Coins"); }
+            if (!node.has("target_address")) { throw new IllegalStateException("Must Set Target Address"); }
+            node.putPOJO("nft_coin_list", nftCoins);
+            return node;
+        }
+
+    }
+
+
+    private record NftCoin(
+            String nft_coin_id,
+            int wallet_id
+    ) { }
 }

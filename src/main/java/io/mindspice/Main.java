@@ -1,7 +1,9 @@
 package io.mindspice;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.mindspice.http.*;
+import io.mindspice.schemas.wallet.nft.MetaData;
 import io.mindspice.util.ChiaUtils;
 import io.mindspice.util.JsonUtils;
 import io.mindspice.util.RPCException;
@@ -49,12 +51,23 @@ public class Main {
                 .setName("test")
                 .isNewWallet(false)
                 .setAssetId("0xea830317f831a23b178aa653e50484568d30d2c5b34d8140e71247ead05961c7")
-                .setFee(1)
+                .addFee(1)
                 .build();
 
-        System.out.println(wallet.setWalletReSyncOnStartup(true));
-    }
+       // System.out.println(wallet.nftGetWalletsWithDids());
 
+        MetaData meta = new ChiaUtils.MetaDataBuilder()
+                .addUri("https://cdn.sstatic.net/Sites/crypto/Img/logo.svg?v=87c028c5e448")
+                .addHash("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+                .build();
+
+        JsonNode jn = new ChiaUtils.SingleMintBuilder()
+                .setWalletId(5)
+                .addMetaData(meta)
+                        .build();
+        System.out.println(wallet.nftMintNft(jn));
+
+    }
     public static void print(Object o) {
         System.out.println(o);
     }

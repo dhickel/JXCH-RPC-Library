@@ -168,6 +168,26 @@ public abstract class SharedAPI {
         );
     }
 
+    protected <T, U> ApiResponse<Map<T, U>> newResponseMap(JsonNode jsonNode,
+            TypeReference<Map<T, U>> typeRef, Endpoint endpoint) throws IOException {
+
+        var success = jsonNode.get("success").asBoolean();
+        Optional<Map<T, U>> data;
+        if (success) {
+            var map = JsonUtils.readJson(jsonNode.traverse(), typeRef);
+            data = Optional.of(Collections.unmodifiableMap(map));
+        } else {
+            data = Optional.empty();
+        }
+        return new ApiResponse<>(
+                data,
+                success,
+                jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
+                config_address + endpoint.getPath(),
+                endpoint
+        );
+    }
+
     protected <T> ApiResponse<T> newResponse(T object, Endpoint endpoint) throws IOException {
         return new ApiResponse<>(
                 Optional.of(object),

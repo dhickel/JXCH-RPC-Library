@@ -72,9 +72,9 @@ public abstract class JsonUtils {
         return mapper.writeValueAsBytes(json);
     }
 
-    public static <T> byte[] writeBytes(T json) throws JsonProcessingException {
-        return JsonUtils.writerFor(json.getClass()).writeValueAsBytes(json);
-    }
+//    public static <T> byte[] writeBytes(T json) throws JsonProcessingException {
+//        return JsonUtils.writerFor(json.getClass()).writeValueAsBytes(json);
+//    }
 
     public static String writeString(JsonNode json) throws JsonProcessingException {
         return mapper.writeValueAsString(json);
@@ -129,6 +129,14 @@ public abstract class JsonUtils {
 
     public static <T> T readJson(JsonParser json, TypeReference<T> typeRef) throws IOException {
         return JsonUtils.writerForRef(typeRef).readValue(json, typeRef);
+    }
+
+    public static JsonNode merge(JsonNode node1, JsonNode node2) {
+        ObjectNode rootNode = (ObjectNode) node1;
+         node2.fields().forEachRemaining(entry -> {
+             rootNode.set(entry.getKey(), entry.getValue());
+         });
+         return rootNode;
     }
 
     // Fluent builder for easier json construction

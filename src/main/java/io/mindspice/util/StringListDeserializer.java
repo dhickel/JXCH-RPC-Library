@@ -22,9 +22,7 @@ public class StringListDeserializer extends JsonDeserializer<List<String>> {
         if (node.isArray()) {
             for (JsonNode element : node) {
                 if (element.isArray()) {
-                    for (JsonNode innerElement : element) {
-                        result.add(innerElement.asText());
-                    }
+                    for (JsonNode innerElement : element) { result.add(innerElement.asText()); }
                 } else {
                     result.add(element.asText());
                 }

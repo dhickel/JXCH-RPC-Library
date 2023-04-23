@@ -4,11 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.mindspice.enums.ChiaService;
+import io.mindspice.enums.NftDataKey;
+import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.enums.endpoints.Wallet;
 import io.mindspice.schemas.ApiResponse;
 import io.mindspice.schemas.TypeRefs;
 import io.mindspice.schemas.fullnode.Network;
 import io.mindspice.schemas.object.Coin;
+import io.mindspice.schemas.object.CoinRecord;
 import io.mindspice.schemas.object.SpendBundle;
 import io.mindspice.schemas.wallet.*;
 import io.mindspice.schemas.wallet.cat.Cat;
@@ -16,12 +19,15 @@ import io.mindspice.schemas.wallet.cat.CatAssetInfo;
 import io.mindspice.schemas.wallet.cat.StrayCat;
 import io.mindspice.schemas.wallet.did.*;
 import io.mindspice.schemas.wallet.SignedTransaction;
+import io.mindspice.schemas.wallet.nft.*;
 import io.mindspice.schemas.wallet.offers.*;
 import io.mindspice.util.JsonUtils;
 import io.mindspice.util.RPCException;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 
 public class WalletAPI extends SharedAPI {
@@ -1291,6 +1297,10 @@ public class WalletAPI extends SharedAPI {
         }
     }
 
+    ////////////
+    /* WALLET */
+    ////////////
+
     public byte[] createSignedTransactionAsBytes(ObjectNode json) throws RPCException {
         try {
             var data = JsonUtils.writeBytes(json);
@@ -1672,9 +1682,8 @@ public class WalletAPI extends SharedAPI {
     public ApiResponse<SyncStatus> getSyncStatus() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getSyncStatusAsBytes());
-            return newResponse(jsonNode,  SyncStatus.class, Wallet.GET_SYNC_STATUS);
-        } catch (
-                IOException e) {
+            return newResponse(jsonNode, SyncStatus.class, Wallet.GET_SYNC_STATUS);
+        } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
     }
@@ -1693,9 +1702,8 @@ public class WalletAPI extends SharedAPI {
     public ApiResponse<String> getTimestampForHeight(int height) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getTimestampForHeightAsBytes(height));
-            return newResponse(jsonNode,  "timestamp", String.class, Wallet.GET_TIMESTAMP_FOR_HEIGHT);
-        } catch (
-                IOException e) {
+            return newResponse(jsonNode, "timestamp", String.class, Wallet.GET_TIMESTAMP_FOR_HEIGHT);
+        } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
     }
@@ -1714,9 +1722,8 @@ public class WalletAPI extends SharedAPI {
     public ApiResponse<Boolean> pushTransactions(List<SimpleTransaction> transactions) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(pushTransactionsAsBytes(transactions));
-            return newResponse(jsonNode,  "success", Boolean.class, Wallet.PUSH_TRANSACTIONS);
-        } catch (
-                IOException e) {
+            return newResponse(jsonNode, "success", Boolean.class, Wallet.PUSH_TRANSACTIONS);
+        } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
     }
@@ -1734,9 +1741,8 @@ public class WalletAPI extends SharedAPI {
     public ApiResponse<Boolean> pushTx(SpendBundle spendBundle) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(pushTxAsBytes(spendBundle));
-            return newResponse(jsonNode,  "success", Boolean.class, Wallet.PUSH_TX);
-        } catch (
-                IOException e) {
+            return newResponse(jsonNode, "success", Boolean.class, Wallet.PUSH_TX);
+        } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
     }
@@ -1754,14 +1760,394 @@ public class WalletAPI extends SharedAPI {
     public ApiResponse<Boolean> setWalletReSyncOnStartup(boolean enable) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(setWalletReSyncOnStartupAsBytes(enable));
-            return newResponse(jsonNode,  "success", Boolean.class, Wallet.SET_WALLET_RESYNC_ON_STARTUP);
+            return newResponse(jsonNode, "success", Boolean.class, Wallet.SET_WALLET_RESYNC_ON_STARTUP);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    ////////////////
+    /* NFT Wallet */
+    ////////////////
+
+    public byte[] nftAddUriAsBytes(int walletId, String uri, NftDataKey dataKey, String nftCoinId, long fee,
+            boolean reusePuzHash) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("uri", uri)
+                    .put("key", dataKey.key)
+                    .put("nft_coin_id", nftCoinId)
+                    .put("fee", fee)
+                    .put("reuse_puzhash", reusePuzHash)
+                    .buildBytes();
+            var req = new Request(Wallet.NFT_ADD_URI, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SpendBundle> nftAddUri(int walletId, String uri, NftDataKey dataKey, String nftCoinId, long fee,
+            boolean reusePuzHash) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftAddUriAsBytes(
+                    walletId, uri, dataKey, nftCoinId, fee, reusePuzHash)
+            );
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, Wallet.NFT_ADD_URI);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftCalculateRoyaltiesAsBytes(@Nullable List<RoyaltyAsset> royaltyAssets,
+            @Nullable List<FungibleAsset> fungibleAssets) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder().buildNode();
+            if (royaltyAssets != null) { data.putPOJO("royalty_assets", royaltyAssets); }
+            if (fungibleAssets != null) { data.putPOJO("fungible_assets", fungibleAssets); }
+            var req = new Request(Wallet.NFT_CALCULATE_ROYALTIES, JsonUtils.writeBytes(data));
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Map<String, List<RoyaltyCalculation>>> nftCalculateRoyalties(
+            @Nullable List<RoyaltyAsset> royaltyAssets, @Nullable List<FungibleAsset> fungibleAssets)
+            throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftCalculateRoyaltiesAsBytes(royaltyAssets, fungibleAssets));
+            return newResponseMap(jsonNode, TypeRefs.ROYALTY_MAP, Wallet.NFT_CALCULATE_ROYALTIES);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftCountNftsAsBytes(int walletId) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
+            var req = new Request(Wallet.NFT_COUNT_NFTS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Integer> nftCountNfts(int walletId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftCountNftsAsBytes(walletId));
+            return newResponse(jsonNode, "count", Integer.class, Wallet.NFT_COUNT_NFTS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftGetByDidAsBytes(String did) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("did_id", did);
+            var req = new Request(Wallet.NFT_GET_BY_DID, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Integer> nftGetByDid(String did) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftGetByDidAsBytes(did));
+            return newResponse(jsonNode, "wallet_id", Integer.class, Wallet.NFT_GET_BY_DID);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftGetInfoAsBytes(String coinId, @Nullable Integer walletId) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder().buildNode();
+            data.put("coin_id", coinId);
+            if (walletId != null) { data.put("wallet_id", walletId); }
+            var req = new Request(Wallet.NFT_GET_INFO, JsonUtils.writeBytes(data));
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<NftInfo> nftGetInfo(String coinId, Integer walletId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftGetInfoAsBytes(coinId, walletId));
+            return newResponse(jsonNode, "nft_info", NftInfo.class, Wallet.NFT_GET_INFO);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public ApiResponse<NftInfo> nftGetInfo(String coinId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftGetInfoAsBytes(coinId, null));
+            return newResponse(jsonNode, "nft_info", NftInfo.class, Wallet.NFT_GET_INFO);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftGetNftsAsBytes(int walletId, int startIdx, int amountLimit) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("start_index", startIdx)
+                    .put("num", amountLimit)
+                    .buildBytes();
+            var req = new Request(Wallet.NFT_GET_NFTS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<NftInfo>> nftGetNfts(int walletId, int startIdx, int amountLimit) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftGetNftsAsBytes(walletId, startIdx, amountLimit));
+            return newResponseList(jsonNode, "nft_list", TypeRefs.NFT_INFO_LIST, Wallet.NFT_GET_NFTS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftGetWalletDidAsBytes(int walletId) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
+            var req = new Request(Wallet.NFT_GET_WALLET_DID, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<String> nftGetWalletDid(int walletId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftGetWalletDidAsBytes(walletId));
+            return newResponse(jsonNode, "did_id", String.class, Wallet.NFT_GET_WALLET_DID);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftGetWalletsWithDidsAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Wallet.NFT_GET_WALLETS_WITH_DIDS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<NftWallet>> nftGetWalletsWithDids() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftGetWalletsWithDidsAsBytes());
+            return newResponseList(
+                    jsonNode, "nft_wallets", TypeRefs.NFT_WALLET_LIST, Wallet.NFT_GET_WALLETS_WITH_DIDS
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftMintBulkAsBytes(JsonNode mintData) throws RPCException {
+        try {
+            var req = new Request(Wallet.NFT_MINT_BULK, JsonUtils.writeBytes(mintData));
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SpendBundle> nftMintBulk(JsonNode mintData) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftMintBulkAsBytes(mintData));
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, Wallet.NFT_MINT_BULK);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftMintNftAsBytes(JsonNode jsonNode) throws RPCException {
+        try {
+            var req = new Request(Wallet.NFT_MINT_NFT, JsonUtils.writeBytes(jsonNode));
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SpendBundle> nftMintNft(JsonNode json) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftMintNftAsBytes(json));
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, Wallet.NFT_MINT_NFT
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftSetDidBulkAsBytes(JsonNode jsonNode) throws RPCException {
+        try {
+            var req = new Request(Wallet.NFT_SET_DID_BULK, JsonUtils.writeBytes(jsonNode));
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SpendBundle> nftSetDidBulk(JsonNode json) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftSetDidBulkAsBytes(json));
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, Wallet.NFT_SET_DID_BULK
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftSetNftDidAsBytes(int walletId, String nftCoinId, String did, long fee,
+            boolean reusePuzHash) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("nft_coin_id", nftCoinId)
+                    .put("did_id", did)
+                    .put("fee", fee)
+                    .put("reuse_puzhash", reusePuzHash)
+                    .buildBytes();
+            var req = new Request(Wallet.NFT_SET_NFT_DID, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SpendBundle> nftSetNftDid(int walletId, String nftCoinId, String did, long fee,
+            boolean reusePuzHash) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftSetNftDidAsBytes(
+                    walletId, nftCoinId, did, fee, reusePuzHash)
+            );
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, Wallet.NFT_SET_NFT_DID);
         } catch (
                 IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
     }
 
+    public byte[] nftSetNftStatusAsBytes(int walletId, String nftCoinId, boolean inTransaction)
+            throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("nft_coin_id", nftCoinId)
+                    .put("in_transaction", inTransaction)
+                    .buildBytes();
+            var req = new Request(Wallet.NFT_SET_NFT_STATUS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
 
+    public ApiResponse<Boolean> nftSetNftStatus(int walletId, String nftCoinId, boolean inTransaction)
+            throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftSetNftStatusAsBytes(walletId, nftCoinId, inTransaction));
+            return newResponse(jsonNode, "success", Boolean.class, Wallet.NFT_SET_NFT_STATUS);
+        } catch (
+                IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
 
+    public byte[] nftTransferBulkAsBytes(JsonNode jsonNode) throws RPCException {
+        try {
+            var req = new Request(Wallet.NFT_TRANSFER_BULK, JsonUtils.writeBytes(jsonNode));
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SpendBundle> nftTransferBulk(JsonNode json) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftTransferBulkAsBytes(json));
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, Wallet.NFT_TRANSFER_BULK
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] nftTransferNftAsBytes(int walletId, String nftCoinId, String targetAddress, long fee,
+            boolean reusePuzHash) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("nft_coin_id", nftCoinId)
+                    .put("target_address", targetAddress)
+                    .put("fee", fee)
+                    .put("reuse_puzhash", reusePuzHash)
+                    .buildBytes();
+            var req = new Request(Wallet.NFT_TRANSFER_NFT, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SpendBundle> nftTransferNft(int walletId, String nftCoinId, String targetAddress, long fee,
+            boolean reusePuzHash) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(nftTransferNftAsBytes(
+                    walletId, nftCoinId, targetAddress, fee, reusePuzHash)
+            );
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, Wallet.NFT_TRANSFER_NFT);
+        } catch (
+                IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    ///////////
+    /* Coins */
+    ///////////
+
+    public byte[] getCoinRecordsByNamesAsBytes(List<String> names, int startHeight, int endHeight,
+            boolean includeSpent) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("names", names)
+                    .put("start_height", startHeight)
+                    .put("end_height", endHeight)
+                    .put("include_spend_coins", includeSpent)
+                    .buildBytes();
+            var req = new Request(Wallet.GET_COIN_RECORDS_BY_NAMES, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<CoinRecord>> getCoinRecordsByNames(List<String> names, int startHeight, int endHeight,
+            boolean includeSpent) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(
+                    getCoinRecordsByNamesAsBytes(names, startHeight, endHeight, includeSpent)
+            );
+            return newResponseList(
+                    jsonNode, "coin_records", TypeRefs.COIN_RECORD_LIST, Wallet.GET_COIN_RECORDS_BY_NAMES
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
 
 }
