@@ -5,6 +5,7 @@ import io.mindspice.enums.ChiaService;
 import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.schemas.ApiResponse;
 import io.mindspice.schemas.TypeRefs;
+import io.mindspice.schemas.custom.PushedTx;
 import io.mindspice.schemas.fullnode.*;
 import io.mindspice.schemas.object.*;
 import io.mindspice.util.JsonUtils;
@@ -432,11 +433,11 @@ public class FullNodeAPI extends SharedAPI {
         }
     }
 
-    public ApiResponse<String> pushTx(SpendBundle spendBundle)
+    public ApiResponse<PushedTx> pushTx(SpendBundle spendBundle)
             throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(pushTxAsBytes(spendBundle));
-            return newResponse(jsonNode, "status", String.class, FullNode.PUSH_TX);
+            return newResponse(jsonNode, PushedTx.class, FullNode.PUSH_TX);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -622,6 +623,30 @@ public class FullNodeAPI extends SharedAPI {
         try {
             var jsonNode = JsonUtils.readTree(getFeeEstimateForCostAsBytes(cost, targetTimes, spendCount));
             return newResponse(jsonNode, FeeEstimate.class, FullNode.GET_FEE_ESTIMATE);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getNftRecipientAddressAsBytes(String puzzleReveal, String solution) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("puzzle_reveal", puzzleReveal)
+                    .put("solution", solution)
+                    .buildBytes();
+            var req = new Request(FullNode.GET_NFT_RECIPIENT_ADDRESS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<String> getNftRecipientAddress(String puzzleReveal, String solution) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getNftRecipientAddressAsBytes(puzzleReveal, solution));
+            return newResponse(
+                    jsonNode, "sender_puzzle_hash", String.class, FullNode.GET_NFT_RECIPIENT_ADDRESS
+            );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }

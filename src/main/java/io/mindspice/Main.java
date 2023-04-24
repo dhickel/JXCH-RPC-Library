@@ -65,7 +65,6 @@ public class Main {
                 .setWalletId(5)
                 .addMetaData(meta)
                         .build();
-        System.out.println(wallet.nftMintNft(jn));
 
     }
     public static void print(Object o) {
