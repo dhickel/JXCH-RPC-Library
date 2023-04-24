@@ -96,7 +96,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public ObjectNode build() {
+        public JsonNode build() {
             return node;
         }
     }
@@ -149,7 +149,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public ObjectNode build() {
+        public JsonNode build() {
             node.putPOJO("offer", offerNode);
             node.putPOJO("driver_dict", driverNode);
             if (solver != null) { node.putPOJO("solver", solver); }
@@ -201,7 +201,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public ObjectNode build() {
+        public JsonNode build() {
             return node;
         }
     }
@@ -284,7 +284,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public ObjectNode build() {
+        public JsonNode build() {
             if (!node.has("offer")) {
                 throw new IllegalStateException("Must include an offer");
             }
@@ -321,7 +321,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public ObjectNode build() {
+        public JsonNode build() {
             node.put("wallet_type", "cat_wallet");
             return node;
         }
@@ -379,7 +379,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public ObjectNode build() {
+        public JsonNode build() {
             node.put("wallet_type", "did_wallet");
             return node;
         }
@@ -404,7 +404,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public ObjectNode build() {
+        public JsonNode build() {
             node.put("wallet_type", "nft_wallet");
             return node;
         }
@@ -486,7 +486,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public ObjectNode build() {
+        public JsonNode build() {
             node.putPOJO("additions", additions);
             node.putPOJO("coins", coins);
             return node;
@@ -590,7 +590,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public ObjectNode build() {
+        public JsonNode build() {
             return node;
         }
     }
@@ -651,7 +651,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public ObjectNode build() {
+        public JsonNode build() {
             node.putPOJO("additions", additions);
             node.putPOJO("coins", coins);
             return node;
