@@ -1,0 +1,18 @@
+unnamed package
+io.mindspice
+io.mindspice.enums
+io.mindspice.enums.endpoints
+io.mindspice.http
+io.mindspice.schemas
+io.mindspice.schemas.daemon
+io.mindspice.schemas.farmer
+io.mindspice.schemas.fullnode
+io.mindspice.schemas.harvester
+io.mindspice.schemas.object
+io.mindspice.schemas.wallet
+io.mindspice.schemas.wallet.cat
+io.mindspice.schemas.wallet.did
+io.mindspice.schemas.wallet.nft
+io.mindspice.schemas.wallet.offers
+io.mindspice.util
+io.mindspice.util.jsondump
