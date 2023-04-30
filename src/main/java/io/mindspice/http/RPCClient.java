@@ -41,7 +41,8 @@ public class RPCClient {
             try {
                 pairStore.addKey(service.name(), config.getCertPair(service));
             } catch (IllegalStateException e) {
-                // TODO log this, it may happen if users does use all keys, but could be one failing to load
+                System.out.println("No cert pair found for: " + service);
+                System.out.println("Ignorable if you don't plan on using above service.");
             }
         }
         try {

@@ -2,6 +2,10 @@ package io.mindspice;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import io.mindspice.enums.ChiaService;
+import io.mindspice.util.JsonUtils;
+
+import java.io.File;
+import java.io.IOException;
 
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
@@ -57,9 +61,11 @@ public class NodeConfig {
     }
 
 
-    // Needed for jackson
-    private NodeConfig() {
+
+    public static NodeConfig loadConfig(String configPath) throws IOException {
+        return  JsonUtils.getMapper().readValue(new File(configPath), NodeConfig.class);
     }
+
 
 
     public String[] getCertPair(ChiaService service) throws IllegalStateException {
