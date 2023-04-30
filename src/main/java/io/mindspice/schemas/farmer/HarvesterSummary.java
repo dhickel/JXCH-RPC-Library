@@ -8,7 +8,7 @@ import java.math.BigInteger;
 
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record HarvesterSummary(
-        @JsonProperty("connection") Connection connection,
+        @JsonProperty("connection") HarvesterConnection harvesterConnection,
         @JsonProperty("duplicates") int duplicates,
         @JsonProperty("failed_to_open_filenames") int failedToOpenFilenames,
         @JsonProperty("last_sync_time") double lastSyncTime,

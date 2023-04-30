@@ -14,7 +14,7 @@ public record HarvesterDetails(
         @JsonProperty("syncing") Syncing syncing,
         @JsonProperty("no_key_filenames") List<String> noKeyFilenames,
         @JsonProperty("last_sync_time") double lastSyncTime,
-        @JsonProperty("connection") Connection connection,
+        @JsonProperty("connection") HarvesterConnection harvesterConnection,
         @JsonProperty("plots") List<Plot> plots
 ) {
     public HarvesterDetails {

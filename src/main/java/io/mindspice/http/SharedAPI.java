@@ -1,11 +1,16 @@
 package io.mindspice.http;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.mindspice.enums.ChiaService;
 import io.mindspice.enums.endpoints.Endpoint;
+import io.mindspice.enums.endpoints.Shared;
 import io.mindspice.schemas.ApiResponse;
+import io.mindspice.schemas.TypeRefs;
+import io.mindspice.schemas.shared.Connection;
 import io.mindspice.util.JsonUtils;
+import io.mindspice.util.RPCException;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -40,7 +45,7 @@ public abstract class SharedAPI {
         );
     }
 
-    protected  ApiResponse<JsonNode> newResponseNode(JsonNode jsonNode, String dataField,
+    protected ApiResponse<JsonNode> newResponseNode(JsonNode jsonNode, String dataField,
             Endpoint endpoint) throws IOException {
 
         var success = jsonNode.get("success").asBoolean();
@@ -57,7 +62,7 @@ public abstract class SharedAPI {
         );
     }
 
-    protected  ApiResponse<JsonNode> newResponseNode(JsonNode jsonNode, Endpoint endpoint) throws IOException {
+    protected ApiResponse<JsonNode> newResponseNode(JsonNode jsonNode, Endpoint endpoint) throws IOException {
 
         var success = jsonNode.get("success").asBoolean();
         Optional<JsonNode> data = success
@@ -72,9 +77,6 @@ public abstract class SharedAPI {
                 endpoint
         );
     }
-
-
-
 
     protected <T> ApiResponse<T> newResponse(JsonNode jsonNode, Class<T> type,
             Endpoint endpoint) throws IOException {
@@ -147,7 +149,6 @@ public abstract class SharedAPI {
         );
     }
 
-
     protected <T, U> ApiResponse<Map<T, U>> newResponseMap(JsonNode jsonNode, String dataField,
             TypeReference<Map<T, U>> typeRef, Endpoint endpoint) throws IOException {
 
@@ -208,11 +209,122 @@ public abstract class SharedAPI {
         );
     }
 
-//    protected <T> ApiResponse<T> newBasicResponse(JsonNode jsonNode, Endpoint endpoint) {
-//        return new ApiResponse<>(
-//                jsonNode.get("success").asBoolean(),
-//                jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-//                address + endpoint.getPath()
-//        );
-//    }
+    public byte[] closeConnectionAsBytes(String nodeId) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("node_id", nodeId);
+            var req = new Request(Shared.CLOSE_CONNECTION, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> closeConnection(String nodeId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(closeConnectionAsBytes(nodeId));
+            return newResponse(jsonNode, "success", Boolean.class, Shared.CLOSE_CONNECTION);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getConnectionsAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Shared.GET_CONNECTIONS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<Connection>> getConnections() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getConnectionsAsBytes());
+            return newResponseList(jsonNode, "connections", TypeRefs.CONNECTION_LIST, Shared.GET_CONNECTIONS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getRoutesAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Shared.GET_ROUTES, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<String>> getRoutes() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getRoutesAsBytes());
+            return newResponseList(jsonNode, "routes", TypeRefs.STRING_LIST, Shared.GET_ROUTES);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] healthzAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Shared.HEALTHZ, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> healthz() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(healthzAsBytes());
+            return newResponse(jsonNode, "success", Boolean.class, Shared.HEALTHZ);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] openConnectionAsBytes(String ip, int port) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("ip", ip)
+                    .put("port", port)
+                    .buildBytes();
+            var req = new Request(Shared.OPEN_CONNECTION, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> openConnection(String ip, int port) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(openConnectionAsBytes(ip, port));
+            return newResponse(jsonNode, "success", Boolean.class, Shared.OPEN_CONNECTION);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] stopNodeAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Shared.STOP_NODE, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> stopNode() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(healthzAsBytes());
+            return newResponse(jsonNode, "success", Boolean.class, Shared.STOP_NODE);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+
 }
