@@ -14,4 +14,10 @@ public class Request {
         this.endpoint = endpoint.getPath();
         this.data = data;
     }
+
+    public Request(ChiaService service, Endpoint endpoint, byte[] data) {
+        this.service = service;
+        this.endpoint = endpoint.getPath();
+        this.data = data;
+    }
 }

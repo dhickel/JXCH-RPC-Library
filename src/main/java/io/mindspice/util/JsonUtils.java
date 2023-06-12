@@ -3,12 +3,8 @@ package io.mindspice.util;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.mindspice.schemas.TypeRefs;
 
 import java.io.IOException;
 import java.util.Map;
@@ -20,10 +16,10 @@ public abstract class JsonUtils {
     private static Map<Class<?>, ObjectReader> readerCache;
     private static Map<Class<?>, ObjectWriter> writerCache;
     private static Map<TypeReference, ObjectReader> typeRefCache; // Raw type use is necessary evil for caching
-    private static ObjectNode emptyNode;
+    private static final ObjectNode emptyNode;
 
     static {
-        mapper = new ObjectMapper();//.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         readerCache = new ConcurrentHashMap<>(20);
         writerCache = new ConcurrentHashMap<>(20);
         typeRefCache = new ConcurrentHashMap<>(20);
@@ -133,9 +129,7 @@ public abstract class JsonUtils {
 
     public static JsonNode merge(JsonNode node1, JsonNode node2) {
         ObjectNode rootNode = (ObjectNode) node1;
-         node2.fields().forEachRemaining(entry -> {
-             rootNode.set(entry.getKey(), entry.getValue());
-         });
+         node2.fields().forEachRemaining(entry -> rootNode.set(entry.getKey(), entry.getValue()));
          return rootNode;
     }
 

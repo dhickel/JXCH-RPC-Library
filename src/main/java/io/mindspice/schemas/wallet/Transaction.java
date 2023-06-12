@@ -1,17 +1,13 @@
 package io.mindspice.schemas.wallet;
 
-import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.mindspice.schemas.object.Coin;
 import io.mindspice.schemas.object.SpendBundle;
-import io.mindspice.util.StringListDeserializer;
 
 
 public record Transaction(

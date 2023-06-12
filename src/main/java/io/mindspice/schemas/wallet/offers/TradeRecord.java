@@ -23,7 +23,7 @@ public record TradeRecord(
 	@JsonProperty("taken_offer") String takenOffer
 ) {
 	public TradeRecord {
-		coinsOfInterest = coinsOfInterest == null ? Collections.unmodifiableList(coinsOfInterest) : List.of();
+		coinsOfInterest = coinsOfInterest != null ? Collections.unmodifiableList(coinsOfInterest) : List.of();
 		pending = pending != null ? Collections.unmodifiableMap(pending) : Map.of();
 		sentTo = sentTo != null ? Collections.unmodifiableList(sentTo) : List.of();
 	}

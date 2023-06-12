@@ -1,8 +1,8 @@
 package io.mindspice;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import io.mindspice.enums.ChiaService;
-import io.mindspice.util.JsonUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,10 +63,12 @@ public class NodeConfig {
 
 
     public static NodeConfig loadConfig(String configPath) throws IOException {
-        return  JsonUtils.getMapper().readValue(new File(configPath), NodeConfig.class);
+        YAMLMapper mapper = new YAMLMapper();
+        return  mapper.readValue(new File(configPath), NodeConfig.class);
     }
 
-
+     NodeConfig() {
+    }
 
     public String[] getCertPair(ChiaService service) throws IllegalStateException {
         String[] certPair = null;
@@ -80,7 +82,7 @@ public class NodeConfig {
             case WALLET -> certPair = new String[]{walletCrt, walletKey};
         }
         if (certPair == null || certPair[0] == null || certPair[1] == null) {
-            throw new IllegalArgumentException("Null string in certificate pair, ensure certificate " +
+            throw new IllegalStateException("Null string in certificate pair, ensure certificate " +
                                                        "fields related to ChiaService have been assigned");
         }
         return certPair;
@@ -107,31 +109,30 @@ public class NodeConfig {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Config: ");
-        sb.append("\n  address: \"").append(address).append('\"');
-        sb.append(",\n  crawlerPort: ").append(crawlerPort);
-        sb.append(",\n  dataLayerPort: ").append(dataLayerPort);
-        sb.append(",\n  daemonPort: ").append(daemonPort);
-        sb.append(",\n  fullNodePort: ").append(fullNodePort);
-        sb.append(",\n  farmerPort: ").append(farmerPort);
-        sb.append(",\n  harvesterPort: ").append(harvesterPort);
-        sb.append(",\n  walletPort: ").append(walletPort);
-        sb.append(",\n  crawlerCrt: \"").append(crawlerCrt).append('\"');
-        sb.append(",\n  crawlerKey: \"").append(crawlerKey).append('\"');
-        sb.append(",\n  dataLayerCrt: \"").append(dataLayerCrt).append('\"');
-        sb.append(",\n  dataLayerKey: \"").append(dataLayerKey).append('\"');
-        sb.append(",\n  daemonCrt: \"").append(daemonCrt).append('\"');
-        sb.append(",\n  daemonKey: \"").append(daemonKey).append('\"');
-        sb.append(",\n  fullNodeCrt: \"").append(fullNodeCrt).append('\"');
-        sb.append(",\n  fullNodeKey: \"").append(fullNodeKey).append('\"');
-        sb.append(",\n  farmerCrt: \"").append(farmerCrt).append('\"');
-        sb.append(",\n  farmerKey: \"").append(farmerKey).append('\"');
-        sb.append(",\n  harvesterCrt: \"").append(harvesterCrt).append('\"');
-        sb.append(",\n  harvesterKey: \"").append(harvesterKey).append('\"');
-        sb.append(",\n  walletCrt: \"").append(walletCrt).append('\"');
-        sb.append(",\n  walletKey: \"").append(walletKey).append('\"');
-        sb.append("\n");
-        return sb.toString();
+        String sb = "Config: " + "\n  address: \"" + address + '\"' +
+                ",\n  crawlerPort: " + crawlerPort +
+                ",\n  dataLayerPort: " + dataLayerPort +
+                ",\n  daemonPort: " + daemonPort +
+                ",\n  fullNodePort: " + fullNodePort +
+                ",\n  farmerPort: " + farmerPort +
+                ",\n  harvesterPort: " + harvesterPort +
+                ",\n  walletPort: " + walletPort +
+                ",\n  crawlerCrt: \"" + crawlerCrt + '\"' +
+                ",\n  crawlerKey: \"" + crawlerKey + '\"' +
+                ",\n  dataLayerCrt: \"" + dataLayerCrt + '\"' +
+                ",\n  dataLayerKey: \"" + dataLayerKey + '\"' +
+                ",\n  daemonCrt: \"" + daemonCrt + '\"' +
+                ",\n  daemonKey: \"" + daemonKey + '\"' +
+                ",\n  fullNodeCrt: \"" + fullNodeCrt + '\"' +
+                ",\n  fullNodeKey: \"" + fullNodeKey + '\"' +
+                ",\n  farmerCrt: \"" + farmerCrt + '\"' +
+                ",\n  farmerKey: \"" + farmerKey + '\"' +
+                ",\n  harvesterCrt: \"" + harvesterCrt + '\"' +
+                ",\n  harvesterKey: \"" + harvesterKey + '\"' +
+                ",\n  walletCrt: \"" + walletCrt + '\"' +
+                ",\n  walletKey: \"" + walletKey + '\"' +
+                "\n";
+        return sb;
     }
 
 
@@ -159,6 +160,15 @@ public class NodeConfig {
         private String harvesterKey;
         private String walletCrt;
         private String walletKey;
+
+        public Builder setAddress(String address) {
+            this.address = address;
+            return this;
+        }
+
+        public String getAddress() {
+            return address;
+        }
 
 
         public Builder addServiceCert(ChiaService chiaService, String crtPath, String keyPath) {

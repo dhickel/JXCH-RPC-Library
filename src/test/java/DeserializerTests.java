@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DeserializerTests {
 
-    public static record testMultiStringArr(
+    public record testMultiStringArr(
             @JsonDeserialize(using = StringListDeserializer.class)
             List<String> arr
     ){}
@@ -30,7 +30,7 @@ public class DeserializerTests {
         testMultiStringArr test3 = JsonUtils.readJson(json3, testMultiStringArr.class);
         testMultiStringArr test4 = JsonUtils.readJson(json4, testMultiStringArr.class);
 
-        List<String> expectedList1 = Arrays.asList("string");
+        List<String> expectedList1 = List.of("string");
         List<String> expectedList2 = Arrays.asList("String", "3", "string", "string");
         List<String> expectedList3 = Arrays.asList("a", "1", "b", "2", "c", "3", "d");
         List<String> expectedList4 = Arrays.asList("a", "1", "b", "2", "c", "3", "string");

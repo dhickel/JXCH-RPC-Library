@@ -21,11 +21,13 @@ import java.util.Optional;
 
 public abstract class SharedAPI {
     protected final RPCClient client;
-    protected final String config_address;
+    protected final String serviceAddress;
+    protected final String nodeAddress;
 
     protected SharedAPI(RPCClient client, ChiaService chiaService) {
         this.client = client;
-        this.config_address = client.getAddressFor(chiaService);
+        this.serviceAddress = client.getAddressFor(chiaService);
+        this.nodeAddress = client.getAddress();
     }
 
     protected <T> ApiResponse<T> newResponse(JsonNode jsonNode, String dataField, Class<T> type,
@@ -40,7 +42,8 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }
@@ -57,7 +60,8 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }
@@ -73,7 +77,8 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }
@@ -90,7 +95,8 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }
@@ -110,7 +116,8 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }
@@ -130,7 +137,8 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }
@@ -144,7 +152,8 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }
@@ -164,7 +173,8 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }
@@ -184,7 +194,8 @@ public abstract class SharedAPI {
                 data,
                 success,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }
@@ -194,7 +205,8 @@ public abstract class SharedAPI {
                 Optional.of(object),
                 true,
                 "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }
@@ -204,7 +216,8 @@ public abstract class SharedAPI {
                 Optional.empty(),
                 false,
                 jsonNode.hasNonNull("error") ? jsonNode.get("error").asText() : "",
-                config_address + endpoint.getPath(),
+                nodeAddress,
+                serviceAddress + endpoint.getPath(),
                 endpoint
         );
     }

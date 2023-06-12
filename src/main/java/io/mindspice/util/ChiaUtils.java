@@ -2,7 +2,6 @@ package io.mindspice.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import io.mindspice.schemas.object.Coin;
 import io.mindspice.schemas.object.CoinSpend;
 import io.mindspice.schemas.object.SpendBundle;
@@ -294,7 +293,7 @@ public class ChiaUtils {
 
 
     public static class CatWalletBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
+        final ObjectNode node = JsonUtils.newEmptyNode();
 
         public CatWalletBuilder addFee(long fee) {
             node.put("fee", fee);
@@ -329,7 +328,7 @@ public class ChiaUtils {
 
 
     public static class DIDWalletBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
+        final ObjectNode node = JsonUtils.newEmptyNode();
 
         public DIDWalletBuilder addFee(long fee) {
             node.put("fee", fee);
@@ -364,7 +363,6 @@ public class ChiaUtils {
 
         public DIDWalletBuilder setNumOfBackUpsNeeded(int num) {
             if (num < 1) { throw new IllegalArgumentException("Backups needed must be more than 0"); }
-            ;
             node.put("num_of_backup_ids_needed", num);
             return this;
         }
@@ -387,7 +385,7 @@ public class ChiaUtils {
 
 
     public static class NFTWalletBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
+        final ObjectNode node = JsonUtils.newEmptyNode();
 
         public NFTWalletBuilder addFee(long fee) {
             node.put("fee", fee);
@@ -412,9 +410,9 @@ public class ChiaUtils {
 
 
     public static class SignedTransactionBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
-        List<Addition> additions = new ArrayList<>();
-        List<Coin> coins = new ArrayList<>();
+        final ObjectNode node = JsonUtils.newEmptyNode();
+        final List<Addition> additions = new ArrayList<>();
+        final List<Coin> coins = new ArrayList<>();
 
         public SignedTransactionBuilder setWalletId(int walletId) {
             node.put("wallet_id", walletId);
@@ -495,7 +493,7 @@ public class ChiaUtils {
 
 
     public static class SpendableCoinBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
+        final ObjectNode node = JsonUtils.newEmptyNode();
 
         public SpendableCoinBuilder setWalletId(int walletId) {
             node.put("wallet_id", walletId);
@@ -538,7 +536,7 @@ public class ChiaUtils {
 
 
     public static class TransactionBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
+        final ObjectNode node = JsonUtils.newEmptyNode();
 
         public TransactionBuilder setWalletId(int walletId) {
             node.put("wallet_id", walletId);
@@ -597,9 +595,9 @@ public class ChiaUtils {
 
 
     public static class MultiTransactionBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
-        List<Addition> additions = new ArrayList<>();
-        List<Coin> coins = new ArrayList<>();
+        final ObjectNode node = JsonUtils.newEmptyNode();
+        final List<Addition> additions = new ArrayList<>();
+        final List<Coin> coins = new ArrayList<>();
 
         public MultiTransactionBuilder setWalletId(int walletId) {
             node.put("wallet_id", walletId);
@@ -660,7 +658,7 @@ public class ChiaUtils {
 
 
     public static class SpendBundleBuilder {
-        List<CoinSpend> coinSpends = new ArrayList<>();
+        final List<CoinSpend> coinSpends = new ArrayList<>();
         String aggregatedSignature;
         String solution;
         String puzzleReveal;
@@ -709,10 +707,10 @@ public class ChiaUtils {
 
 
     public static class BulkMintBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
-        List<MetaData> metaList = new ArrayList<>();
-        List<String> targetList = new ArrayList<>();
-        List<String> coinList = new ArrayList<>();
+        final ObjectNode node = JsonUtils.newEmptyNode();
+        final List<MetaData> metaList = new ArrayList<>();
+        final List<String> targetList = new ArrayList<>();
+        final List<String> coinList = new ArrayList<>();
 
         public BulkMintBuilder setWalletId(int walletId) {
             node.put("wallet_id", walletId);
@@ -813,9 +811,9 @@ public class ChiaUtils {
 
 
     public static class MetaDataBuilder {
-        List<String> uris = new ArrayList<>();
-        List<String> metaUris = new ArrayList<>();
-        List<String> licenseUris = new ArrayList<>();
+        final List<String> uris = new ArrayList<>();
+        final List<String> metaUris = new ArrayList<>();
+        final List<String> licenseUris = new ArrayList<>();
         String hash;
         String metaHash;
         String licenseHash;
@@ -828,7 +826,7 @@ public class ChiaUtils {
         }
 
         public MetaDataBuilder addUris(List<String> uris) {
-            uris.addAll(uris);
+            this.uris.addAll(uris);
             return this;
         }
 
@@ -897,7 +895,7 @@ public class ChiaUtils {
 
 
     public static class SingleMintBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
+        final ObjectNode node = JsonUtils.newEmptyNode();
         MetaData metaData;
         int walletId = -1;
 
@@ -951,8 +949,8 @@ public class ChiaUtils {
 
 
     public static class SetDidBulkBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
-        List<NftCoin> nftCoins = new ArrayList<>();
+        final ObjectNode node = JsonUtils.newEmptyNode();
+        final List<NftCoin> nftCoins = new ArrayList<>();
 
         public SetDidBulkBuilder addNft(String coinId, int walletId) {
             nftCoins.add(new NftCoin(coinId, walletId));
@@ -986,8 +984,8 @@ public class ChiaUtils {
 
 
     public static class NftBulkTransferBuilder {
-        ObjectNode node = JsonUtils.newEmptyNode();
-        List<NftCoin> nftCoins = new ArrayList<>();
+        final ObjectNode node = JsonUtils.newEmptyNode();
+        final List<NftCoin> nftCoins = new ArrayList<>();
 
         public NftBulkTransferBuilder addNft(String coinId, int walletId) {
             nftCoins.add(new NftCoin(coinId, walletId));

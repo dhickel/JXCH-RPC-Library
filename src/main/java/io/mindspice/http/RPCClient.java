@@ -30,12 +30,13 @@ import java.util.Arrays;
 
 
 public class RPCClient {
-    private CloseableHttpClient client;
-    private NodeConfig config;
+    private final CloseableHttpClient client;
+    private final NodeConfig config;
 
     public RPCClient(NodeConfig config) throws IllegalStateException {
         this.config = config;
         var pairStore = new CertPairStore();
+
 
         for (var service : ChiaService.values()) {
             try {
@@ -71,7 +72,7 @@ public class RPCClient {
 
         try {
             var uri = new URI(config.getAddressOf(req.service) + req.endpoint);
-            System.out.println(uri.toString());
+            System.out.println(uri);
             var httpPost = new HttpPost(uri);
             httpPost.setEntity(new ByteArrayEntity(req.data));
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
@@ -100,5 +101,9 @@ public class RPCClient {
 
     public String getAddressFor(ChiaService cs) {
         return config.getAddressOf(cs);
+    }
+
+    public String getAddress() {
+        return config.getAddress();
     }
 }

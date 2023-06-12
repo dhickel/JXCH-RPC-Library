@@ -2,10 +2,8 @@ package io.mindspice.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.mindspice.enums.ChiaService;
 import io.mindspice.enums.NftDataKey;
-import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.enums.endpoints.Wallet;
 import io.mindspice.schemas.ApiResponse;
 import io.mindspice.schemas.TypeRefs;
@@ -18,13 +16,12 @@ import io.mindspice.schemas.wallet.cat.Cat;
 import io.mindspice.schemas.wallet.cat.CatAssetInfo;
 import io.mindspice.schemas.wallet.cat.StrayCat;
 import io.mindspice.schemas.wallet.did.*;
-import io.mindspice.schemas.wallet.SignedTransaction;
 import io.mindspice.schemas.wallet.nft.*;
 import io.mindspice.schemas.wallet.offers.*;
 import io.mindspice.util.JsonUtils;
 import io.mindspice.util.RPCException;
-import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -268,9 +265,9 @@ public class WalletAPI extends SharedAPI {
         }
     }
 
-    public ApiResponse<TransactionStatus> catSpend(JsonNode catSpendbuilder) throws RPCException {
+    public ApiResponse<TransactionStatus> catSpend(JsonNode catSpendBuilder) throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(catSpendAsBytes(catSpendbuilder));
+            var jsonNode = JsonUtils.readTree(catSpendAsBytes(catSpendBuilder));
             return newResponse(jsonNode, TransactionStatus.class, Wallet.CAT_SPEND);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
