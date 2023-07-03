@@ -13,7 +13,7 @@ The Goals of the library are as follows:
 
 - Provide a modern simple to use library for interfacing with the Chia blockchain via RPC requests to nodes and wallets.
 - Provide a modular/granular library implementation that allows for various levels of use.
-- Provide a means to load self signed certificates via their .crt & .key files into a keystore.
+- Provide a means to load self-signed certificates via their .crt & .key files into a keystore.
 - Provide a RPCClient wrapper around Apache Closeable HTTP Client for making direct requests to predefined endpoints using defined configs.
 - Provide API classes that provide a higher level implementation of methods for making RPC request.
 - Provide the option to manually handle response json.
@@ -23,7 +23,7 @@ The Goals of the library are as follows:
 
 <br>
 
-Using the above outlined features the library can be used simply to load self signed certificate/key pairs (which can be a challenge with java), be used simply as a RPCClient to make a process requests/response json manually or be used as a full abstraction for making RPC calls with requests returned as predefined immutable java records that map 1:1 with response data. Due to the nature of blockchains being immutable, and immutability being generally preferable whenever possible, all data relating to responses is contained in immutable records, and all collections that returned are also wrapped immutably. As such this library can provide a solid backbone for interfacing via RPC in a simply, safely and allows for thread safe high performance processing of RPC requests across multiple nodes/wallets.
+Using the above outlined features the library can be used simply to load self-signed certificate/key pairs (which can be a challenge with java), be used simply as a RPCClient to make a process requests/response json manually or be used as a full abstraction for making RPC calls with requests returned as predefined immutable java records that map 1:1 with response data. Due to the nature of blockchains being immutable, and immutability being generally preferable whenever possible, all data relating to responses is contained in immutable records, and all collections that returned are also wrapped immutably. As such this library can provide a solid backbone for interfacing via RPC in a simple and safe manner and allowing for thread safe high performance processing of RPC requests across multiple nodes/wallets.
 
 <br>
 
