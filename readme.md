@@ -5,6 +5,8 @@
 
 <br>
 
+***Currently implements Chia Blockchain RPC API up to 1.7.1, 1.8.2 coming soon. Datalayer support not currently implemented***
+
 
 # **About**
 This library aims to provide a modular and robust RPC library for interacting with the Chia blockchain and directly interfacing with node/wallets it via Java.
@@ -42,7 +44,7 @@ Currently, the library provides implementations for all endpoints ***except for 
 - Add DataLayer Endpoints
 - Add JavaDocs mirroring RPC documentation for all the Api member methods
 - Add Unit Tests
-- Implement BLS functionalities, or include from an existing library (https://github.com/chiachat/kbls is a good existing one)
+- Implement BLS functionalities,  (https://github.com/chiachat/kbls is a good existing one wtih aggregation if needed)
 
 <br>
 
@@ -50,7 +52,7 @@ When writing the library I didn't have any experience with using the data layer 
 
 Unit tests are not the easiest to implement due to the complexity of some of the api parameters and their response, but it still would be a great benefits for regression testing, proper validation, and will be indispensable for endpoint changes. There was a lot of ground to cover when writing all of the endpoint methods, so I didn't implement any unit tests while writing. I did test all the endpoints while implementing and manually validated them, but this not a valid or maintainable metric to go by.
 
-Things like fully crafting spendbundles would benefit from BLS functionality, mainly aggregation, and it would also be nice to provide the ability to do puzzlehash <-> address conversion. KBLS(https://github.com/chiachat/kbls ) is a nice java library for this that I have used before, and likely will be implemented in the next release. I wanted to keep the first release simple so I didn't add it into this release. But the goal is to have the library provide all functionality needed to interface with the blockchain, and BLS signature aggregation is needed for this.
+Things like fully crafting spendbundles would benefit from BLS functionality, mainly aggregation, and it would also be nice to provide the ability to do puzzlehash <-> address conversion. KBLS(https://github.com/chiachat/kbls ) is a nice java library for this if you need BLS for your project. I wanted to keep the first release simple so I didn't approach  BLS. But the goal is to have the library provide all functionality needed to interface with the blockchain, and BLS signature aggregation is needed for this.
 
 <br>
 
