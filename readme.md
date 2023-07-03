@@ -275,8 +275,10 @@ ApiResponse<BlockChainState> response =  node.getBlockChainState();
 var response = node.getBlockChainState();
 ```
 
-
 <br>
+
+***All Api requests throw RPCException***
+
 <br>
 
 
@@ -499,7 +501,7 @@ wallet.getSpendableCoins(req);
 ## **JsonUtils**
 <br>
 
-This is a small custom wrapper around the Jackson json library that provide fluent functionality, some extra caching and is mainly used lessen the amount of code needed in the internal methods of the library. Since json performance should not be a bottleneck it is also implemented as a singleton to make it easy to reused the same ObjectMapper anywhere in a project. This class will also makes uses of reader for classes to deserialize allowing for performant, thread-safe deserialization. This will scale well into deserializing thousands of requests per second. It can also be used directly if one is choosing to not use the API methods and wants to craft the request json by hand to use directly with RPCClient.
+This is a small custom wrapper around the Jackson json library that provides fluent functionality, some extra caching and is mainly used lessen the amount of code needed in the internal methods of the library. Since json performance should not be a bottleneck it is also implemented as a singleton to make it easy to reused the same ObjectMapper anywhere in a project. This class will also makes uses of reader for classes to deserialize allowing for performant, thread-safe deserialization. This will scale well into deserializing thousands of requests per second. It can also be used directly if one is choosing to not use the API methods and wants to craft the request json by hand to use directly with RPCClient.
 
 Most of the methods are simple wrappers of existing ObjectMapper methods, and are used to easily contain them to the singleton without having to explicitly do ```mapper.x``` while also providing some caching of existing readers and type references.
 
