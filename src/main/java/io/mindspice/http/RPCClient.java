@@ -77,17 +77,12 @@ public class RPCClient {
             httpPost.setEntity(new ByteArrayEntity(req.data));
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 
-            System.out.println("Request method: " + httpPost.getMethod());
-            System.out.println("Request URI: " + httpPost.getURI());
-            System.out.println("Request headers: " + Arrays.toString(httpPost.getAllHeaders()));
-            System.out.println("Request payload: " + EntityUtils.toString(httpPost.getEntity()));
 
             try (CloseableHttpResponse response = client.execute(httpPost)) {
                 InputStream content = response.getEntity().getContent();
                 byte[] bytes = content.readAllBytes();
                 System.out.println(new String(bytes));
                 return bytes;
-                //return content.readAllBytes();
             }
 
 
