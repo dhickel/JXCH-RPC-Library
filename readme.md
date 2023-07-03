@@ -1,12 +1,6 @@
 
 # ***Disclaimer***
-***JChia-RPC-Library is n unofficial third party library and has no relation to, or endorsement by Chia Network, Inc***
-
-
-<br>
-
-
-
+***JXCH-RPC-Library is an unofficial third party library and has no relation to, or endorsement by Chia Network, Inc***
 
 # **About**
 ***Currently implements Chia Blockchain RPC API up to 1.7.1, 1.8.2 coming soon. Datalayer support not currently implemented***
