@@ -23,7 +23,7 @@ The Goals of the library are as follows:
 
 <br>
 
-Using the above outlined features the library can be used simply to load self-signed certificate/key pairs (which can be a challenge with java), be used simply as a RPCClient to make a process requests/response json manually or be used as a full abstraction for making RPC calls with requests returned as predefined immutable java records that map 1:1 with response data. Due to the nature of blockchains being immutable, and immutability being generally preferable whenever possible, all data relating to responses is contained in immutable records, and all collections that returned are also wrapped immutably. As such this library can provide a solid backbone for interfacing via RPC in a simple and safe manner and allowing for thread safe high performance processing of RPC requests across multiple nodes/wallets.
+Using the above outlined features the library can be used simply to load self-signed certificate/key pairs (which can be a challenge with java), be used simply as a RPCClient to make a process requests/response json manually or be used as a full abstraction for making RPC calls with requests returned as predefined immutable java records that map 1:1 with response data. Due to the nature of blockchains being immutable, and immutability being generally preferable whenever possible, all data relating to responses is contained in immutable records, and all collections that returned are also wrapped immutably. As such this library can provide a solid backbone for interfacing via RPC in a simple and safe manner, allowing for thread safe high performance processing of RPC requests across multiple nodes/wallets.
 
 <br>
 
