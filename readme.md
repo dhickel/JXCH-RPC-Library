@@ -1,12 +1,12 @@
 
 # ***Disclaimer***
-***JChia-RPC-Library is n unofficial third party library and has no relation to, or endorsement by Chia Network, Inc***
+***JXCH-RPC-Library is an unofficial third party library and has no relation to, or endorsement by Chia Network, Inc***
 
+# **About**
+***Currently implements Chia Blockchain RPC API up to 1.7.1, 1.8.2 coming soon. Datalayer support not currently implemented***
 
 <br>
 
-
-# **About**
 This library aims to provide a modular and robust RPC library for interacting with the Chia blockchain and directly interfacing with node/wallets it via Java.
 
 The Goals of the library are as follows:
@@ -42,7 +42,7 @@ Currently, the library provides implementations for all endpoints ***except for 
 - Add DataLayer Endpoints
 - Add JavaDocs mirroring RPC documentation for all the Api member methods
 - Add Unit Tests
-- Implement BLS functionalities, or include from an existing library (https://github.com/chiachat/kbls is a good existing one)
+- Implement BLS functionalities,  (https://github.com/chiachat/kbls is a good existing one wtih aggregation if needed)
 
 <br>
 
@@ -50,7 +50,7 @@ When writing the library I didn't have any experience with using the data layer 
 
 Unit tests are not the easiest to implement due to the complexity of some of the api parameters and their response, but it still would be a great benefits for regression testing, proper validation, and will be indispensable for endpoint changes. There was a lot of ground to cover when writing all of the endpoint methods, so I didn't implement any unit tests while writing. I did test all the endpoints while implementing and manually validated them, but this not a valid or maintainable metric to go by.
 
-Things like fully crafting spendbundles would benefit from BLS functionality, mainly aggregation, and it would also be nice to provide the ability to do puzzlehash <-> address conversion. KBLS(https://github.com/chiachat/kbls ) is a nice java library for this that I have used before, and likely will be implemented in the next release. I wanted to keep the first release simple so I didn't add it into this release. But the goal is to have the library provide all functionality needed to interface with the blockchain, and BLS signature aggregation is needed for this.
+Things like fully crafting spendbundles would benefit from BLS functionality, mainly aggregation, and it would also be nice to provide the ability to do puzzlehash <-> address conversion. KBLS(https://github.com/chiachat/kbls ) is a nice java library for this if you need BLS for your project. I wanted to keep the first release simple so I didn't approach  BLS. But the goal is to have the library provide all functionality needed to interface with the blockchain, and BLS signature aggregation is needed for this.
 
 <br>
 
@@ -275,8 +275,10 @@ ApiResponse<BlockChainState> response =  node.getBlockChainState();
 var response = node.getBlockChainState();
 ```
 
-
 <br>
+
+***All Api requests throw RPCException***
+
 <br>
 
 
@@ -499,7 +501,7 @@ wallet.getSpendableCoins(req);
 ## **JsonUtils**
 <br>
 
-This is a small custom wrapper around the Jackson json library that provide fluent functionality, some extra caching and is mainly used lessen the amount of code needed in the internal methods of the library. Since json performance should not be a bottleneck it is also implemented as a singleton to make it easy to reused the same ObjectMapper anywhere in a project. This class will also makes uses of reader for classes to deserialize allowing for performant, thread-safe deserialization. This will scale well into deserializing thousands of requests per second. It can also be used directly if one is choosing to not use the API methods and wants to craft the request json by hand to use directly with RPCClient.
+This is a small custom wrapper around the Jackson json library that provides fluent functionality, some extra caching and is mainly used lessen the amount of code needed in the internal methods of the library. Since json performance should not be a bottleneck it is also implemented as a singleton to make it easy to reused the same ObjectMapper anywhere in a project. This class will also makes uses of reader for classes to deserialize allowing for performant, thread-safe deserialization. This will scale well into deserializing thousands of requests per second. It can also be used directly if one is choosing to not use the API methods and wants to craft the request json by hand to use directly with RPCClient.
 
 Most of the methods are simple wrappers of existing ObjectMapper methods, and are used to easily contain them to the singleton without having to explicitly do ```mapper.x``` while also providing some caching of existing readers and type references.
 
