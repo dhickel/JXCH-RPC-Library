@@ -103,6 +103,28 @@ The library was developed using Java 17, but *should* be compatible with Java 14
 ```
 <br>
 
+
+# Building
+
+Due to the nature of blockchain and key access needed for RPC, I have chosen to not provide a jar for the first releases, 
+at a later date a maven repo will be set up once the project is more mature.
+Building is really simple. But installing it to you local maven repository is as simple as:
+
+- cd into the directory you want to download to
+ - run `git clone https://github.com/mindspice/JXCH-RPC-Library`
+ - run `mvn clean install`
+
+This will package the library and add it to you local maven repository, then you can add it to your project pom as:
+```xml
+<dependency>
+    <groupId>io.mindspice</groupId>
+    <artifactId>jxch-rpc-library</artifactId>
+    <version>0.1.0</version>
+</dependency>
+
+```
+
+
 # **Usage**
 
 <br>
@@ -359,13 +381,60 @@ if (response.data().isPresent()) {
     // act on data                                         
 }
 
-// Example of using streams on a list of data elements that may have empty values
-long totalFees = recordsList.stream()                                   
-    .filter(r -> r.data().isPresent())                                  
-    .mapToLong(r -> r.data().get().fees()) 
-    .sum();                                                             
+
+// Example of using streams on a list of of fees, will return the sum of 0 if data is not present
+long totalFees= recordsList.stream()
+        .flatMap(r -> r.data().map(Stream::of).orElseGet(Stream::empty))
+        .mapToLong(Data::fees)
+        .sum();                                                          
 
 ```
+
+## **A note on Optionals**
+
+I know many people are not too familiar with or, or favorable of optionals. When first designing the library they weren't
+the first choice, but after getting further in development they became the clear path to deal with the fact that an endpoint
+could return and empty response and wanting to be able to handle this, while also providing a generic ApiResponse class
+that contained information related to the request regardless if it failed or return an empty response. They also provide
+the ability to embrace more functional paradigms when using the library. Either way null check would be needed for data,
+and by using optional it the same amount of lines to do an ```isPresent()``` check and then getting the value. But with
+the use of optionals you can also do things like:
+
+
+String coinName = "0x1fd60c070e821d785b65e10e5135e52d12c8f4d902a506f48bc1c5268b7bb45b";
+ApiResponse<List<CoinRecords>> apiResponse = walletAPI.getCoinRecordsByNames(List.of(coinName));
+
+```java
+
+
+// Retrieve a list of parent coins for all coins contained in the coinRecords list (only 1 in this case), and throw a default
+// NoSuchElementException
+
+List<CoinRecord> coinRecords = apiResponse.data()
+        .orElseThrow()
+        .stream()
+        .filter(cr -> cr.parentCoinInfo() != null)
+        .toList();
+
+// Do the same but with a custom exception
+
+List<CoinRecord> coinRecords = apiResponse.data()
+.orElseThrow(() -> new RPCException("Request Failed))
+.stream()
+.filter(cr -> cr.parentCoinInfo() != null)
+.toList();
+
+
+
+// Get an empty list if data is of type Optional.empty 
+List<CoinRecord> coinRecordsList = apiResponse.data().orElseGet(Collections::emptyList);
+```
+
+There are a lot of different functional interfaces and ways that data can be  accessed, filtered, mapped and dealt with 
+when absent when using the optional type. This is one of the few areas where the library imposes a strict paradigm, but imo 
+it is the best approach as it allows for cleaner more concise code than traditional null checking and data manipulation. It also embraces
+a more modern functional approach to java.
+
 
 <br>
 
