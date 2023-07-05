@@ -392,12 +392,12 @@ long totalFees= recordsList.stream()
 
 ## **A note on Optionals**
 
-I know many people are not too familiar with or, or favorable of optionals. When first designing the library they weren't
+I know many people are not too familiar with or favorable of optionals. When first designing the library they weren't
 the first choice, but after getting further in development they became the clear path to deal with the fact that an endpoint
 could return and empty response and wanting to be able to handle this, while also providing a generic ApiResponse class
 that contained information related to the request regardless if it failed or return an empty response. They also provide
 the ability to embrace more functional paradigms when using the library. Either way null check would be needed for data,
-and by using optional it the same amount of lines to do an ```isPresent()``` check and then getting the value. But with
+and by using optional results the same amount of lines to do an ```isPresent()``` check and then getting the value. But with
 the use of optionals you can also do things like:
 
 
@@ -417,7 +417,6 @@ List<CoinRecord> coinRecords = apiResponse.data()
         .toList();
 
 // Do the same but with a custom exception
-
 List<CoinRecord> coinRecords = apiResponse.data()
 .orElseThrow(() -> new RPCException("Request Failed))
 .stream()
@@ -430,9 +429,9 @@ List<CoinRecord> coinRecords = apiResponse.data()
 List<CoinRecord> coinRecordsList = apiResponse.data().orElseGet(Collections::emptyList);
 ```
 
-There are a lot of different functional interfaces and ways that data can be  accessed, filtered, mapped and dealt with 
+There are a lot of different functional interfaces and ways that data can be accessed, filtered, mapped and dealt with 
 when absent when using the optional type. This is one of the few areas where the library imposes a strict paradigm, but imo 
-it is the best approach as it allows for cleaner more concise code than traditional null checking and data manipulation. It also embraces
+it is the best approach as it allows for cleaner, more concise code than traditional null checking and data manipulation. It also embraces
 a more modern functional approach to java.
 
 
