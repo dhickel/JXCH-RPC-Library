@@ -1,10 +1,9 @@
 package io.mindspice.schemas.object;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
-record FoliageBlockData(
+public record FoliageBlockData(
         @JsonProperty("extension_data") String extensionData,
         @JsonProperty("farmer_reward_puzzle_hash") String farmerRewardPuzzleHash,
         @JsonProperty("pool_signature") String poolSignature,
