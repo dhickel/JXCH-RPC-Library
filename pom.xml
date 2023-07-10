@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.mindspice</groupId>
-    <artifactId>jxch-rpc-library</artifactId>
+    <artifactId>jxch-rpc-library-custom</artifactId>
     <version>0.1.0</version>
 
     <properties>
@@ -14,31 +14,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-
-
-<!--    <plugins>-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.jetbrains.kotlin</groupId>-->
-    <!--                <artifactId>kotlin-maven-plugin</artifactId>-->
-    <!--                <version>1.8.10</version>-->
-    <!--                <executions>-->
-    <!--                    <execution>-->
-    <!--                        <id>compile</id>-->
-    <!--                        <goals>-->
-    <!--                            <goal>compile</goal>-->
-    <!--                        </goals>-->
-    <!--                    </execution>-->
-    <!--                    <execution>-->
-    <!--                        <id>test-compile</id>-->
-    <!--                        <goals>-->
-    <!--                            <goal>test-compile</goal>-->
-    <!--                        </goals>-->
-    <!--                    </execution>-->
-    <!--                </executions>-->
-    <!--                <configuration>-->
-    <!--                    <jvmTarget>17</jvmTarget>-->
-    <!--                </configuration>-->
-    <!--            </plugin>-->
 
     <dependencies>
 
