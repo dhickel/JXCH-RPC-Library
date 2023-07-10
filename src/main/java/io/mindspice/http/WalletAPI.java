@@ -7,6 +7,7 @@ import io.mindspice.enums.NftDataKey;
 import io.mindspice.enums.endpoints.Wallet;
 import io.mindspice.schemas.ApiResponse;
 import io.mindspice.schemas.TypeRefs;
+import io.mindspice.schemas.custom.NftBundle;
 import io.mindspice.schemas.fullnode.Network;
 import io.mindspice.schemas.object.Coin;
 import io.mindspice.schemas.object.CoinRecord;
@@ -1961,10 +1962,10 @@ public class WalletAPI extends SharedAPI {
         }
     }
 
-    public ApiResponse<SpendBundle> nftMintBulk(JsonNode bulkMintBuilder) throws RPCException {
+    public ApiResponse<NftBundle> nftMintBulk(JsonNode bulkMintBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftMintBulkAsBytes(bulkMintBuilder));
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, Wallet.NFT_MINT_BULK);
+            return newResponse(jsonNode, NftBundle.class, Wallet.NFT_MINT_BULK);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }

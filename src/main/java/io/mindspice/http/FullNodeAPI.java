@@ -6,7 +6,6 @@ import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.schemas.ApiResponse;
 import io.mindspice.schemas.TypeRefs;
 import io.mindspice.schemas.custom.InclusionCost;
-import io.mindspice.schemas.custom.NftRecipient;
 import io.mindspice.schemas.custom.PushedTx;
 import io.mindspice.schemas.fullnode.*;
 import io.mindspice.schemas.object.*;
@@ -647,10 +646,10 @@ public class FullNodeAPI extends SharedAPI {
     }
 
     // Note fee estimate can also take spend_type, but it seems to not be used atm
-    public ApiResponse<NftRecipient> getNftRecipientAddress(String puzzleReveal, String solution) throws RPCException {
+    public ApiResponse<String> getNftRecipientAddress(String puzzleReveal, String solution) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getNftRecipientAddressAsBytes(puzzleReveal, solution));
-            return newResponse(jsonNode, NftRecipient.class, FullNode.GET_NFT_RECIPIENT_ADDRESS);
+            return newResponse(jsonNode, "nft_recipient_address", String.class, FullNode.GET_NFT_RECIPIENT_ADDRESS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
