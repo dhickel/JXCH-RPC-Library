@@ -5,6 +5,8 @@ import io.mindspice.enums.ChiaService;
 import io.mindspice.enums.endpoints.FullNode;
 import io.mindspice.schemas.ApiResponse;
 import io.mindspice.schemas.TypeRefs;
+import io.mindspice.schemas.custom.InclusionCost;
+import io.mindspice.schemas.custom.NftRecipient;
 import io.mindspice.schemas.custom.PushedTx;
 import io.mindspice.schemas.fullnode.*;
 import io.mindspice.schemas.object.*;
@@ -645,10 +647,30 @@ public class FullNodeAPI extends SharedAPI {
     }
 
     // Note fee estimate can also take spend_type, but it seems to not be used atm
-    public ApiResponse<FeeEstimate> getNftRecipientAddress(String puzzleReveal, String solution) throws RPCException {
+    public ApiResponse<NftRecipient> getNftRecipientAddress(String puzzleReveal, String solution) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getNftRecipientAddressAsBytes(puzzleReveal, solution));
-            return newResponse(jsonNode, FeeEstimate.class, FullNode.GET_NFT_RECIPIENT_ADDRESS);
+            return newResponse(jsonNode, NftRecipient.class, FullNode.GET_NFT_RECIPIENT_ADDRESS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getSpendBundleInclusionCostAsBytes(SpendBundle spendBundle) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("spend_bundle", spendBundle);
+            var req = new Request(FullNode.GET_SPENDBUNDLE_INCLUSION_COST, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    // Note fee estimate can also take spend_type, but it seems to not be used atm
+    public ApiResponse<InclusionCost> getSpendBundleInclusionCost(SpendBundle spendBundle) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getSpendBundleInclusionCostAsBytes(spendBundle));
+            return newResponse(jsonNode, InclusionCost.class, FullNode.GET_SPENDBUNDLE_INCLUSION_COST);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
