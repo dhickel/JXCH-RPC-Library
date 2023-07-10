@@ -20,7 +20,7 @@ public record PoolWalletStatus(
                 : List.of();
     }
 
-    record State(
+    public record State(
             @JsonProperty("current") PoolInfo poolInfo,
             @JsonProperty("launcher_coin") Coin launcherCoin,
             @JsonProperty("current_inner") String currentInner,

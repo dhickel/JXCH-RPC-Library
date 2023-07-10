@@ -8,7 +8,6 @@ import io.mindspice.schemas.object.SpendBundle;
 
 
 public record SignedTransaction(
-
 	@JsonProperty("amount") long amount,
 	@JsonProperty("spend_bundle") SpendBundle spendBundle,
 	@JsonProperty("additions") List<Coin> additions,
