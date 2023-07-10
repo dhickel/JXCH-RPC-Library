@@ -19,7 +19,7 @@ public record SignagePointBundle(
     }
 
 
-    record SpInfo(
+    public record SpInfo(
             @JsonProperty("difficulty") int difficulty,
             @JsonProperty("signage_point_index") int signagePointIndex,
             @JsonProperty("reward_chain_sp") String rewardChainSp,

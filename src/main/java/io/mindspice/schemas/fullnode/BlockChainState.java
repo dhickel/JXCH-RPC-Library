@@ -25,7 +25,7 @@ public record BlockChainState(
         @JsonProperty("sub_slot_iters") long subSlotIters,
         @JsonProperty("sync") Sync sync
 ) {
-    record Peak(
+    public record Peak(
             @JsonProperty("challenge_block_info_hash") String challengeBlockInfoHash,
             @JsonProperty("challenge_vdf_output") Output challengeVdfOutput,
             @JsonProperty("deficit") int deficit,
@@ -72,7 +72,7 @@ public record BlockChainState(
     }
 
 
-    record Sync(
+    public record Sync(
             @JsonProperty("sync_mode") boolean syncMode,
             @JsonProperty("sync_progress_height") int syncProgressHeight,
             @JsonProperty("sync_tip_height") int syncTipHeight,
