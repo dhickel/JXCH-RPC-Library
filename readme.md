@@ -441,7 +441,7 @@ a more modern functional approach to java.
 
 <br>
 
- Found in ```io.mindspice.schemas.object``` these are a subset of the schema objects that are directly related to on-chain info and direct interactions with the blockchain/nodes.
+ Found in ```io.mindspice.jxch.rpc.schemas.object``` these are a subset of the schema objects that are directly related to on-chain info and direct interactions with the blockchain/nodes.
 
 <br>
 
@@ -501,7 +501,7 @@ The enums classes containing the enums of the endpoints are:
 
 <br>
 
-Any of the API endpoints that directly take a JsonNode, have an associated builder method that can be found in ```io.mindspice.util.ChiaUtils```. These will later be documented in the JavaDocs for the project, but currently are not, which can be slightly confusing and was an oversight. JavaDocs for all the the API methods, will be added soon and should clear things up more. ***When encountering a method that takes a parameter of type JsonNode, the parameter name is the name of the builder you should use.*** These are used for endpoints that have a lot of parameters and/or optional parameters. If a method take a JsonNode (The builders actually return an ObjectNode, but these are interchangeable in this context) type parameter, then there is a related builder method. There is also a builder method for crafting spendbundles.
+Any of the API endpoints that directly take a JsonNode, have an associated builder method that can be found in ```io.mindspice.jxch.rpc.util.ChiaUtils```. These will later be documented in the JavaDocs for the project, but currently are not, which can be slightly confusing and was an oversight. JavaDocs for all the the API methods, will be added soon and should clear things up more. ***When encountering a method that takes a parameter of type JsonNode, the parameter name is the name of the builder you should use.*** These are used for endpoints that have a lot of parameters and/or optional parameters. If a method take a JsonNode (The builders actually return an ObjectNode, but these are interchangeable in this context) type parameter, then there is a related builder method. There is also a builder method for crafting spendbundles.
 
 To identify what parameters are required for your use case, and what is optional or not, its best to consult the RPC documentation at: https://docs.chia.net/rpc
 
