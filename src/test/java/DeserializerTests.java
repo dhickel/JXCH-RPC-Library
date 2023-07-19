@@ -1,6 +1,6 @@
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.mindspice.util.JsonUtils;
-import io.mindspice.util.StringListDeserializer;
+import io.mindspice.mindlib.util.JsonUtils;
+import io.mindspice.jxch.rpc.util.StringListDeserializer;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
