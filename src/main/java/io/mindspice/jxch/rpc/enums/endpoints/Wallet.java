@@ -109,7 +109,8 @@ public enum Wallet implements Endpoint {
     DID_GET_INFO,
     DID_FIND_LOST_DID,
     AGGREGATE_SPENDS,
-    GET_CAT_WRAPPED_ADDRESS;
+    CAT_SPEND_BUNDLE_ONLY;
+
 
 
     @Override

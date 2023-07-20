@@ -3,6 +3,7 @@ package io.mindspice.jxch.rpc.http;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.mindspice.jxch.rpc.enums.ChiaService;
 import io.mindspice.jxch.rpc.enums.endpoints.FullNode;
+import io.mindspice.jxch.rpc.schemas.custom.CatSenderInfo;
 import io.mindspice.mindlib.util.JsonUtils;
 import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;
@@ -415,10 +416,10 @@ public class FullNodeAPI extends SharedAPI {
         }
     }
 
-    public ApiResponse<CoinRecord> getPuzzleAndSolutionAs(String coinId, int height) throws RPCException {
+    public ApiResponse<CoinSolution> getPuzzleAndSolution(String coinId, int height) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getPuzzleAndSolutionAsBytes(coinId, height));
-            return newResponse(jsonNode, "coin_solution", CoinRecord.class, FullNode.GET_PUZZLE_AND_SOLUTION);
+            return newResponse(jsonNode, "coin_solution", CoinSolution.class, FullNode.GET_PUZZLE_AND_SOLUTION);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -696,10 +697,10 @@ public class FullNodeAPI extends SharedAPI {
         }
     }
 
-    public byte[] unwrapCatAddressAsBytes(CoinRecord coinRecord) throws RPCException {
+    public byte[] getCatSenderInfoAsBytes(CoinRecord coinRecord) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("coin_record", coinRecord);
-            var req = new Request(FullNode.UNWRAP_CAT_ADDRESS, data);
+            var req = new Request(FullNode.GET_CAT_SENDER_INFO, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -707,10 +708,10 @@ public class FullNodeAPI extends SharedAPI {
     }
 
     // Note fee estimate can also take spend_type, but it seems to not be used atm
-    public ApiResponse<String> unwrapCatAddress(CoinRecord coinRecord) throws RPCException {
+    public ApiResponse<CatSenderInfo> getCatSenderInfo(CoinRecord coinRecord) throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(unwrapCatAddressAsBytes(coinRecord));
-            return newResponse(jsonNode, "unwrapped_puzzlehash", String.class, FullNode.UNWRAP_CAT_ADDRESS);
+            var jsonNode = JsonUtils.readTree(getCatSenderInfoAsBytes(coinRecord));
+            return newResponse(jsonNode, CatSenderInfo.class, FullNode.GET_CAT_SENDER_INFO);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }

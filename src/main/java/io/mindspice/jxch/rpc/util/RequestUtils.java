@@ -28,7 +28,7 @@ public class RequestUtils {
             return this;
         }
 
-        public CatSpendBuilder setAdditions(List<Coin> additions) {
+        public CatSpendBuilder setAdditions(List<Addition> additions) {
             node.putPOJO("additions", additions);
             return this;
         }

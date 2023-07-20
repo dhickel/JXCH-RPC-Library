@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.mindspice.jxch.rpc.enums.ChiaService;
 import io.mindspice.jxch.rpc.enums.NftDataKey;
 import io.mindspice.jxch.rpc.enums.endpoints.Wallet;
+import io.mindspice.jxch.rpc.util.RequestUtils;
 import io.mindspice.mindlib.util.JsonUtils;
 import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;
@@ -2166,6 +2167,24 @@ public class WalletAPI extends SharedAPI {
         try {
             var jsonNode = JsonUtils.readTree(aggregateSpendsAsBytes(spends));
             return newResponse(jsonNode, "agg_bundle", SpendBundle.class , Wallet.AGGREGATE_SPENDS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] catSpendBundleOnlyAsBytes(JsonNode catSpendBuilder) throws RPCException {
+        try {
+            var req = new Request(Wallet.CAT_SPEND, JsonUtils.writeBytes(catSpendBuilder));
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<SpendBundle> catSpendBundleOnly(JsonNode catSpendBuilder) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(catSpendBundleOnlyAsBytes(catSpendBuilder));
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class , Wallet.CAT_SPEND_BUNDLE_ONLY);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
