@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ChiaUtils {
+public class RequestUtils {
 
     public static class CatSpendBuilder {
         private final ObjectNode node = JsonUtils.newEmptyNode();
@@ -25,7 +25,7 @@ public class ChiaUtils {
             return this;
         }
 
-        public CatSpendBuilder setAdditions(List<Coin> additions) {
+        public CatSpendBuilder setAdditions(List<Addition> additions) {
             node.putPOJO("additions", additions);
             return this;
         }
