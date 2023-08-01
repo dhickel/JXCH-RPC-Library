@@ -70,7 +70,6 @@ public class RPCClient {
 
         try {
             var uri = new URI(config.getAddressOf(req.service) + req.endpoint);
-            System.out.println(uri);
             var httpPost = new HttpPost(uri);
             httpPost.setEntity(new ByteArrayEntity(req.data));
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
@@ -79,7 +78,6 @@ public class RPCClient {
             try (CloseableHttpResponse response = client.execute(httpPost)) {
                 InputStream content = response.getEntity().getContent();
                 byte[] bytes = content.readAllBytes();
-                System.out.println(new String(bytes));
                 return bytes;
             }
 
