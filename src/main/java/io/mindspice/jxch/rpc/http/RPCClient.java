@@ -15,6 +15,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -76,10 +77,10 @@ public class RPCClient {
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 
 
-            try (CloseableHttpResponse response = client.execute(httpPost)) {
-                InputStream content = response.getEntity().getContent();
+            try (CloseableHttpResponse response = client.execute(httpPost);
+                 InputStream content = response.getEntity().getContent()) {
                 byte[] bytes = content.readAllBytes();
-                System.out.println(new String(bytes));
+                EntityUtils.consume(response.getEntity());
                 return bytes;
             }
 
