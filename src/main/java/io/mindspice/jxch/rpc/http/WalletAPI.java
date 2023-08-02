@@ -53,7 +53,6 @@ public class WalletAPI extends SharedAPI {
     public ApiResponse<Wallet> createNewWallet(JsonNode walletBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(createNewWalletAsBytes(walletBuilder));
-            System.out.println(JsonUtils.writeString(jsonNode));
             return newResponse(jsonNode, Wallet.class, Wallet.CREATE_NEW_WALLET);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -503,7 +502,6 @@ public class WalletAPI extends SharedAPI {
                     .buildNode();
 
             var respNode = JsonUtils.readTree(takeOfferAsBytes(reqNode));
-            System.out.println(JsonUtils.writeString(respNode));
             return newResponse(respNode, "trade_record", TradeRecord.class, Wallet.TAKE_OFFER);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);

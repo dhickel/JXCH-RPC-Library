@@ -15,6 +15,7 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
+import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
@@ -70,23 +71,24 @@ public class RPCClient {
 
         try {
             var uri = new URI(config.getAddressOf(req.service) + req.endpoint);
+            System.out.println(uri);
             var httpPost = new HttpPost(uri);
             httpPost.setEntity(new ByteArrayEntity(req.data));
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 
 
-            try (CloseableHttpResponse response = client.execute(httpPost)) {
-                InputStream content = response.getEntity().getContent();
+            try (CloseableHttpResponse response = client.execute(httpPost);
+                 InputStream content = response.getEntity().getContent()) {
                 byte[] bytes = content.readAllBytes();
+                EntityUtils.consume(response.getEntity());
                 return bytes;
             }
 
-
         } catch (URISyntaxException e) {
+
             throw new RPCException("URI error on RPC request", e);
         } catch (IOException e) {
             throw new RPCException("Byte read error on RPC request", e);
-
         }
     }
 
