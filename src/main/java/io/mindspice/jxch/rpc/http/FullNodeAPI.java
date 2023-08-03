@@ -660,7 +660,7 @@ public class FullNodeAPI extends SharedAPI {
     public byte[] getSpendBundleInclusionCostAsBytes(SpendBundle spendBundle) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("spend_bundle", spendBundle);
-            var req = new Request(FullNode.GET_SPENDBUNDLE_INCLUSION_COST, data);
+            var req = new Request(FullNode.GET_SPEND_BUNDLE_INCLUSION_COST, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -671,7 +671,7 @@ public class FullNodeAPI extends SharedAPI {
     public ApiResponse<InclusionCost> getSpendBundleInclusionCost(SpendBundle spendBundle) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getSpendBundleInclusionCostAsBytes(spendBundle));
-            return newResponse(jsonNode, InclusionCost.class, FullNode.GET_SPENDBUNDLE_INCLUSION_COST);
+            return newResponse(jsonNode, InclusionCost.class, FullNode.GET_SPEND_BUNDLE_INCLUSION_COST);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }

@@ -8,6 +8,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ConnectionKeepAliveStrategy;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.entity.ByteArrayEntity;
@@ -26,6 +27,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.Arrays;
 
 
 public class RPCClient {
@@ -35,7 +37,6 @@ public class RPCClient {
     public RPCClient(NodeConfig config) throws IllegalStateException {
         this.config = config;
         var pairStore = new CertPairStore();
-
 
         for (var service : ChiaService.values()) {
             try {
@@ -49,7 +50,8 @@ public class RPCClient {
             RequestConfig requestConfig = RequestConfig.custom()
                     .setConnectTimeout(60_000)
                     .setConnectionRequestTimeout(60_000)
-                    .setSocketTimeout(60_000).build();
+                    .setSocketTimeout(60_000)
+                    .setExpectContinueEnabled(true).build();
 
             SSLContext sslContext = SSLContexts.custom()
                     .loadKeyMaterial(pairStore.getKeyStore(), "".toCharArray())
@@ -71,11 +73,9 @@ public class RPCClient {
 
         try {
             var uri = new URI(config.getAddressOf(req.service) + req.endpoint);
-            System.out.println(uri);
             var httpPost = new HttpPost(uri);
             httpPost.setEntity(new ByteArrayEntity(req.data));
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-
 
             try (CloseableHttpResponse response = client.execute(httpPost);
                  InputStream content = response.getEntity().getContent()) {
