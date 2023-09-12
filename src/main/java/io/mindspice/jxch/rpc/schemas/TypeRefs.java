@@ -5,6 +5,7 @@ import io.mindspice.jxch.rpc.schemas.farmer.*;
 import io.mindspice.jxch.rpc.schemas.object.*;
 import io.mindspice.jxch.rpc.schemas.shared.Connection;
 import io.mindspice.jxch.rpc.schemas.wallet.Notification;
+import io.mindspice.jxch.rpc.schemas.wallet.WalletBalance;
 import io.mindspice.jxch.rpc.schemas.wallet.cat.Cat;
 import io.mindspice.jxch.rpc.schemas.wallet.cat.StrayCat;
 import io.mindspice.jxch.rpc.schemas.wallet.Transaction;
@@ -40,5 +41,6 @@ public class TypeRefs {
     public static final TypeReference<Map<String, List<String>>> MEMO_MAP = new TypeReference<>() { };
     public static final TypeReference<Map<String, List<RoyaltyCalculation>>> ROYALTY_MAP = new TypeReference<>() { };
     public static final TypeReference<List<Connection>> CONNECTION_LIST = new TypeReference<>() { };
+    public static final TypeReference<List<WalletBalance>> WALLET_BALANCE_LIST = new TypeReference<>() { };
 }
 

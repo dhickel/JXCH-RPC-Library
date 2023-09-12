@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static io.mindspice.jxch.rpc.enums.endpoints.Wallet.*;
+
 
 public class WalletAPI extends ChiaAPI {
 
@@ -41,7 +43,7 @@ public class WalletAPI extends ChiaAPI {
 
     public byte[] createNewWalletAsBytes(JsonNode walletBuilder) throws RPCException {
         try {
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CREATE_NEW_WALLET, JsonUtils.writeBytes(walletBuilder));
+            var req = new Request(CREATE_NEW_WALLET, JsonUtils.writeBytes(walletBuilder));
             return client.makeRequest(req);
         } catch (JsonProcessingException | RPCException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -52,7 +54,7 @@ public class WalletAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(createNewWalletAsBytes(walletBuilder));
             System.out.println(JsonUtils.writeString(jsonNode));
-            return newResponse(jsonNode, io.mindspice.jxch.rpc.enums.endpoints.Wallet.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CREATE_NEW_WALLET);
+            return newResponse(jsonNode, class,CREATE_NEW_WALLET);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -63,7 +65,7 @@ public class WalletAPI extends ChiaAPI {
         try {
             var data = JsonUtils.newSingleNode("include_data", includeData);
             if (type != -1) { data.put("type", type); }
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_WALLETS, JsonUtils.writeBytes(data));
+            var req = new Request(GET_WALLETS, JsonUtils.writeBytes(data));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -73,7 +75,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Wallets> getWallets(int type, boolean includeData) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getWalletsAsBytes(type, includeData));
-            return newResponse(jsonNode, Wallets.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_WALLETS);
+            return newResponse(jsonNode, Wallets.class, GET_WALLETS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -94,7 +96,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("fee", fee)
                     .put("secure", cancelOnChain)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CANCEL_OFFER, data);
+            var req = new Request(CANCEL_OFFER, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -104,7 +106,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> cancelOffer(String tradeId, long fee, boolean cancelOnChain) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(cancelOfferAsBytes(tradeId, fee, cancelOnChain));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CANCEL_OFFER);
+            return newResponse(jsonNode, "success", Boolean.class, CANCEL_OFFER);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -116,7 +118,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("secure", cancelOnChain)
                     .put("cancel_all", true)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CANCEL_OFFERS, data);
+            var req = new Request(CANCEL_OFFERS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -126,7 +128,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> cancelAllOffers(boolean cancelOnChain) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(cancelAllOffersAsBytes(cancelOnChain));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CANCEL_OFFERS);
+            return newResponse(jsonNode, "success", Boolean.class, CANCEL_OFFERS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -141,7 +143,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("batch_size", batchSize)
                     .put("batch_fee", batchFee)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CANCEL_OFFERS, data);
+            var req = new Request(CANCEL_OFFERS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -152,7 +154,7 @@ public class WalletAPI extends ChiaAPI {
             throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(cancelOffersAsBytes(assetId, batchSize, batchFee, cancelOnChain));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CANCEL_OFFERS);
+            return newResponse(jsonNode, "success", Boolean.class, CANCEL_OFFERS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -161,7 +163,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] catAssetIdToNameAsBytes(String catAssetId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("asset_id", catAssetId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_ASSET_ID_TO_NAME, data);
+            var req = new Request(CAT_ASSET_ID_TO_NAME, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -171,7 +173,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<CatAssetInfo> catAssetIdToName(String assetId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(catAssetIdToNameAsBytes(assetId));
-            return newResponse(jsonNode, CatAssetInfo.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_ASSET_ID_TO_NAME);
+            return newResponse(jsonNode, CatAssetInfo.class, CAT_ASSET_ID_TO_NAME);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -180,7 +182,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] catGetAssetIdAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_GET_ASSET_ID, data);
+            var req = new Request(CAT_GET_ASSET_ID, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -190,7 +192,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<String> catGetAssetId(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(catGetAssetIdAsBytes(walletId));
-            return newResponse(jsonNode, "asset_id", String.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_GET_ASSET_ID);
+            return newResponse(jsonNode, "asset_id", String.class, CAT_GET_ASSET_ID);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -199,7 +201,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] catGetNameAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_GET_NAME, data);
+            var req = new Request(CAT_GET_NAME, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -209,7 +211,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<String> catGetName(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(catGetNameAsBytes(walletId));
-            return newResponse(jsonNode, "asset_id", String.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_GET_NAME);
+            return newResponse(jsonNode, "asset_id", String.class, CAT_GET_NAME);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -221,7 +223,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("wallet_id", walletId)
                     .put("name", name)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_SET_NAME, data);
+            var req = new Request(CAT_SET_NAME, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -231,7 +233,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> catSetName(int walletId, String name) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(catSetNameAsBytes(walletId, name));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_SET_NAME);
+            return newResponse(jsonNode, "success", Boolean.class, CAT_SET_NAME);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -239,7 +241,7 @@ public class WalletAPI extends ChiaAPI {
 
     public byte[] catSpendAsBytes(JsonNode catSpendBuilder) throws RPCException {
         try {
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_SPEND, JsonUtils.writeBytes(catSpendBuilder));
+            var req = new Request(CAT_SPEND, JsonUtils.writeBytes(catSpendBuilder));
             return client.makeRequest(req);
         } catch (JsonProcessingException | RPCException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -259,7 +261,7 @@ public class WalletAPI extends ChiaAPI {
             RPCException {
         try {
             var jsonNode = JsonUtils.readTree(catSpendAsBytes(walletId, amountInMojo, address));
-            return newResponse(jsonNode, TransactionStatus.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_SPEND);
+            return newResponse(jsonNode, TransactionStatus.class, CAT_SPEND);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -268,7 +270,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<TransactionStatus> catSpend(JsonNode catSpendBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(catSpendAsBytes(catSpendBuilder));
-            return newResponse(jsonNode, TransactionStatus.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CAT_SPEND);
+            return newResponse(jsonNode, TransactionStatus.class, CAT_SPEND);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -277,7 +279,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] checkOfferValidityAsBytes(String offer) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("offer", offer);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CHECK_OFFER_VALIDITY, data);
+            var req = new Request(CHECK_OFFER_VALIDITY, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -287,7 +289,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<OfferValidity> checkOfferValidity(String offer) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(checkOfferValidityAsBytes(offer));
-            return newResponse(jsonNode, OfferValidity.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CHECK_OFFER_VALIDITY);
+            return newResponse(jsonNode, OfferValidity.class, CHECK_OFFER_VALIDITY);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -295,7 +297,7 @@ public class WalletAPI extends ChiaAPI {
 
     public byte[] createOfferForIdsAsBytes(JsonNode offerBuilder) throws RPCException {
         try {
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CREATE_OFFER_FOR_IDS, JsonUtils.writeBytes(offerBuilder));
+            var req = new Request(CREATE_OFFER_FOR_IDS, JsonUtils.writeBytes(offerBuilder));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -305,7 +307,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Offer> createOfferForIds(JsonNode offerBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(createOfferForIdsAsBytes(offerBuilder));
-            return newResponse(jsonNode, Offer.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CREATE_OFFER_FOR_IDS);
+            return newResponse(jsonNode, Offer.class, CREATE_OFFER_FOR_IDS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -313,7 +315,7 @@ public class WalletAPI extends ChiaAPI {
 
     public byte[] getAllOffersAsBytes(JsonNode offerSearchBuilder) throws RPCException {
         try {
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_ALL_OFFERS, JsonUtils.writeBytes(offerSearchBuilder));
+            var req = new Request(GET_ALL_OFFERS, JsonUtils.writeBytes(offerSearchBuilder));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -323,7 +325,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Offers> getAllOffers() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getAllOffersAsBytes(JsonUtils.newEmptyNode()));
-            return newResponse(jsonNode, Offers.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_ALL_OFFERS);
+            return newResponse(jsonNode, Offers.class, GET_ALL_OFFERS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -332,7 +334,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Offers> getAllOffers(JsonNode offerSearchBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getAllOffersAsBytes(offerSearchBuilder));
-            return newResponse(jsonNode, Offers.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_ALL_OFFERS);
+            return newResponse(jsonNode, Offers.class, GET_ALL_OFFERS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -341,7 +343,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getCatListAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_CAT_LIST, data);
+            var req = new Request(GET_CAT_LIST, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -351,7 +353,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<List<Cat>> getCatList() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getCatListAsBytes());
-            return newResponseList(jsonNode, "cat_list", TypeRefs.CAT_LIST, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_CAT_LIST);
+            return newResponseList(jsonNode, "cat_list", TypeRefs.CAT_LIST, GET_CAT_LIST);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -363,7 +365,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("trade_id", tradeId)
                     .buildNode();
             if (fileContents != null) { data.put("file_contents", fileContents); }
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_OFFER, JsonUtils.writeBytes(data));
+            var req = new Request(GET_OFFER, JsonUtils.writeBytes(data));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -373,7 +375,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Offer> getOfferById(String tradeId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getOfferByBytes(tradeId, null));
-            return newResponse(jsonNode, Offer.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_OFFER);
+            return newResponse(jsonNode, Offer.class, GET_OFFER);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -382,7 +384,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Offer> getOfferById(String tradeId, String fileContents) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getOfferByBytes(tradeId, fileContents));
-            return newResponse(jsonNode, Offer.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_OFFER);
+            return newResponse(jsonNode, Offer.class, GET_OFFER);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -395,7 +397,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("offer", offer)
                     .put("advanced", showAdvanced)
                     .buildNode();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_OFFER_SUMMARY, JsonUtils.writeBytes(data));
+            var req = new Request(GET_OFFER_SUMMARY, JsonUtils.writeBytes(data));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -406,7 +408,7 @@ public class WalletAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(getOfferSummaryAsBytes(offer, showAdvanced));
 
-            return newResponse(jsonNode, "summary", OfferSummary.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_OFFER_SUMMARY);
+            return newResponse(jsonNode, "summary", OfferSummary.class, GET_OFFER_SUMMARY);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -415,7 +417,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getOffersCountAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_OFFERS_COUNT, data);
+            var req = new Request(GET_OFFERS_COUNT, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -426,7 +428,7 @@ public class WalletAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(getOffersCountAsBytes());
 
-            return newResponse(jsonNode, OfferCount.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_OFFERS_COUNT);
+            return newResponse(jsonNode, OfferCount.class, GET_OFFERS_COUNT);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -435,7 +437,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getStrayCatsAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_STRAY_CATS, data);
+            var req = new Request(GET_STRAY_CATS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -446,7 +448,7 @@ public class WalletAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(getStrayCatsAsBytes());
 
-            return newResponseList(jsonNode, "stray_cats", TypeRefs.STRAY_CAT_LIST, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_STRAY_CATS);
+            return newResponseList(jsonNode, "stray_cats", TypeRefs.STRAY_CAT_LIST, GET_STRAY_CATS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -454,7 +456,7 @@ public class WalletAPI extends ChiaAPI {
 
     public byte[] selectCoinsAsBytes(JsonNode selectCoinBuilder) throws RPCException {
         try {
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.SELECT_COINS, JsonUtils.writeBytes(selectCoinBuilder));
+            var req = new Request(SELECT_COINS, JsonUtils.writeBytes(selectCoinBuilder));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -468,7 +470,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("amount", amount)
                     .buildNode();
             var respNode = JsonUtils.readTree(selectCoinsAsBytes(reqNode));
-            return newResponseList(respNode, "coins", TypeRefs.COIN_LIST, io.mindspice.jxch.rpc.enums.endpoints.Wallet.SELECT_COINS);
+            return newResponseList(respNode, "coins", TypeRefs.COIN_LIST, SELECT_COINS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -477,7 +479,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<List<Coin>> selectCoins(JsonNode selectCoinBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(selectCoinsAsBytes(selectCoinBuilder));
-            return newResponseList(jsonNode, "coins", TypeRefs.COIN_LIST, io.mindspice.jxch.rpc.enums.endpoints.Wallet.SELECT_COINS);
+            return newResponseList(jsonNode, "coins", TypeRefs.COIN_LIST, SELECT_COINS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -486,7 +488,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] takeOfferAsBytes(JsonNode takeOfferbuilder) throws RPCException {
         try {
             var data = JsonUtils.writeBytes(takeOfferbuilder);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.TAKE_OFFER, data);
+            var req = new Request(TAKE_OFFER, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -502,7 +504,7 @@ public class WalletAPI extends ChiaAPI {
 
             var respNode = JsonUtils.readTree(takeOfferAsBytes(reqNode));
             System.out.println(JsonUtils.writeString(respNode));
-            return newResponse(respNode, "trade_record", TradeRecord.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.TAKE_OFFER);
+            return newResponse(respNode, "trade_record", TradeRecord.class, TAKE_OFFER);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -511,7 +513,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<TradeRecord> takeOffer(JsonNode takeOfferBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(takeOfferAsBytes(takeOfferBuilder));
-            return newResponse(jsonNode, "trade_record", TradeRecord.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.TAKE_OFFER);
+            return newResponse(jsonNode, "trade_record", TradeRecord.class, TAKE_OFFER);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -530,7 +532,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("pubkey", pubKey)
                     .put("puzhash", puzHash)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_CREATE_ATTEST, data);
+            var req = new Request(DID_CREATE_ATTEST, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -541,7 +543,7 @@ public class WalletAPI extends ChiaAPI {
             String puzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didCreateAttestAsBytes(walletId, coinName, pubKey, puzHash));
-            return newResponse(jsonNode, DIDAttest.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_CREATE_ATTEST);
+            return newResponse(jsonNode, DIDAttest.class, DID_CREATE_ATTEST);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -550,7 +552,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] didCreateDIDBackupFileAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_CREATE_BACKUP_FILE, data);
+            var req = new Request(DID_CREATE_BACKUP_FILE, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -560,7 +562,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<String> didCreateDIDBackupFile(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didCreateDIDBackupFileAsBytes(walletId));
-            return newResponse(jsonNode, "backup_data", String.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_CREATE_BACKUP_FILE);
+            return newResponse(jsonNode, "backup_data", String.class, DID_CREATE_BACKUP_FILE);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -569,7 +571,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] didFindLostDIDAsBytes(String coinId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("coin_id", coinId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_FIND_LOST_DID, data);
+            var req = new Request(DID_FIND_LOST_DID, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -579,7 +581,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<String> didFindLostDID(String coinId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didFindLostDIDAsBytes(coinId));
-            return newResponse(jsonNode, "latest_coin_id", String.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_FIND_LOST_DID);
+            return newResponse(jsonNode, "latest_coin_id", String.class, DID_FIND_LOST_DID);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -588,7 +590,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] didGetCurrentCoinInfoAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_CURRENT_COIN_INFO, data);
+            var req = new Request(DID_GET_CURRENT_COIN_INFO, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -598,7 +600,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<DIDCoin> didGetCurrentCoinInfo(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didGetCurrentCoinInfoAsBytes(walletId));
-            return newResponse(jsonNode, DIDCoin.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_CURRENT_COIN_INFO);
+            return newResponse(jsonNode, DIDCoin.class, DID_GET_CURRENT_COIN_INFO);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -607,7 +609,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] didGetDIDAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_DID, data);
+            var req = new Request(DID_GET_DID, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -617,7 +619,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<DID> didGetDID(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didGetDIDAsBytes(walletId));
-            return newResponse(jsonNode, DID.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_DID);
+            return newResponse(jsonNode, DID.class, DID_GET_DID);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -626,7 +628,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] didGetInfoAsBytes(String coinId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("coin_id", coinId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_INFO, data);
+            var req = new Request(DID_GET_INFO, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -636,7 +638,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<DIDInfo> didGetInfo(String coinId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didGetInfoAsBytes(coinId));
-            return newResponse(jsonNode, DIDInfo.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_INFO);
+            return newResponse(jsonNode, DIDInfo.class, DID_GET_INFO);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -645,7 +647,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] didGetInformationNeededForRecoveryAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_INFORMATION_NEEDED_FOR_RECOVERY, data);
+            var req = new Request(DID_GET_INFORMATION_NEEDED_FOR_RECOVERY, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -655,7 +657,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<DIDRecoveryInfo> didGetInformationNeededForRecovery(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didGetInformationNeededForRecoveryAsBytes(walletId));
-            return newResponse(jsonNode, DIDRecoveryInfo.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_INFORMATION_NEEDED_FOR_RECOVERY);
+            return newResponse(jsonNode, DIDRecoveryInfo.class, DID_GET_INFORMATION_NEEDED_FOR_RECOVERY);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -664,7 +666,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] didGetMetaDataAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_METADATA, data);
+            var req = new Request(DID_GET_METADATA, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -674,7 +676,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<JsonNode> didGetMetaData(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didGetMetaDataAsBytes(walletId));
-            return newResponseNode(jsonNode, "meta_data", io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_METADATA);
+            return newResponseNode(jsonNode, "meta_data", DID_GET_METADATA);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -689,7 +691,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("fee", fee)
                     .put("reuse_puzhash", reusePuzHash)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_UPDATE_METADATA, data);
+            var req = new Request(DID_UPDATE_METADATA, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -700,7 +702,7 @@ public class WalletAPI extends ChiaAPI {
             boolean reusePuzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didUpdateMetaDataAsBytes(walletId, metaData, fee, reusePuzHash));
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_UPDATE_METADATA);
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, DID_UPDATE_METADATA);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -709,7 +711,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] didGetPubKeyAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_PUBKEY, data);
+            var req = new Request(DID_GET_PUBKEY, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -719,7 +721,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<String> didGetPubKey(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didGetPubKeyAsBytes(walletId));
-            return newResponse(jsonNode, "pubkey", String.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_PUBKEY);
+            return newResponse(jsonNode, "pubkey", String.class, DID_GET_PUBKEY);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -728,7 +730,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] didGetRecoveryListAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_RECOVERY_LIST, data);
+            var req = new Request(DID_GET_RECOVERY_LIST, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -738,7 +740,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<DIDRecoveryList> didGetRecoveryList(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didGetRecoveryListAsBytes(walletId));
-            return newResponse(jsonNode, DIDRecoveryList.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_RECOVERY_LIST);
+            return newResponse(jsonNode, DIDRecoveryList.class, DID_GET_RECOVERY_LIST);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -747,7 +749,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] didGetWalletNameAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_WALLET_NAME, data);
+            var req = new Request(DID_GET_WALLET_NAME, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -757,7 +759,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<String> didGetWalletName(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didGetWalletNameAsBytes(walletId));
-            return newResponse(jsonNode, "name", String.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_GET_WALLET_NAME);
+            return newResponse(jsonNode, "name", String.class, DID_GET_WALLET_NAME);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -771,7 +773,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("coin_announcements", coinAnnouncements)
                     .put("puzzle_announcements", puzzleAnnouncements)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_MESSAGE_SPEND, data);
+            var req = new Request(DID_MESSAGE_SPEND, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -784,7 +786,7 @@ public class WalletAPI extends ChiaAPI {
             var jsonNode = JsonUtils.readTree(
                     didMessageSpendAsBytes(walletId, coinAnnouncements, puzzleAnnouncements)
             );
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_MESSAGE_SPEND);
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, DID_MESSAGE_SPEND);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -799,7 +801,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("pubkey", pubKey)
                     .put("puzhash", puzHash)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_RECOVERY_SPEND, data);
+            var req = new Request(DID_RECOVERY_SPEND, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -810,7 +812,7 @@ public class WalletAPI extends ChiaAPI {
             String pubKey, String puzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didRecoverySpendAsBytes(walletId, attestData, pubKey, puzHash));
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_RECOVERY_SPEND);
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, DID_RECOVERY_SPEND);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -822,7 +824,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("wallet_id", walletId)
                     .put("name", name)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_SET_WALLET_NAME, data);
+            var req = new Request(DID_SET_WALLET_NAME, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -832,7 +834,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> didSetWalletName(int walletId, String name) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didSetWalletNameAsBytes(walletId, name));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_SET_WALLET_NAME);
+            return newResponse(jsonNode, "success", Boolean.class, DID_SET_WALLET_NAME);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -847,7 +849,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("with_recovery_info", withRecoveryInfo)
                     .put("reuse_puzhash", reusePuzHash)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_TRANSFER_DID, data);
+            var req = new Request(DID_TRANSFER_DID, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -860,7 +862,7 @@ public class WalletAPI extends ChiaAPI {
             var jsonNode = JsonUtils.readTree(
                     didTransferDIDAsBytes(walletId, address, fee, withRecoveryInfo, reusePuzHash)
             );
-            return newResponse(jsonNode, TransactionStatus.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_TRANSFER_DID);
+            return newResponse(jsonNode, TransactionStatus.class, DID_TRANSFER_DID);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -875,7 +877,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("num_verifications_required", numVerificationsReq)
                     .put("reuse_puzhash", reusePuzHash)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_UPDATE_RECOVERY_IDS, data);
+            var req = new Request(DID_UPDATE_RECOVERY_IDS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -892,7 +894,7 @@ public class WalletAPI extends ChiaAPI {
             var jsonNode = JsonUtils.readTree(
                     didUpdateRecoveryIdsAsBytes(walletId, newIds, numVerificationsReq, reusePuzHash)
             );
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DID_UPDATE_RECOVERY_IDS);
+            return newResponse(jsonNode, "success", Boolean.class, DID_UPDATE_RECOVERY_IDS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -901,7 +903,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] addKeyAsBytes(List<String> mnemonic) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("mnemonic", mnemonic);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.ADD_KEY, data);
+            var req = new Request(ADD_KEY, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -911,7 +913,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Long> addKey(List<String> mnemonic) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(addKeyAsBytes(mnemonic));
-            return newResponse(jsonNode, "fingerprint", Long.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.ADD_KEY);
+            return newResponse(jsonNode, "fingerprint", Long.class, ADD_KEY);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -920,7 +922,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] deleteKeyAsBytes(long fingerprint) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("fingerprint", fingerprint);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DELETE_KEY, data);
+            var req = new Request(DELETE_KEY, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -930,7 +932,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> deleteKey(long fingerprint) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(deleteKeyAsBytes(fingerprint));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DELETE_KEY);
+            return newResponse(jsonNode, "success", Boolean.class, DELETE_KEY);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -942,7 +944,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("fingerprint", fingerprint)
                     .put("max_ph_to_search", searchDepth)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CHECK_DELETE_KEY, data);
+            var req = new Request(CHECK_DELETE_KEY, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -952,7 +954,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<KeyInfo> checkDeleteKey(long fingerprint, int searchDepth) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(checkDeleteKeyAsBytes(fingerprint, searchDepth));
-            return newResponse(jsonNode, KeyInfo.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CHECK_DELETE_KEY);
+            return newResponse(jsonNode, KeyInfo.class, CHECK_DELETE_KEY);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -961,7 +963,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] deleteAllKeysAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DELETE_ALL_KEYS, data);
+            var req = new Request(DELETE_ALL_KEYS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -971,7 +973,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> deleteAllKeys() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(deleteAllKeysAsBytes());
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DELETE_ALL_KEYS);
+            return newResponse(jsonNode, "success", Boolean.class, DELETE_ALL_KEYS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -980,7 +982,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] generateMnemonicAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GENERATE_MNEMONIC, data);
+            var req = new Request(GENERATE_MNEMONIC, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -990,7 +992,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<List<String>> generateMnemonic() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(generateMnemonicAsBytes());
-            return newResponseList(jsonNode, "mnemonic", TypeRefs.STRING_LIST, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GENERATE_MNEMONIC);
+            return newResponseList(jsonNode, "mnemonic", TypeRefs.STRING_LIST, GENERATE_MNEMONIC);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -999,7 +1001,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getLoggedInFingerprintAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_LOGGED_IN_FINGERPRINT, data);
+            var req = new Request(GET_LOGGED_IN_FINGERPRINT, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1009,7 +1011,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Long> getLoggedInFingerprint() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getLoggedInFingerprintAsBytes());
-            return newResponse(jsonNode, "fingerprint", Long.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_LOGGED_IN_FINGERPRINT);
+            return newResponse(jsonNode, "fingerprint", Long.class, GET_LOGGED_IN_FINGERPRINT);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1018,7 +1020,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getPublicKeysAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_PUBLIC_KEYS, data);
+            var req = new Request(GET_PUBLIC_KEYS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1029,7 +1031,7 @@ public class WalletAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(getPublicKeysAsBytes());
             return newResponseList(
-                    jsonNode, "public_key_fingerprints", TypeRefs.STRING_LIST, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_PUBLIC_KEYS
+                    jsonNode, "public_key_fingerprints", TypeRefs.STRING_LIST, GET_PUBLIC_KEYS
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -1039,7 +1041,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] logInAsBytes(long fingerprint) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("fingerprint", fingerprint);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.LOG_IN, data);
+            var req = new Request(LOG_IN, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1049,7 +1051,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> logIn(long fingerprint) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(logInAsBytes(fingerprint));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.LOG_IN);
+            return newResponse(jsonNode, "success", Boolean.class, LOG_IN);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1064,7 +1066,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("signature", signature)
                     .put("address", address)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.VERIFY_SIGNATURE, data);
+            var req = new Request(VERIFY_SIGNATURE, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1075,7 +1077,7 @@ public class WalletAPI extends ChiaAPI {
             String address) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(verifySignatureAsBytes(pubKey, message, signature, address));
-            return newResponse(jsonNode, "isValid", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.VERIFY_SIGNATURE);
+            return newResponse(jsonNode, "isValid", Boolean.class, VERIFY_SIGNATURE);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1088,7 +1090,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] pwStatusAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.PW_STATUS, data);
+            var req = new Request(PW_STATUS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1098,7 +1100,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<PoolWalletStatus> pwStatus(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(pwStatusAsBytes(walletId));
-            return newResponse(jsonNode, PoolWalletStatus.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.PW_STATUS);
+            return newResponse(jsonNode, PoolWalletStatus.class, PW_STATUS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1107,7 +1109,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] pwSelfPoolAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.PW_SELF_POOL, data);
+            var req = new Request(PW_SELF_POOL, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1117,7 +1119,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Transaction> pwSelfPool(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(pwSelfPoolAsBytes(walletId));
-            return newResponse(jsonNode, "transaction", Transaction.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.PW_SELF_POOL);
+            return newResponse(jsonNode, "transaction", Transaction.class, PW_SELF_POOL);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1133,7 +1135,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("relative_lock_height", lockHeight)
                     .put("fee", fee)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.PW_JOIN_POOL, data);
+            var req = new Request(PW_JOIN_POOL, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1146,7 +1148,7 @@ public class WalletAPI extends ChiaAPI {
             var jsonNode = JsonUtils.readTree(
                     pwJoinPoolAsBytes(walletId, targetPuzHash, poolURL, lockHeight, fee)
             );
-            return newResponse(jsonNode, "transaction", Transaction.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.PW_JOIN_POOL);
+            return newResponse(jsonNode, "transaction", Transaction.class, PW_JOIN_POOL);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1158,7 +1160,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("wallet_id", walletId)
                     .put("fee", fee)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.PW_ABSORB_REWARDS, data);
+            var req = new Request(PW_ABSORB_REWARDS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1168,7 +1170,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Transaction> pwAbsorbRewards(int walletId, int fee) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(pwAbsorbRewardsAsBytes(walletId, fee));
-            return newResponse(jsonNode, "transaction", Transaction.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.PW_ABSORB_REWARDS);
+            return newResponse(jsonNode, "transaction", Transaction.class, PW_ABSORB_REWARDS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1181,7 +1183,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] deleteNotificationsAsBytes(List<String> ids) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("ids", ids);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DELETE_NOTIFICATIONS, data);
+            var req = new Request(DELETE_NOTIFICATIONS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1191,7 +1193,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> deleteNotifications(List<String> ids) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(deleteNotificationsAsBytes(ids));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DELETE_NOTIFICATIONS);
+            return newResponse(jsonNode, "success", Boolean.class, DELETE_NOTIFICATIONS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1200,7 +1202,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getNotificationsAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_NOTIFICATIONS, data);
+            var req = new Request(GET_NOTIFICATIONS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1211,7 +1213,7 @@ public class WalletAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(getNotificationsAsBytes());
             return newResponseList(
-                    jsonNode, "notifications", TypeRefs.NOTIFICATION_LIST, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_NOTIFICATIONS
+                    jsonNode, "notifications", TypeRefs.NOTIFICATION_LIST, GET_NOTIFICATIONS
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -1227,7 +1229,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("amount", amount)
                     .put("fee", fee)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.SEND_NOTIFICATION, data);
+            var req = new Request(SEND_NOTIFICATION, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1238,7 +1240,7 @@ public class WalletAPI extends ChiaAPI {
             long fee) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(sendNotificationAsBytes(address, message, amount, fee));
-            return newResponse(jsonNode, "tx", Transaction.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.SEND_NOTIFICATION);
+            return newResponse(jsonNode, "tx", Transaction.class, SEND_NOTIFICATION);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1252,7 +1254,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("message", message)
                     .put("is_hex", isHex)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.SIGN_MESSAGE_BY_ADDRESS, data);
+            var req = new Request(SIGN_MESSAGE_BY_ADDRESS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1263,7 +1265,7 @@ public class WalletAPI extends ChiaAPI {
             boolean isHex) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(signMessageByAddressAsBytes(address, message, isHex));
-            return newResponse(jsonNode, SignedMessage.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.SIGN_MESSAGE_BY_ADDRESS);
+            return newResponse(jsonNode, SignedMessage.class, SIGN_MESSAGE_BY_ADDRESS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1277,7 +1279,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("message", message)
                     .put("is_hex", isHex)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.SIGN_MESSAGE_BY_ID, data);
+            var req = new Request(SIGN_MESSAGE_BY_ID, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1288,7 +1290,7 @@ public class WalletAPI extends ChiaAPI {
             throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(signMessageByIdAsBytes(id, message, isHex));
-            return newResponse(jsonNode, SignedMessage.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.SIGN_MESSAGE_BY_ID);
+            return newResponse(jsonNode, SignedMessage.class, SIGN_MESSAGE_BY_ID);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1301,7 +1303,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] createSignedTransactionAsBytes(JsonNode signedTransactionBuilder) throws RPCException {
         try {
             var data = JsonUtils.writeBytes(signedTransactionBuilder);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.CREATE_SIGNED_TRANSACTION, data);
+            var req = new Request(CREATE_SIGNED_TRANSACTION, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1312,7 +1314,7 @@ public class WalletAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(createSignedTransactionAsBytes(signedTransactionBuilder));
             return newResponse(
-                    jsonNode, "signed_tx", SignedTransaction.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.CREATE_SIGNED_TRANSACTION
+                    jsonNode, "signed_tx", SignedTransaction.class, CREATE_SIGNED_TRANSACTION
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -1322,7 +1324,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] deleteUnconfirmedTransactionsAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.DELETE_UNCONFIRMED_TRANSACTIONS, data);
+            var req = new Request(DELETE_UNCONFIRMED_TRANSACTIONS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1332,7 +1334,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> deleteUnconfirmedTransactions(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(deleteUnconfirmedTransactionsAsBytes(walletId));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.DELETE_UNCONFIRMED_TRANSACTIONS);
+            return newResponse(jsonNode, "success", Boolean.class, DELETE_UNCONFIRMED_TRANSACTIONS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1341,7 +1343,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] extendDerivationIndexAsBytes(int index) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("index", index);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.EXTEND_DERIVATION_INDEX, data);
+            var req = new Request(EXTEND_DERIVATION_INDEX, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1351,7 +1353,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Integer> extendDerivationIndex(int index) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(extendDerivationIndexAsBytes(index));
-            return newResponse(jsonNode, "index", Integer.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.EXTEND_DERIVATION_INDEX);
+            return newResponse(jsonNode, "index", Integer.class, EXTEND_DERIVATION_INDEX);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1360,7 +1362,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getCurrentDerivationIndexAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_CURRENT_DERIVATION_INDEX, data);
+            var req = new Request(GET_CURRENT_DERIVATION_INDEX, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1370,7 +1372,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Integer> getCurrentDerivationIndex() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getCurrentDerivationIndexAsBytes());
-            return newResponse(jsonNode, "index", Integer.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_CURRENT_DERIVATION_INDEX);
+            return newResponse(jsonNode, "index", Integer.class, GET_CURRENT_DERIVATION_INDEX);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1379,7 +1381,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getFarmedAmountAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_FARMED_AMOUNT, data);
+            var req = new Request(GET_FARMED_AMOUNT, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1389,7 +1391,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<FarmedAmount> getFarmedAmount() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getFarmedAmountAsBytes());
-            return newResponse(jsonNode, FarmedAmount.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_FARMED_AMOUNT);
+            return newResponse(jsonNode, FarmedAmount.class, GET_FARMED_AMOUNT);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1401,7 +1403,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("wallet_id", walletId)
                     .put("new_address", getNewAddress)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_NEXT_ADDRESS, data);
+            var req = new Request(GET_NEXT_ADDRESS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1411,7 +1413,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<String> getNextAddress(int walletId, boolean getNewAddress) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getNextAddressAsBytes(walletId, getNewAddress));
-            return newResponse(jsonNode, "address", String.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_NEXT_ADDRESS);
+            return newResponse(jsonNode, "address", String.class, GET_NEXT_ADDRESS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1420,7 +1422,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getSpendableCoinsAsBytes(JsonNode spendableCoinbuilder) throws RPCException {
         try {
             var data = JsonUtils.writeBytes(spendableCoinbuilder);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_SPENDABLE_COINS, data);
+            var req = new Request(GET_SPENDABLE_COINS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1430,7 +1432,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<SpendableCoins> getSpendableCoins(JsonNode spendableCoinbuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getSpendableCoinsAsBytes(spendableCoinbuilder));
-            return newResponse(jsonNode, SpendableCoins.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_SPENDABLE_COINS);
+            return newResponse(jsonNode, SpendableCoins.class, GET_SPENDABLE_COINS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1439,7 +1441,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getTransactionAsBytes(String transactionId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("transaction_id", transactionId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TRANSACTION, data);
+            var req = new Request(GET_TRANSACTION, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1449,7 +1451,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Transaction> getTransaction(String transactionId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getTransactionAsBytes(transactionId));
-            return newResponse(jsonNode, "transaction", Transaction.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TRANSACTION);
+            return newResponse(jsonNode, "transaction", Transaction.class, GET_TRANSACTION);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1465,7 +1467,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("reversed", reversed)
                     .buildNode();
             if (sortKey != null) { data.put("sort_key", sortKey); }
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TRANSACTIONS, JsonUtils.writeBytes(data));
+            var req = new Request(GET_TRANSACTIONS, JsonUtils.writeBytes(data));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1478,7 +1480,7 @@ public class WalletAPI extends ChiaAPI {
             var jsonNode = JsonUtils.readTree(
                     getTransactionsAsBytes(walletId, start, end, reversed, sortKey)
             );
-            return newResponse(jsonNode, "transaction", Transaction.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TRANSACTIONS);
+            return newResponse(jsonNode, "transaction", Transaction.class, GET_TRANSACTIONS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1491,7 +1493,7 @@ public class WalletAPI extends ChiaAPI {
                     getTransactionsAsBytes(walletId, start, end, reversed, null)
             );
             return newResponseList(
-                    jsonNode, "transactions", TypeRefs.TRANSACTIONS_LIST, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TRANSACTIONS
+                    jsonNode, "transactions", TypeRefs.TRANSACTIONS_LIST, GET_TRANSACTIONS
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -1502,7 +1504,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getTransactionMemoAsBytes(String transactionId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("transaction_id", transactionId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TRANSACTION_MEMO, data);
+            var req = new Request(GET_TRANSACTION_MEMO, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1512,7 +1514,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<JsonNode> getTransactionMemo(String transactionId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getTransactionMemoAsBytes(transactionId));
-            return newResponseNode(jsonNode, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TRANSACTION_MEMO);
+            return newResponseNode(jsonNode, GET_TRANSACTION_MEMO);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1521,7 +1523,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getTransactionCountAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TRANSACTION_COUNT, data);
+            var req = new Request(GET_TRANSACTION_COUNT, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1531,7 +1533,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<JsonNode> getTransactionCount(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getTransactionCountAsBytes(walletId));
-            return newResponseNode(jsonNode, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TRANSACTION_COUNT);
+            return newResponseNode(jsonNode, GET_TRANSACTION_COUNT);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1540,17 +1542,38 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getWalletBalanceAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_WALLET_BALANCE, data);
+            var req = new Request(GET_WALLET_BALANCE, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
         }
     }
 
-    public ApiResponse<JsonNode> getWalletBalance(int walletId) throws RPCException {
+    public ApiResponse<WalletBalance> getWalletBalance(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getWalletBalanceAsBytes(walletId));
-            return newResponseNode(jsonNode, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_WALLET_BALANCE);
+            return newResponse(jsonNode, "wallet_balance", WalletBalance.class, GET_WALLET_BALANCE);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getWalletBalancesAsBytes(List<Integer> walletIds) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletIds);
+            var req = new Request(GET_WALLET_BALANCES, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<WalletBalance>> getWalletBalances(List<Integer> walletIds) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getWalletBalancesAsBytes(walletIds));
+            return newResponseList(
+                    jsonNode, "wallet_balances", TypeRefs.WALLET_BALANCE_LIST, GET_WALLET_BALANCES
+            );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1565,7 +1588,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("amount", amount)
                     .put("fee", fee)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.SEND_TRANSACTION, data);
+            var req = new Request(SEND_TRANSACTION, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1575,7 +1598,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] sendTransactionAsBytes(JsonNode transactionbuilder)
             throws RPCException {
         try {
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.SEND_TRANSACTION, JsonUtils.writeBytes(transactionbuilder));
+            var req = new Request(SEND_TRANSACTION, JsonUtils.writeBytes(transactionbuilder));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1585,7 +1608,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Transaction> sendTransaction(JsonNode transactionBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(sendTransactionAsBytes(transactionBuilder));
-            return newResponse(jsonNode, "transaction", Transaction.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.SEND_TRANSACTION);
+            return newResponse(jsonNode, "transaction", Transaction.class, SEND_TRANSACTION);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1595,7 +1618,7 @@ public class WalletAPI extends ChiaAPI {
             throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(sendTransactionAsBytes(walletId, address, amount, fee));
-            return newResponse(jsonNode, "transaction", Transaction.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.SEND_TRANSACTION);
+            return newResponse(jsonNode, "transaction", Transaction.class, SEND_TRANSACTION);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1604,7 +1627,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] sendTransactionMultiAsBytes(JsonNode multiTransactionBuilder) throws RPCException {
         try {
             var data = JsonUtils.writeBytes(multiTransactionBuilder);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.SEND_TRANSACTION_MULTI, data);
+            var req = new Request(SEND_TRANSACTION_MULTI, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1614,7 +1637,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Transaction> sendTransactionMulti(JsonNode multiTransactionBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(sendTransactionMultiAsBytes(multiTransactionBuilder));
-            return newResponse(jsonNode, "transaction", Transaction.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.SEND_TRANSACTION_MULTI);
+            return newResponse(jsonNode, "transaction", Transaction.class, SEND_TRANSACTION_MULTI);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1623,7 +1646,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getHeightInfoAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_HEIGHT_INFO, data);
+            var req = new Request(GET_HEIGHT_INFO, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1633,7 +1656,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Integer> getHeightInfo() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getHeightInfoAsBytes());
-            return newResponse(jsonNode, "height", Integer.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_HEIGHT_INFO);
+            return newResponse(jsonNode, "height", Integer.class, GET_HEIGHT_INFO);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1642,7 +1665,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getNetworkInfoAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_NETWORK_INFO, data);
+            var req = new Request(GET_NETWORK_INFO, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1657,9 +1680,9 @@ public class WalletAPI extends ChiaAPI {
                         jsonNode.get("network_name").asText(),
                         jsonNode.get("network_prefix").asText()
                 );
-                return newResponse(network, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_NETWORK_INFO);
+                return newResponse(network, GET_NETWORK_INFO);
             } else {
-                return newFailedResponse(jsonNode, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_NETWORK_INFO);
+                return newFailedResponse(jsonNode, GET_NETWORK_INFO);
             }
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -1669,7 +1692,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getSyncStatusAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_SYNC_STATUS, data);
+            var req = new Request(GET_SYNC_STATUS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1679,7 +1702,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<SyncStatus> getSyncStatus() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getSyncStatusAsBytes());
-            return newResponse(jsonNode, SyncStatus.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_SYNC_STATUS);
+            return newResponse(jsonNode, SyncStatus.class, GET_SYNC_STATUS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1689,7 +1712,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] getTimestampForHeightAsBytes(int height) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("height", height);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TIMESTAMP_FOR_HEIGHT, data);
+            var req = new Request(GET_TIMESTAMP_FOR_HEIGHT, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1699,7 +1722,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<String> getTimestampForHeight(int height) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getTimestampForHeightAsBytes(height));
-            return newResponse(jsonNode, "timestamp", String.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_TIMESTAMP_FOR_HEIGHT);
+            return newResponse(jsonNode, "timestamp", String.class, GET_TIMESTAMP_FOR_HEIGHT);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1709,7 +1732,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] pushTransactionsAsBytes(List<SimpleTransaction> transactions) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("transactions", transactions);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.PUSH_TRANSACTIONS, data);
+            var req = new Request(PUSH_TRANSACTIONS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1719,7 +1742,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> pushTransactions(List<SimpleTransaction> transactions) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(pushTransactionsAsBytes(transactions));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.PUSH_TRANSACTIONS);
+            return newResponse(jsonNode, "success", Boolean.class, PUSH_TRANSACTIONS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1728,7 +1751,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] pushTxAsBytes(SpendBundle spendBundle) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("spend_bundle", spendBundle);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.PUSH_TX, data);
+            var req = new Request(PUSH_TX, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1738,7 +1761,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> pushTx(SpendBundle spendBundle) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(pushTxAsBytes(spendBundle));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.PUSH_TX);
+            return newResponse(jsonNode, "success", Boolean.class, PUSH_TX);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1747,7 +1770,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] setWalletReSyncOnStartupAsBytes(boolean enable) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("enable", enable);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.SET_WALLET_RESYNC_ON_STARTUP, data);
+            var req = new Request(SET_WALLET_RESYNC_ON_STARTUP, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1757,7 +1780,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Boolean> setWalletReSyncOnStartup(boolean enable) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(setWalletReSyncOnStartupAsBytes(enable));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.SET_WALLET_RESYNC_ON_STARTUP);
+            return newResponse(jsonNode, "success", Boolean.class, SET_WALLET_RESYNC_ON_STARTUP);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1778,7 +1801,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("fee", fee)
                     .put("reuse_puzhash", reusePuzHash)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_ADD_URI, data);
+            var req = new Request(NFT_ADD_URI, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1791,7 +1814,7 @@ public class WalletAPI extends ChiaAPI {
             var jsonNode = JsonUtils.readTree(nftAddUriAsBytes(
                     walletId, uri, dataKey, nftCoinId, fee, reusePuzHash)
             );
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_ADD_URI);
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, NFT_ADD_URI);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1803,7 +1826,7 @@ public class WalletAPI extends ChiaAPI {
             var data = new JsonUtils.ObjectBuilder().buildNode();
             if (royaltyAssets != null) { data.putPOJO("royalty_assets", royaltyAssets); }
             if (fungibleAssets != null) { data.putPOJO("fungible_assets", fungibleAssets); }
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_CALCULATE_ROYALTIES, JsonUtils.writeBytes(data));
+            var req = new Request(NFT_CALCULATE_ROYALTIES, JsonUtils.writeBytes(data));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1815,7 +1838,7 @@ public class WalletAPI extends ChiaAPI {
             throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftCalculateRoyaltiesAsBytes(royaltyAssets, fungibleAssets));
-            return newResponseMap(jsonNode, TypeRefs.ROYALTY_MAP, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_CALCULATE_ROYALTIES);
+            return newResponseMap(jsonNode, TypeRefs.ROYALTY_MAP, NFT_CALCULATE_ROYALTIES);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1824,7 +1847,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] nftCountNftsAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_COUNT_NFTS, data);
+            var req = new Request(NFT_COUNT_NFTS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1834,7 +1857,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Integer> nftCountNfts(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftCountNftsAsBytes(walletId));
-            return newResponse(jsonNode, "count", Integer.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_COUNT_NFTS);
+            return newResponse(jsonNode, "count", Integer.class, NFT_COUNT_NFTS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1843,7 +1866,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] nftGetByDidAsBytes(String did) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("did_id", did);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_BY_DID, data);
+            var req = new Request(NFT_GET_BY_DID, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1853,7 +1876,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Integer> nftGetByDid(String did) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftGetByDidAsBytes(did));
-            return newResponse(jsonNode, "wallet_id", Integer.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_BY_DID);
+            return newResponse(jsonNode, "wallet_id", Integer.class, NFT_GET_BY_DID);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1864,7 +1887,7 @@ public class WalletAPI extends ChiaAPI {
             var data = new JsonUtils.ObjectBuilder().buildNode();
             data.put("coin_id", coinId);
             if (walletId != null) { data.put("wallet_id", walletId); }
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_INFO, JsonUtils.writeBytes(data));
+            var req = new Request(NFT_GET_INFO, JsonUtils.writeBytes(data));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1874,7 +1897,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<NftInfo> nftGetInfo(String coinId, Integer walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftGetInfoAsBytes(coinId, walletId));
-            return newResponse(jsonNode, "nft_info", NftInfo.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_INFO);
+            return newResponse(jsonNode, "nft_info", NftInfo.class, NFT_GET_INFO);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1883,7 +1906,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<NftInfo> nftGetInfo(String coinId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftGetInfoAsBytes(coinId, null));
-            return newResponse(jsonNode, "nft_info", NftInfo.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_INFO);
+            return newResponse(jsonNode, "nft_info", NftInfo.class, NFT_GET_INFO);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1896,7 +1919,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("start_index", startIdx)
                     .put("num", amountLimit)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_NFTS, data);
+            var req = new Request(NFT_GET_NFTS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1906,7 +1929,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<List<NftInfo>> nftGetNfts(int walletId, int startIdx, int amountLimit) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftGetNftsAsBytes(walletId, startIdx, amountLimit));
-            return newResponseList(jsonNode, "nft_list", TypeRefs.NFT_INFO_LIST, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_NFTS);
+            return newResponseList(jsonNode, "nft_list", TypeRefs.NFT_INFO_LIST, NFT_GET_NFTS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1915,7 +1938,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] nftGetWalletDidAsBytes(int walletId) throws RPCException {
         try {
             var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_WALLET_DID, data);
+            var req = new Request(NFT_GET_WALLET_DID, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1925,7 +1948,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<String> nftGetWalletDid(int walletId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftGetWalletDidAsBytes(walletId));
-            return newResponse(jsonNode, "did_id", String.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_WALLET_DID);
+            return newResponse(jsonNode, "did_id", String.class, NFT_GET_WALLET_DID);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1934,7 +1957,7 @@ public class WalletAPI extends ChiaAPI {
     public byte[] nftGetWalletsWithDidsAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_WALLETS_WITH_DIDS, data);
+            var req = new Request(NFT_GET_WALLETS_WITH_DIDS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1945,7 +1968,7 @@ public class WalletAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(nftGetWalletsWithDidsAsBytes());
             return newResponseList(
-                    jsonNode, "nft_wallets", TypeRefs.NFT_WALLET_LIST, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_GET_WALLETS_WITH_DIDS
+                    jsonNode, "nft_wallets", TypeRefs.NFT_WALLET_LIST, NFT_GET_WALLETS_WITH_DIDS
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -1954,7 +1977,7 @@ public class WalletAPI extends ChiaAPI {
 
     public byte[] nftMintBulkAsBytes(JsonNode bulkMintBuilder) throws RPCException {
         try {
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_MINT_BULK, JsonUtils.writeBytes(bulkMintBuilder));
+            var req = new Request(NFT_MINT_BULK, JsonUtils.writeBytes(bulkMintBuilder));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1964,7 +1987,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<SpendBundle> nftMintBulk(JsonNode bulkMintBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftMintBulkAsBytes(bulkMintBuilder));
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_MINT_BULK);
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, NFT_MINT_BULK);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -1972,7 +1995,7 @@ public class WalletAPI extends ChiaAPI {
 
     public byte[] nftMintNftAsBytes(JsonNode singleMintbuilder) throws RPCException {
         try {
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_MINT_NFT, JsonUtils.writeBytes(singleMintbuilder));
+            var req = new Request(NFT_MINT_NFT, JsonUtils.writeBytes(singleMintbuilder));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -1982,7 +2005,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<SpendBundle> nftMintNft(JsonNode singleMintbuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftMintNftAsBytes(singleMintbuilder));
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_MINT_NFT
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, NFT_MINT_NFT
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -1991,7 +2014,7 @@ public class WalletAPI extends ChiaAPI {
 
     public byte[] nftSetDidBulkAsBytes(JsonNode setDidBulkBuilder) throws RPCException {
         try {
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_SET_DID_BULK, JsonUtils.writeBytes(setDidBulkBuilder));
+            var req = new Request(NFT_SET_DID_BULK, JsonUtils.writeBytes(setDidBulkBuilder));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -2001,7 +2024,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<SpendBundle> nftSetDidBulk(JsonNode setdidBulkBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftSetDidBulkAsBytes(setdidBulkBuilder));
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_SET_DID_BULK
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, NFT_SET_DID_BULK
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -2018,7 +2041,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("fee", fee)
                     .put("reuse_puzhash", reusePuzHash)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_SET_NFT_DID, data);
+            var req = new Request(NFT_SET_NFT_DID, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -2031,7 +2054,7 @@ public class WalletAPI extends ChiaAPI {
             var jsonNode = JsonUtils.readTree(nftSetNftDidAsBytes(
                     walletId, nftCoinId, did, fee, reusePuzHash)
             );
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_SET_NFT_DID);
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, NFT_SET_NFT_DID);
         } catch (
                 IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -2046,7 +2069,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("nft_coin_id", nftCoinId)
                     .put("in_transaction", inTransaction)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_SET_NFT_STATUS, data);
+            var req = new Request(NFT_SET_NFT_STATUS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -2057,7 +2080,7 @@ public class WalletAPI extends ChiaAPI {
             throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftSetNftStatusAsBytes(walletId, nftCoinId, inTransaction));
-            return newResponse(jsonNode, "success", Boolean.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_SET_NFT_STATUS);
+            return newResponse(jsonNode, "success", Boolean.class, NFT_SET_NFT_STATUS);
         } catch (
                 IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -2066,7 +2089,7 @@ public class WalletAPI extends ChiaAPI {
 
     public byte[] nftTransferBulkAsBytes(JsonNode jsonNode) throws RPCException {
         try {
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_TRANSFER_BULK, JsonUtils.writeBytes(jsonNode));
+            var req = new Request(NFT_TRANSFER_BULK, JsonUtils.writeBytes(jsonNode));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -2076,7 +2099,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<SpendBundle> nftTransferBulk(JsonNode json) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftTransferBulkAsBytes(json));
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_TRANSFER_BULK
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, NFT_TRANSFER_BULK
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -2093,7 +2116,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("fee", fee)
                     .put("reuse_puzhash", reusePuzHash)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_TRANSFER_NFT, data);
+            var req = new Request(NFT_TRANSFER_NFT, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -2106,7 +2129,7 @@ public class WalletAPI extends ChiaAPI {
             var jsonNode = JsonUtils.readTree(nftTransferNftAsBytes(
                     walletId, nftCoinId, targetAddress, fee, reusePuzHash)
             );
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, io.mindspice.jxch.rpc.enums.endpoints.Wallet.NFT_TRANSFER_NFT);
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, NFT_TRANSFER_NFT);
         } catch (
                 IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -2126,7 +2149,7 @@ public class WalletAPI extends ChiaAPI {
                     .put("end_height", endHeight)
                     .put("include_spend_coins", includeSpent)
                     .buildBytes();
-            var req = new Request(io.mindspice.jxch.rpc.enums.endpoints.Wallet.GET_COIN_RECORDS_BY_NAMES, data);
+            var req = new Request(GET_COIN_RECORDS_BY_NAMES, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);

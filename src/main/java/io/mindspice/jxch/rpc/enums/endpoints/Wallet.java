@@ -107,7 +107,7 @@ public enum Wallet implements Endpoint {
     DID_TRANSFER_DID,
     DID_MESSAGE_SPEND,
     DID_GET_INFO,
-    DID_FIND_LOST_DID;
+    DID_FIND_LOST_DID, GET_WALLET_BALANCES;
 
 
     @Override
