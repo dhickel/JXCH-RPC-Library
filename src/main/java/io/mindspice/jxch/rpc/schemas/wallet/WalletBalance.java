@@ -7,7 +7,7 @@ public record WalletBalance(
 	@JsonProperty("wallet_id") int walletId,
 	@JsonProperty("pending_change") int pendingChange,
 	@JsonProperty("unspent_coin_count") int unspentCoinCount,
-	@JsonProperty("fingerprint") int fingerprint,
+	@JsonProperty("fingerprint") long fingerprint,
 	@JsonProperty("wallet_type") int walletType,
 	@JsonProperty("confirmed_wallet_balance") int confirmedWalletBalance,
 	@JsonProperty("pending_coin_removal_count") int pendingCoinRemovalCount,

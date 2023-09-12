@@ -50,11 +50,11 @@ public class WalletAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<io.mindspice.jxch.rpc.enums.endpoints.Wallet> createNewWallet(JsonNode walletBuilder) throws RPCException {
+    public ApiResponse<Wallet> createNewWallet(JsonNode walletBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(createNewWalletAsBytes(walletBuilder));
             System.out.println(JsonUtils.writeString(jsonNode));
-            return newResponse(jsonNode, class,CREATE_NEW_WALLET);
+            return newResponse(jsonNode, Wallet.class, CREATE_NEW_WALLET);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
