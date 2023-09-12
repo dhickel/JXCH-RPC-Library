@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class FullNodeAPI extends SharedAPI {
+public class FullNodeAPI extends ChiaAPI {
 
     public FullNodeAPI(RPCClient client) {
         super(client, ChiaService.FULL_NODE);

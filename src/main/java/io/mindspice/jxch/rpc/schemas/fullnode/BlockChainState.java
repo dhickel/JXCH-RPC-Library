@@ -80,7 +80,7 @@ public record BlockChainState(
     ) { }
 
 
-    record MemPoolFees(long cost_5000000) { }
+    public record MemPoolFees(long cost_5000000) { }
 }
 
 

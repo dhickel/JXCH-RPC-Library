@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 
-public class HarvesterAPI extends SharedAPI {
+public class HarvesterAPI extends ChiaAPI {
 
     public HarvesterAPI(RPCClient client) {
         super(client, ChiaService.FARMER);

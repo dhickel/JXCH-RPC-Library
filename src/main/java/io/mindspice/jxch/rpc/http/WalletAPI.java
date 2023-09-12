@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 
-public class WalletAPI extends SharedAPI {
+public class WalletAPI extends ChiaAPI {
 
     public WalletAPI(RPCClient client) {
         super(client, ChiaService.FARMER);

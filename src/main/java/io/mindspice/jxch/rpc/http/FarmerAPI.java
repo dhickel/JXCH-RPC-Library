@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class FarmerAPI extends SharedAPI {
+public class FarmerAPI extends ChiaAPI {
 
     public FarmerAPI(RPCClient client) {
         super(client, ChiaService.FARMER);

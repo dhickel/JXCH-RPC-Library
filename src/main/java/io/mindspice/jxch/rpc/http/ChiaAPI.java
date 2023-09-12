@@ -19,12 +19,12 @@ import java.util.Map;
 import java.util.Optional;
 
 
-public abstract class SharedAPI {
+public abstract class ChiaAPI {
     protected final RPCClient client;
     protected final String serviceAddress;
     protected final String nodeAddress;
 
-    protected SharedAPI(RPCClient client, ChiaService chiaService) {
+    protected ChiaAPI(RPCClient client, ChiaService chiaService) {
         this.client = client;
         this.serviceAddress = client.getAddressFor(chiaService);
         this.nodeAddress = client.getAddress();

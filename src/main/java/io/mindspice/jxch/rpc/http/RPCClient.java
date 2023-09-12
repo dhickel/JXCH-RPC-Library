@@ -26,25 +26,31 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 
 public class RPCClient {
     private final CloseableHttpClient client;
     private final NodeConfig config;
+    private final List<ChiaService> availableServices;
 
     public RPCClient(NodeConfig config) throws IllegalStateException {
         this.config = config;
         var pairStore = new CertPairStore();
 
-
+        var serviceList = new ArrayList<ChiaService>();
         for (var service : ChiaService.values()) {
             try {
                 pairStore.addKey(service.name(), config.getCertPair(service));
+                serviceList.add(service);
             } catch (IllegalStateException e) {
                 System.out.println("No cert pair found for: " + service);
                 System.out.println("Ignorable if you don't plan on using above service.");
             }
         }
+        availableServices = Collections.unmodifiableList(serviceList);
         try {
             RequestConfig requestConfig = RequestConfig.custom()
                     .setConnectTimeout(60_000)
@@ -71,7 +77,6 @@ public class RPCClient {
 
         try {
             var uri = new URI(config.getAddressOf(req.service) + req.endpoint);
-            System.out.println(uri);
             var httpPost = new HttpPost(uri);
             httpPost.setEntity(new ByteArrayEntity(req.data));
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
@@ -99,5 +104,9 @@ public class RPCClient {
 
     public String getAddress() {
         return config.getAddress();
+    }
+
+    public List<ChiaService> getAvailableServices() {
+        return availableServices;
     }
 }
