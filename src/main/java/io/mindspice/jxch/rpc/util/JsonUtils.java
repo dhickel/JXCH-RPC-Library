@@ -68,9 +68,9 @@ public abstract class JsonUtils {
         return mapper.writeValueAsBytes(json);
     }
 
-//    public static <T> byte[] writeBytes(T json) throws JsonProcessingException {
-//        return JsonUtils.writerFor(json.getClass()).writeValueAsBytes(json);
-//    }
+    public static <T> byte[] writeBytes(T json) throws JsonProcessingException {
+        return JsonUtils.writerFor(json.getClass()).writeValueAsBytes(json);
+    }
 
     public static String writeString(JsonNode json) throws JsonProcessingException {
         return mapper.writeValueAsString(json);

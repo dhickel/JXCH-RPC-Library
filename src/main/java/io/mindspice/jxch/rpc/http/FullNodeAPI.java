@@ -7,6 +7,7 @@ import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;
 import io.mindspice.jxch.rpc.schemas.fullnode.*;
 import io.mindspice.jxch.rpc.schemas.object.*;
+import io.mindspice.jxch.rpc.schemas.shared.Connection;
 import io.mindspice.jxch.rpc.util.JsonUtils;
 import io.mindspice.jxch.rpc.util.RPCException;
 
@@ -21,6 +22,131 @@ public class FullNodeAPI extends ChiaAPI {
     public FullNodeAPI(RPCClient client) {
         super(client, ChiaService.FULL_NODE);
     }
+
+    ////////////
+    // SHARED //
+    ////////////
+
+    public byte[] closeConnectionAsBytes(String nodeId) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("node_id", nodeId);
+            var req = new Request(FullNode.CLOSE_CONNECTION, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> closeConnection(String nodeId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(closeConnectionAsBytes(nodeId));
+            return newResponse(jsonNode, "success", Boolean.class, FullNode.CLOSE_CONNECTION);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getConnectionsAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(FullNode.GET_CONNECTIONS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<Connection>> getConnections() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getConnectionsAsBytes());
+            return newResponseList(jsonNode, "connections", TypeRefs.CONNECTION_LIST, FullNode.GET_CONNECTIONS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getRoutesAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(FullNode.GET_ROUTES, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<String>> getRoutes() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getRoutesAsBytes());
+            return newResponseList(jsonNode, "routes", TypeRefs.STRING_LIST, FullNode.GET_ROUTES);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] healthzAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(FullNode.HEALTHZ, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> healthz() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(healthzAsBytes());
+            return newResponse(jsonNode, "success", Boolean.class, FullNode.HEALTHZ);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] openConnectionAsBytes(String ip, int port) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("ip", ip)
+                    .put("port", port)
+                    .buildBytes();
+            var req = new Request(FullNode.OPEN_CONNECTION, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> openConnection(String ip, int port) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(openConnectionAsBytes(ip, port));
+            return newResponse(jsonNode, "success", Boolean.class, FullNode.OPEN_CONNECTION);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] stopNodeAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(FullNode.STOP_NODE, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> stopNode() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(healthzAsBytes());
+            return newResponse(jsonNode, "success", Boolean.class, FullNode.STOP_NODE);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    ///////////////
+    // FULL NODE //
+    ///////////////
 
     public byte[] getAdditionsAndRemovalsAsBytes(String headerHash) throws RPCException {
         try {

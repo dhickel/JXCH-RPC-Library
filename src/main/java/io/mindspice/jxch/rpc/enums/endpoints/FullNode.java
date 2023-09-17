@@ -28,7 +28,14 @@ public enum FullNode implements Endpoint {
     GET_ALL_MEMPOOL_ITEMS,
     GET_ALL_MEMPOOL_TX_IDS,
     GET_MEMPOOL_ITEM_BY_TX_ID,
-    GET_FEE_ESTIMATE;
+    GET_FEE_ESTIMATE,
+    // SHARED
+    CLOSE_CONNECTION,
+    GET_CONNECTIONS,
+    GET_ROUTES,
+    OPEN_CONNECTION,
+    STOP_NODE,
+    HEALTHZ;
 
 
     @Override
