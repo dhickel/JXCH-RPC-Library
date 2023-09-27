@@ -373,7 +373,7 @@ public class FullNodeAPI extends ChiaAPI {
     public ApiResponse<CoinRecord> getCoinRecordByName(String name) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getCoinRecordByNameAsBytes(name));
-            return newResponse(jsonNode, CoinRecord.class, FullNode.GET_COIN_RECORD_BY_NAME);
+            return newResponse(jsonNode, "coin_record", CoinRecord.class, FullNode.GET_COIN_RECORD_BY_NAME);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
