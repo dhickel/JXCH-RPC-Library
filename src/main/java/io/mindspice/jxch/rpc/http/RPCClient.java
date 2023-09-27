@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -35,6 +36,7 @@ public class RPCClient {
     private final CloseableHttpClient client;
     private final NodeConfig config;
     private final List<ChiaService> availableServices;
+    private volatile boolean doDebug = false;
 
     public RPCClient(NodeConfig config) throws IllegalStateException {
         this.config = config;
@@ -76,6 +78,10 @@ public class RPCClient {
         }
     }
 
+    public void setDebug(boolean doDebug) {
+        this.doDebug = doDebug;
+    }
+
     public byte[] makeRequest(Request req) throws RPCException {
 
         try {
@@ -84,9 +90,17 @@ public class RPCClient {
             httpPost.setEntity(new ByteArrayEntity(req.data));
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 
+
+            if (doDebug) {
+                System.out.println("Request | Uri: " + uri + " | data: " + new String(req.data, StandardCharsets.UTF_8));
+            }
+
             try (CloseableHttpResponse response = client.execute(httpPost);
                  InputStream content = response.getEntity().getContent()) {
                 byte[] bytes = content.readAllBytes();
+                if (doDebug) {
+                    System.out.println("Response: " + new String(bytes, StandardCharsets.UTF_8));
+                }
                 EntityUtils.consume(response.getEntity());
                 return bytes;
             }
