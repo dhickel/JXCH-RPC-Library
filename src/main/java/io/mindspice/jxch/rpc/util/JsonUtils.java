@@ -1,4 +1,4 @@
-package io.mindspice.mindlib.util;
+package io.mindspice.jxch.rpc.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
