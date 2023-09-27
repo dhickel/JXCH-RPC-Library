@@ -697,6 +697,7 @@ public class FullNodeAPI extends ChiaAPI {
     public ApiResponse<MempoolItem> getMempoolItemByTxId(String txId) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getMempoolItemByTxIdAsBytes(txId));
+            System.out.println(JsonUtils.writeString(jsonNode));
             return newResponse(jsonNode, "mempool_items", MempoolItem.class, FullNode.GET_MEMPOOL_ITEM_BY_TX_ID);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
