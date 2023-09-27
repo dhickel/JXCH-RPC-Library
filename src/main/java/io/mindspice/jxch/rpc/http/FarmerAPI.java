@@ -4,12 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.mindspice.jxch.rpc.enums.ChiaService;
 import io.mindspice.jxch.rpc.enums.endpoints.Endpoint;
 import io.mindspice.jxch.rpc.enums.endpoints.Farmer;
-import io.mindspice.mindlib.util.JsonUtils;
 import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;
 import io.mindspice.jxch.rpc.schemas.farmer.*;
 import io.mindspice.jxch.rpc.schemas.shared.Connection;
 
+import io.mindspice.jxch.rpc.util.JsonUtils;
 import io.mindspice.jxch.rpc.util.RPCException;
 
 import java.io.IOException;

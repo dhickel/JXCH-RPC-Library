@@ -2,7 +2,7 @@ package io.mindspice.jxch.rpc.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.mindspice.jxch.rpc.enums.endpoints.Daemon;
-import io.mindspice.mindlib.util.JsonUtils;
+import io.mindspice.jxch.rpc.util.JsonUtils;
 import io.mindspice.jxch.rpc.schemas.daemon.Status;
 import io.mindspice.jxch.rpc.util.RPCException;
 

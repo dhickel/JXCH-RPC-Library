@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.mindspice.jxch.rpc.enums.ChiaService;
 import io.mindspice.jxch.rpc.enums.endpoints.Harvester;
 
-import io.mindspice.mindlib.util.JsonUtils;
+import io.mindspice.jxch.rpc.util.JsonUtils;
 import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.harvester.HarvesterPlots;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;

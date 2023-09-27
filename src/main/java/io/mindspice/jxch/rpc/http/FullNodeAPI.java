@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.mindspice.jxch.rpc.enums.ChiaService;
 import io.mindspice.jxch.rpc.enums.endpoints.FullNode;
 import io.mindspice.jxch.rpc.schemas.custom.CatSenderInfo;
-import io.mindspice.mindlib.util.JsonUtils;
 import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;
 import io.mindspice.jxch.rpc.schemas.custom.InclusionCost;
@@ -12,6 +11,7 @@ import io.mindspice.jxch.rpc.schemas.custom.PushedTx;
 import io.mindspice.jxch.rpc.schemas.fullnode.*;
 import io.mindspice.jxch.rpc.schemas.object.*;
 import io.mindspice.jxch.rpc.schemas.shared.Connection;
+import io.mindspice.jxch.rpc.util.JsonUtils;
 import io.mindspice.jxch.rpc.util.RPCException;
 
 import java.io.IOException;

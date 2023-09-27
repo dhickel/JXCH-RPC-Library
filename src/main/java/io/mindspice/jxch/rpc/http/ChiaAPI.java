@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.mindspice.jxch.rpc.enums.ChiaService;
 import io.mindspice.jxch.rpc.enums.endpoints.Endpoint;
-import io.mindspice.mindlib.util.JsonUtils;
+import io.mindspice.jxch.rpc.util.JsonUtils;
 import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.shared.Connection;
 import io.mindspice.jxch.rpc.util.RPCException;

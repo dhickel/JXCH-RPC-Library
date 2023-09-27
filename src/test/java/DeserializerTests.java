@@ -1,5 +1,5 @@
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import io.mindspice.mindlib.util.JsonUtils;
+import io.mindspice.jxch.rpc.util.JsonUtils;
 import io.mindspice.jxch.rpc.util.StringListDeserializer;
 import org.junit.jupiter.api.Test;
 
