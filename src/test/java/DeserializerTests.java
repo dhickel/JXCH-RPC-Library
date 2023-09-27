@@ -15,8 +15,7 @@ public class DeserializerTests {
     public record testMultiStringArr(
             @JsonDeserialize(using = StringListDeserializer.class)
             List<String> arr
-    ){}
-
+    ) { }
 
     @Test
     void testDeserializer() throws IOException {

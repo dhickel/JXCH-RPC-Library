@@ -8,6 +8,8 @@ import io.mindspice.mindlib.util.JsonUtils;
 import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;
 import io.mindspice.jxch.rpc.schemas.farmer.*;
+import io.mindspice.jxch.rpc.schemas.shared.Connection;
+
 import io.mindspice.jxch.rpc.util.RPCException;
 
 import java.io.IOException;
@@ -15,13 +17,134 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class FarmerAPI extends SharedAPI {
+public class FarmerAPI extends ChiaAPI {
 
     public FarmerAPI(RPCClient client) {
         super(client, ChiaService.FARMER);
     }
 
-    // Shared method for reading plot pages
+    ////////////
+    // SHARED //
+    ////////////
+
+    public byte[] closeConnectionAsBytes(String nodeId) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("node_id", nodeId);
+            var req = new Request(Farmer.CLOSE_CONNECTION, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> closeConnection(String nodeId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(closeConnectionAsBytes(nodeId));
+            return newResponse(jsonNode, "success", Boolean.class, Farmer.CLOSE_CONNECTION);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getConnectionsAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Farmer.GET_CONNECTIONS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<Connection>> getConnections() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getConnectionsAsBytes());
+            return newResponseList(jsonNode, "connections", TypeRefs.CONNECTION_LIST, Farmer.GET_CONNECTIONS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getRoutesAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Farmer.GET_ROUTES, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<String>> getRoutes() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getRoutesAsBytes());
+            return newResponseList(jsonNode, "routes", TypeRefs.STRING_LIST, Farmer.GET_ROUTES);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] healthzAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Farmer.HEALTHZ, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> healthz() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(healthzAsBytes());
+            return newResponse(jsonNode, "success", Boolean.class, Farmer.HEALTHZ);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] openConnectionAsBytes(String ip, int port) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("ip", ip)
+                    .put("port", port)
+                    .buildBytes();
+            var req = new Request(Farmer.OPEN_CONNECTION, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> openConnection(String ip, int port) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(openConnectionAsBytes(ip, port));
+            return newResponse(jsonNode, "success", Boolean.class, Farmer.OPEN_CONNECTION);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] stopNodeAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Farmer.STOP_NODE, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> stopNode() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(healthzAsBytes());
+            return newResponse(jsonNode, "success", Boolean.class, Farmer.STOP_NODE);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    // Farmer method for reading plot pages
     private ApiResponse<List<String>> processPlotPages(String nodeId, List<String> filter, int pageSize,
             boolean reverse, Endpoint endpoint) throws RPCException {
         try {
@@ -44,7 +167,7 @@ public class FarmerAPI extends SharedAPI {
         }
     }
 
-    // Shared method for making plot request
+    // Farmer method for making plot request
     private byte[] makePlotRequest(String nodeId, List<String> filter, int page, int pageSize,
             boolean reverse, Endpoint endpoint) throws RPCException {
         try {

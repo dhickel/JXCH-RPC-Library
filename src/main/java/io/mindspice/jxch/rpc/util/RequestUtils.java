@@ -3,6 +3,7 @@ package io.mindspice.jxch.rpc.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.mindspice.mindlib.util.JsonUtils;
+
 import io.mindspice.jxch.rpc.schemas.object.Coin;
 import io.mindspice.jxch.rpc.schemas.object.CoinSpend;
 import io.mindspice.jxch.rpc.schemas.object.SpendBundle;

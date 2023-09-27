@@ -1,5 +1,6 @@
 package io.mindspice.jxch.rpc.enums;
 
+
 public enum ChiaService {
     CRAWLER,
     DATA_LAYER,
@@ -8,6 +9,9 @@ public enum ChiaService {
     FULL_NODE,
     HARVESTER,
     WALLET;
+
+
+    ChiaService() { }
 
     public enum SubService {
         BLOCKS,

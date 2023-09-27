@@ -8,7 +8,14 @@ public enum Daemon implements Endpoint {
     GET_STATUS,
     GET_VERSION,
     IS_RUNNING,
-    PING;
+    PING,
+    // SHARED
+    CLOSE_CONNECTION,
+    GET_CONNECTIONS,
+    GET_ROUTES,
+    OPEN_CONNECTION,
+    STOP_NODE,
+    HEALTHZ;;
 
 
     @Override

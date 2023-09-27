@@ -27,7 +27,7 @@ public record Transaction(
         List<List<String>> sentTo, //Fixme Not sure if this sometimes just returns an unested array? if so flatted with serializer?
         @JsonAlias({"to_address", "send_to"})
         @JsonProperty("to_address") String toAddress,
-        @JsonProperty("trade_id") Object tradeId,
+        @JsonProperty("trade_id") String tradeId,
         @JsonProperty("type") int type,
         @JsonProperty("name") String name,
         @JsonProperty("memos") JsonNode memos,

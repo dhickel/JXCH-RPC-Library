@@ -32,7 +32,14 @@ public enum FullNode implements Endpoint {
     GET_NFT_RECIPIENT_ADDRESS,
     GET_SPEND_BUNDLE_INCLUSION_COST,
     GET_HEIGHT,
-    GET_CAT_SENDER_INFO;
+    GET_CAT_SENDER_INFO,
+    // SHARED
+    CLOSE_CONNECTION,
+    GET_CONNECTIONS,
+    GET_ROUTES,
+    OPEN_CONNECTION,
+    STOP_NODE,
+    HEALTHZ;
 
 
     @Override
