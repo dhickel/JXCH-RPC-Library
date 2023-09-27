@@ -1,4 +1,4 @@
-package io.mindspice.jxch.rpc.util;
+package io.mindspice.mindlib.util;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
@@ -64,14 +64,18 @@ public abstract class JsonUtils {
     }
 
     public static <T> T readJson(String json, Class<?> objClass) throws JsonProcessingException {
+        if (json == null) { return null; }
         return readerFor(objClass, false).readValue(json);
     }
 
     public static <T> T readJson(JsonNode json, Class<?> objClass) throws IOException {
+        if (json == null) { return null; }
+
         return readerFor(objClass, false).readValue(json);
     }
 
     public static <T> T readJson(byte[] json, Class<?> objClass) throws IOException {
+        if (json == null) { return null; }
         return readerFor(objClass, false).readValue(json);
     }
 
@@ -104,18 +108,17 @@ public abstract class JsonUtils {
     }
 
     public static JsonNode readTree(String json) throws JsonProcessingException {
-        if (json == null) { return emptyNode; }
-        ;
+        if (json == null) { return newEmptyNode(); }
         return mapper.readTree(json);
     }
 
     public static JsonNode readTree(byte[] json) throws IOException {
-        if (json == null) { return emptyNode; }
+        if (json == null) { return newEmptyNode(); }
         return mapper.readTree(json);
     }
 
     public static JsonNode readTree(JsonNode json) throws IOException {
-        if (json == null) { return emptyNode; }
+        if (json == null) { return newEmptyNode(); }
         return mapper.readTree(json.traverse());
     }
 
@@ -136,7 +139,6 @@ public abstract class JsonUtils {
 
     public static <T> T readValue(InputStream json, Class<T> objClass) throws IOException {
         if (json == null) { return null; }
-        ;
         return mapper.readValue(json, objClass);
     }
 
