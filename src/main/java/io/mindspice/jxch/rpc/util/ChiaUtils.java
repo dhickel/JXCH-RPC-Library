@@ -40,16 +40,19 @@ public class ChiaUtils {
 
 
     public static String getCoinId(Coin coin) {
-        byte[] parentCoinBytes = Hex.decode(coin.parentCoinInfo());
-        byte[] puzzleHashBytes = Hex.decode(coin.puzzleHash());
+        String pc = coin.parentCoinInfo();
+        String ph = coin.puzzleHash();
+
+        byte[] parentCoinBytes = Hex.decode(pc.length() == 66 ? pc.substring(2) : pc);
+        byte[] puzzleHashBytes = Hex.decode(ph.length() == 66 ? ph.substring(2) : ph);
         byte[] amountBytes =  BigInteger.valueOf(coin.amount()).toByteArray();
 
-        byte[] concat = new byte[parentCoinBytes.length + puzzleHashBytes.length + amountBytes.length];
-        System.arraycopy(parentCoinBytes, 0, concat, 0, parentCoinBytes.length);
-        System.arraycopy(puzzleHashBytes, 0, concat, parentCoinBytes.length, puzzleHashBytes.length);
-        System.arraycopy(amountBytes, 0, concat, parentCoinBytes.length + puzzleHashBytes.length, amountBytes.length);
+        byte[] concatBuffer = new byte[parentCoinBytes.length + puzzleHashBytes.length + amountBytes.length];
+        System.arraycopy(parentCoinBytes, 0, concatBuffer, 0, parentCoinBytes.length);
+        System.arraycopy(puzzleHashBytes, 0, concatBuffer, parentCoinBytes.length, puzzleHashBytes.length);
+        System.arraycopy(amountBytes, 0, concatBuffer, parentCoinBytes.length + puzzleHashBytes.length, amountBytes.length);
 
-        return getSha256(concat);
+        return getSha256(concatBuffer);
     }
 
     public static BigInteger xchToMojos(BigDecimal xch) {
