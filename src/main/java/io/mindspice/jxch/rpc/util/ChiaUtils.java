@@ -13,7 +13,9 @@ import java.security.NoSuchAlgorithmException;
 
 public class ChiaUtils {
     private static final MessageDigest shaDigest;
-    private static final BigDecimal MOJO_PER_XCH = new BigDecimal("1000000000000");
+    private static final BigDecimal MOJO_PER_XCH = new BigDecimal("100000000000");
+    private static final BigDecimal MOJO_PER_CAT = new BigDecimal("1000");
+
 
     static {
         try {
@@ -63,8 +65,7 @@ public class ChiaUtils {
 
     public static BigInteger xchToMojos(Double xch) {
         BigDecimal xc = new BigDecimal(xch);
-        return xc.multiply(MOJO_PER_XCH).toBigInteger();
-    }
+        return xc.multiply(MOJO_PER_XCH).setScale(0, RoundingMode.HALF_UP).toBigInteger();    }
 
     public static BigDecimal mojosToXch(BigDecimal mojos) {
         return mojos.divide(MOJO_PER_XCH, 12, RoundingMode.HALF_UP).stripTrailingZeros();
@@ -72,7 +73,26 @@ public class ChiaUtils {
 
     public static BigDecimal mojosToXch(Long mojos) {
         BigDecimal mj = new BigDecimal(mojos);
-        return mj.divide(MOJO_PER_XCH, 12, RoundingMode.HALF_UP).stripTrailingZeros();
+        return mj.divide(MOJO_PER_XCH, 12,RoundingMode.HALF_UP).stripTrailingZeros();
+    }
+
+
+    public static BigInteger catToMojos(BigDecimal cat) {
+        return cat.multiply(MOJO_PER_CAT).toBigInteger();
+    }
+
+    public static BigInteger catToMojos(Double cat) {
+        BigDecimal c = new BigDecimal(cat);
+        return c.multiply(MOJO_PER_CAT).setScale(0, RoundingMode.HALF_UP).toBigInteger();
+    }
+
+    public static BigDecimal mojosToCat(BigDecimal mojos) {
+        return mojos.divide(MOJO_PER_CAT, 4, RoundingMode.HALF_UP).stripTrailingZeros();
+    }
+
+    public static BigDecimal mojosToCat(Long mojos) {
+        BigDecimal mj = new BigDecimal(mojos);
+        return mj.divide(MOJO_PER_CAT, 4, RoundingMode.HALF_UP).stripTrailingZeros();
     }
 
 
