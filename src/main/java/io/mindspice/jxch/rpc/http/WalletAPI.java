@@ -173,7 +173,6 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<Wallet> createNewWallet(JsonNode walletBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(createNewWalletAsBytes(walletBuilder));
-            System.out.println(JsonUtils.writeString(jsonNode));
             return newResponse(jsonNode, Wallet.class, CREATE_NEW_WALLET);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -623,7 +622,6 @@ public class WalletAPI extends ChiaAPI {
                     .buildNode();
 
             var respNode = JsonUtils.readTree(takeOfferAsBytes(reqNode));
-            System.out.println(JsonUtils.writeString(respNode));
             return newResponse(respNode, "trade_record", TradeRecord.class, TAKE_OFFER);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
