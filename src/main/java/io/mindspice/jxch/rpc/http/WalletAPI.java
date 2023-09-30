@@ -2287,5 +2287,4 @@ public class WalletAPI extends ChiaAPI {
             throw new RPCException("Error reading response JSON", e);
         }
     }
-
 }

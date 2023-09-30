@@ -28,8 +28,8 @@ import java.io.ByteArrayOutputStream;
 public class AddressUtil {
     private static final int M = 0x2bc830a3;
 
-    public static String encode(Bytes32 h, String prefix) {
-        final byte[] bytes = convertBits(h.getBytes(), 8, 5, true);
+    public static String encode(String prefix, Bytes32 hex) {
+        final byte[] bytes = convertBits(hex.getBytes(), 8, 5, true);
         return Bech32.encode(new Bech32.Bech32Data(prefix, bytes), M);
     }
 
@@ -40,6 +40,12 @@ public class AddressUtil {
         }
         final byte[] bytes = convertBits(decode.data, 5, 8, false);
         return new Bytes32(bytes);
+    }
+
+    public static String encode(String hex, String prefix) {
+        Bytes32 h = Bytes32.fromHex(hex);
+        final byte[] bytes = convertBits(h.getBytes(), 8, 5, true);
+        return Bech32.encode(new Bech32.Bech32Data(prefix, bytes), M);
     }
 
     /**
