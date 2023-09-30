@@ -42,7 +42,7 @@ public class AddressUtil {
         return new Bytes32(bytes);
     }
 
-    public static String encode(String hex, String prefix) {
+    public static String encode(String prefix, String hex) {
         Bytes32 h = Bytes32.fromHex(hex);
         final byte[] bytes = convertBits(h.getBytes(), 8, 5, true);
         return Bech32.encode(new Bech32.Bech32Data(prefix, bytes), M);
