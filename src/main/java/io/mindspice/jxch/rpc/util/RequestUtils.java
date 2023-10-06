@@ -727,6 +727,11 @@ public class RequestUtils {
             return this;
         }
 
+        public BulkMintBuilder mintFromDid(boolean mintFromDid) {
+            node.put("mint_from_did", mintFromDid);
+            return this;
+        }
+
         public BulkMintBuilder setRoyaltyPercentage(int royaltyPct) {
             node.put("royalty_percentage", royaltyPct);
             return this;
@@ -785,6 +790,11 @@ public class RequestUtils {
         public BulkMintBuilder addDidCoin(Coin coin) {
             node.putPOJO("did_coin_dict", coin);
             node.put("mint_from_did", true);
+            return this;
+        }
+
+        public BulkMintBuilder setDidLinageParent(String linageParentHex) {
+            node.put("did_lineage_parent_hex", linageParentHex);
             return this;
         }
 
