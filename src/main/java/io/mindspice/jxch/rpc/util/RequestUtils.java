@@ -812,7 +812,7 @@ public class RequestUtils {
             if (!node.has("wallet_id")) { throw new IllegalStateException("Must Set Wallet Id"); }
             if (metaList.isEmpty()) { throw new IllegalStateException("Must Add Meta Data To Mint"); }
             node.putPOJO("metadata_list", metaList);
-            if (!targetList.isEmpty()) { node.putPOJO("target_address_list", targetList); }
+            if (!targetList.isEmpty()) { node.putPOJO("target_list", targetList); }
             if (!coinList.isEmpty()) { node.putPOJO("xch_coin_list", coinList); }
 
             return node;
