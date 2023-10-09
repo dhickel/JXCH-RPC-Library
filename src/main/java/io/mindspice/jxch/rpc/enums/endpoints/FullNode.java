@@ -39,7 +39,7 @@ public enum FullNode implements Endpoint {
     GET_ROUTES,
     OPEN_CONNECTION,
     STOP_NODE,
-    HEALTHZ;
+    HEALTHZ, UNWRAP_CAT_ADDRESS, GET_CAT_SENDER_INFO2;
 
 
     @Override

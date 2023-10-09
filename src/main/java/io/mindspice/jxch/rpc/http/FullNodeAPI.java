@@ -773,7 +773,6 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    // Note fee estimate can also take spend_type, but it seems to not be used atm
     public ApiResponse<String> getNftRecipientAddress(String puzzleReveal, String solution) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getNftRecipientAddressAsBytes(puzzleReveal, solution));
@@ -793,7 +792,6 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    // Note fee estimate can also take spend_type, but it seems to not be used atm
     public ApiResponse<InclusionCost> getSpendBundleInclusionCost(SpendBundle spendBundle) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getSpendBundleInclusionCostAsBytes(spendBundle));
@@ -813,7 +811,6 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    // Note fee estimate can also take spend_type, but it seems to not be used atm
     public ApiResponse<Integer> getHeight() throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getHeightAsBytes());
@@ -833,7 +830,6 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    // Note fee estimate can also take spend_type, but it seems to not be used atm
     public ApiResponse<CatSenderInfo> getCatSenderInfo(CoinRecord coinRecord) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getCatSenderInfoAsBytes(coinRecord));
@@ -842,6 +838,9 @@ public class FullNodeAPI extends ChiaAPI {
             throw new RPCException("Error reading response JSON", e);
         }
     }
+
+
+
 
 }
 
