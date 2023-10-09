@@ -681,9 +681,12 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    public byte[] getMempoolItemByTxIdAsBytes(String txId) throws RPCException {
+    public byte[] getMempoolItemByTxIdAsBytes(String txId, boolean includePending) throws RPCException {
         try {
-            var data = JsonUtils.newSingleNodeAsBytes("tx_id", txId);
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("tx_id", txId)
+                    .put("boolean includePending", includePending)
+                    .buildBytes();
             var req = new Request(FullNode.GET_MEMPOOL_ITEM_BY_TX_ID, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -691,9 +694,9 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<MempoolItem> getMempoolItemByTxId(String txId) throws RPCException {
+    public ApiResponse<MempoolItem> getMempoolItemByTxId(String txId, boolean includePending) throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(getMempoolItemByTxIdAsBytes(txId));
+            var jsonNode = JsonUtils.readTree(getMempoolItemByTxIdAsBytes(txId, includePending));
             return newResponse(jsonNode, "mempool_items", MempoolItem.class, FullNode.GET_MEMPOOL_ITEM_BY_TX_ID);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
