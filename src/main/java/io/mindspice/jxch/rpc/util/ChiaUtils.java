@@ -13,7 +13,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class ChiaUtils {
     private static final MessageDigest shaDigest;
-    private static final BigDecimal MOJO_PER_XCH = new BigDecimal("100000000000");
+    private static final BigDecimal MOJO_PER_XCH = BigDecimal.valueOf(Math.pow(10, 12));
     private static final BigDecimal MOJO_PER_CAT = new BigDecimal("1000");
 
 
