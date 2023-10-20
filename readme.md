@@ -3,7 +3,7 @@
 ***JXCH-RPC-Library is an unofficial third party library and has no relation to, or endorsement by Chia Network, Inc***
 
 # **About**
-***Currently implements Chia Blockchain RPC API up to 2.1.0 coming soon. Datalayer support not currently implemented***
+***Currently implements Chia Blockchain RPC API up to 2.1.0. Datalayer support not currently implemented***
 
 <br>
 
@@ -31,7 +31,7 @@ Using the above outlined features the library can be used simply to load self-si
 ## **Current Project State**
 <br>
 
-Currently, the library provides implementations for all endpoints ***except for the Data Layer*** for the chia client as of 1.7. The library is still in a beta state, all implemented endpoints except for the ones introduced in version 1.7 of the client (Did not have a node on 1.7 when creating, but the new endpoints are implemented, just not tested) have been tested and should function as expected, but due to the nature of software development and the complexity of some of the endpoints and the associated return data, some latent bugs are to be expected. THe library will be updated and maintained as I use it in future projects, and I will try to keep it up to date as possible, but I cannot guarantee up to date full coverage of all endpoints. ***If any bugs are found please create an issue and I will investigate and fix them when time permits.*** I wll try my best to keep the every thing updated and fix any issues proactively, but I am only one person. I tried to architect the library to be fairly simple, and easy to maintainable/contribute to. ***Any contributions are welcome, even if it is just something little.***
+Currently, the library provides implementations for all endpoints ***except for the Data Layer*** for the chia client as of 2.1.0. The library is still in a beta state, all implemented endpoints except for the ones introduced in version 1.7 of the client (Did not have a node on 1.7 when creating, but the new endpoints are implemented, just not tested) have been tested and should function as expected, but due to the nature of software development and the complexity of some of the endpoints and the associated return data, some latent bugs are to be expected. THe library will be updated and maintained as I use it in future projects, and I will try to keep it up to date as possible, but I cannot guarantee up to date full coverage of all endpoints. ***If any bugs are found please create an issue and I will investigate and fix them when time permits.*** I wll try my best to keep the every thing updated and fix any issues proactively, but I am only one person. I tried to architect the library to be fairly simple, and easy to maintainable/contribute to. ***Any contributions are welcome, even if it is just something little.***
 
 <br>
 
