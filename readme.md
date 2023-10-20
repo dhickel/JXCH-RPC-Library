@@ -3,7 +3,7 @@
 ***JXCH-RPC-Library is an unofficial third party library and has no relation to, or endorsement by Chia Network, Inc***
 
 # **About**
-***Currently implements Chia Blockchain RPC API up to 1.7.1, 1.8.2 coming soon. Datalayer support not currently implemented***
+***Currently implements Chia Blockchain RPC API up to 2.1.0 coming soon. Datalayer support not currently implemented***
 
 <br>
 
@@ -546,6 +546,10 @@ The provided builder methods are:
 - **SetDidBulkBuilder:** Used to bulk update NFTs with a DID.
 
 - **NftBulkTransferBuilder:** Used For bulk NFT transfers.
+- 
+- **CoinRecordBuilder:** Used for the coin record API in the wallet.
+- 
+- **HarvesterConfigBuilder:** Used for the new harvester configuration options.
 
 <br>
 
@@ -563,6 +567,23 @@ wallet.getSpendableCoins(req);
 
 
 ```
+
+<br>
+
+## **ChiaUtils**
+Chia Utils is a class containing various utility methods for various conversion. Includes static methods for converting amounts between chia/mojos/cats, also include a method to get the coin name/id for a coin object.
+
+<br>
+
+
+## **AddressUtils**
+Address utils is a small clas containing methods for encoding/decoding puzzlehashes.
+
+Credited to:
+
+* Credit: https://github.com/joelcho/
+* Repo: https://github.com/joelcho/chia-rpc-java
+
 
 <br>
 
