@@ -703,6 +703,27 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
+    public byte[] getMempoolItemsByCoinNameAsBytes(String coinName) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("coin_name", coinName);
+            var req = new Request(FullNode.GET_MEMPOOL_ITEMS_BY_COIN_NAME, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<MempoolItem> getMempoolItemsByCoinName(String coinName) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getMempoolItemsByCoinNameAsBytes(coinName));
+            return newResponse(
+                    jsonNode, "mempool_items", MempoolItem.class, FullNode.GET_MEMPOOL_ITEMS_BY_COIN_NAME
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
     // TODO add multiple method sigs
     public byte[] getFeeEstimateForBundleAsBytes(SpendBundle spendBundle, List<Integer> targetTimes,
             int spendCount) throws RPCException {
@@ -746,8 +767,8 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<FeeEstimate> getFeeEstimateForCost(long cost, List<Integer> targetTimes,
-            int spendCount) throws RPCException {
+    public ApiResponse<FeeEstimate> getFeeEstimateForCost(long cost, List<Integer> targetTimes, int spendCount)
+            throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getFeeEstimateForCostAsBytes(cost, targetTimes, spendCount));
             return newResponse(jsonNode, FeeEstimate.class, FullNode.GET_FEE_ESTIMATE);
