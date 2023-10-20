@@ -63,43 +63,52 @@ If wishing to support/donate donations can be made to :
 <br>
 
 # Dependencies
-The library was developed using Java 17, but *should* be compatible with Java 14, though not for certain. Up to date dependencies can be found in the pom file. Depending the use case some can be avoid if not using all of the libraries features.
+The library was developed using Java 17. Up to date dependencies can be found in the pom file. Depending the use case some can be avoid if not using all of the libraries features.
 
 ```xml
          <!-- Needed for CertPairStore and loading self-signed .crt/.key pairs -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.70</version>
-        </dependency>
+<dependency>
+    <groupId>org.bouncycastle</groupId>
+    <artifactId>bcpkix-jdk15on</artifactId>
+    <version>1.70</version>
+</dependency>
 
         <!-- Needed if using the internal Api classes -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.14.2</version>
-        </dependency>
+<dependency>
+<groupId>com.fasterxml.jackson.core</groupId>
+<artifactId>jackson-databind</artifactId>
+<version>2.15.3</version>
+</dependency>
 
         <!-- Needed for loading config via .yaml -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.13.0</version>
-        </dependency>
+<dependency>
+<groupId>com.fasterxml.jackson.dataformat</groupId>
+<artifactId>jackson-dataformat-yaml</artifactId>
+<version>2.15.3</version>
+</dependency>
 
         <!-- Needed for making http request via RPCClient, and for the Api classes -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
-        </dependency>
+<dependency>
+<groupId>org.apache.httpcomponents</groupId>
+<artifactId>httpclient</artifactId>
+<version>4.5.13</version>
+</dependency>
 
-         <!-- @Nullable annotations -->
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-            <version>3.0.1</version>
-        </dependency>
+
+<dependency>
+<groupId>org.junit.jupiter</groupId>
+<artifactId>junit-jupiter-engine</artifactId>
+<version>5.9.2</version>
+<scope>test</scope>
+</dependency>
+
+        <!-- @Nullable annotations -->
+<dependency>
+<groupId>com.google.code.findbugs</groupId>
+<artifactId>annotations</artifactId>
+<version>3.0.1</version>
+</dependency>
+
 ```
 <br>
 
@@ -119,7 +128,7 @@ This will package the library and add it to you local maven repository, then you
 <dependency>
     <groupId>io.mindspice</groupId>
     <artifactId>jxch-rpc-library</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 
 ```
