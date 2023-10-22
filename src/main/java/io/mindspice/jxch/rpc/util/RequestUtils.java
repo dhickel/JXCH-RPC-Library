@@ -10,6 +10,7 @@ import io.mindspice.jxch.rpc.schemas.wallet.Addition;
 import io.mindspice.jxch.rpc.schemas.wallet.CoinAnnouncement;
 import io.mindspice.jxch.rpc.schemas.wallet.PuzzleAnnouncement;
 import io.mindspice.jxch.rpc.schemas.wallet.nft.MetaData;
+import org.apache.http.annotation.Experimental;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -108,17 +109,23 @@ public class RequestUtils {
         private final ObjectNode driverNode = JsonUtils.newEmptyNode();
         private ObjectNode solver;
 
-        public OfferBuilder putAsset(String asset, int value) {
+        public OfferBuilder addRequestedAsset(String asset, int value) {
+            if (value < 0) { throw new IllegalArgumentException("Value must be positive for requested assets."); }
             offerNode.put(asset, value);
             return this;
         }
 
-        public OfferBuilder putDriverDict(String prop, String value) {
+        public OfferBuilder addOfferedAsset(String asset, int value) {
+            offerNode.put(asset, value > 0 ? -value : value);
+            return this;
+        }
+
+        public OfferBuilder addDriverDict(String prop, String value) {
             driverNode.put(prop, value);
             return this;
         }
 
-        public <T> OfferBuilder putSolver(String prop, T value) {
+        public <T> OfferBuilder addSolver(String prop, T value) {
             if (solver == null) { solver = JsonUtils.newEmptyNode(); }
             solver.putPOJO(prop, value);
             return this;
@@ -146,6 +153,38 @@ public class RequestUtils {
 
         public OfferBuilder addFee(long fee) {
             node.put("fee", fee);
+            return this;
+        }
+
+        /**
+         * Not Implemented in chia client yet
+         **/
+        @Experimental
+        public OfferBuilder setMaxValidHeight(long height) {
+            node.put("max_height", height);
+            return this;
+        }
+
+        public OfferBuilder setMaxValidTime(long unixTime) {
+            node.put("max_time", unixTime);
+            return this;
+        }
+
+        /**
+         * Not Implemented in chia client yet
+         **/
+        @Experimental
+        public OfferBuilder setMinValidHeight(long height) {
+            node.put("min_height", height);
+            return this;
+        }
+
+        /**
+         * Not Implemented in chia client yet
+         **/
+        @Experimental
+        public OfferBuilder setMinValidTime(long unixTime) {
+            node.put("min_time", unixTime);
             return this;
         }
 
@@ -278,7 +317,7 @@ public class RequestUtils {
             return this;
         }
 
-        public <T> TakeOfferBuilder putSolver(String prop, T value) {
+        public <T> TakeOfferBuilder addSolver(String prop, T value) {
             if (solver == null) { solver = JsonUtils.newEmptyNode(); }
             solver.putPOJO(prop, value);
             return this;
