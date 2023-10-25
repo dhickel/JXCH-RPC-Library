@@ -81,7 +81,7 @@ public class RPCClient {
     }
 
     public RPCClient(NodeConfig config) {
-        new RPCClient(config, 10_000, 60_000, 60_000, null);
+         this(config, 10_000, 60_000, 60_000, null);
     }
 
 
