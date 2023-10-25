@@ -109,13 +109,13 @@ public class RequestUtils {
         private final ObjectNode driverNode = JsonUtils.newEmptyNode();
         private ObjectNode solver;
 
-        public OfferBuilder addRequestedAsset(String asset, int value) {
+        public OfferBuilder addRequestedAsset(String asset, long value) {
             if (value < 0) { throw new IllegalArgumentException("Value must be positive for requested assets."); }
             offerNode.put(asset, value);
             return this;
         }
 
-        public OfferBuilder addOfferedAsset(String asset, int value) {
+        public OfferBuilder addOfferedAsset(String asset, long value) {
             offerNode.put(asset, value > 0 ? -value : value);
             return this;
         }
