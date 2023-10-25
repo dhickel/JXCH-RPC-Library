@@ -14,6 +14,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 
@@ -33,12 +34,13 @@ import java.util.List;
 
 
 public class RPCClient {
-    private final CloseableHttpClient client;
-    private final NodeConfig config;
-    private final List<ChiaService> availableServices;
+    private CloseableHttpClient client;
+    private NodeConfig config;
+    private List<ChiaService> availableServices;
     private volatile boolean doDebug = false;
 
-    public RPCClient(NodeConfig config) throws IllegalStateException {
+    public RPCClient(NodeConfig config, int connectionTimeout, int requestTimeout, int socketTimeOut,
+            PoolingHttpClientConnectionManager poolingManager) throws IllegalStateException {
         this.config = config;
         var pairStore = new CertPairStore();
 
@@ -55,25 +57,33 @@ public class RPCClient {
         availableServices = Collections.unmodifiableList(serviceList);
         try {
             RequestConfig requestConfig = RequestConfig.custom()
-                    .setConnectTimeout(60_000)
-                    .setConnectionRequestTimeout(60_000)
-                    .setSocketTimeout(60_000).build();
+                    .setConnectTimeout(connectionTimeout)
+                    .setConnectionRequestTimeout(requestTimeout)
+                    .setSocketTimeout(socketTimeOut).build();
 
             SSLContext sslContext = SSLContexts.custom()
                     .loadKeyMaterial(pairStore.getKeyStore(), "".toCharArray())
                     .loadTrustMaterial(TrustAllStrategy.INSTANCE)
                     .build();
 
-            client = HttpClients
+            var clientBuilder = HttpClients
                     .custom()
                     .setDefaultRequestConfig(requestConfig)
                     .setSSLContext(sslContext)
-                    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                    .build();
+                    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+
+            if (poolingManager != null) { clientBuilder.setConnectionManager(poolingManager); }
+            client = clientBuilder.build();
+
         } catch (UnrecoverableKeyException | KeyManagementException | KeyStoreException | NoSuchAlgorithmException e) {
             throw new IllegalStateException("Failed to construct HttpClient.", e);
         }
     }
+
+    public RPCClient(NodeConfig config) {
+        new RPCClient(config, 10_000, 60_000, 60_000, null);
+    }
+
 
     public void setDebug(boolean doDebug) {
         this.doDebug = doDebug;
