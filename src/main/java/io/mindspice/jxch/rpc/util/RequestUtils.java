@@ -63,12 +63,12 @@ public class RequestUtils {
         }
 
         public CatSpendBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("exclude_coin_amounts", amounts);
+            node.putPOJO("excluded_coin_amounts", amounts);
             return this;
         }
 
         public CatSpendBuilder setExcludedCoinIds(List<String> coinIds) {
-            node.putPOJO("exclude_coin_ids", coinIds);
+            node.putPOJO("excluded_coin_ids", coinIds);
             return this;
         }
 
@@ -143,6 +143,16 @@ public class RequestUtils {
 
         public OfferBuilder setMaxCoinAmount(long amount) {
             node.put("max_coin_amount", amount);
+            return this;
+        }
+
+        public OfferBuilder setExcludedCoins(List<Coin> coins) {
+            node.putPOJO("excluded_coins", coins);
+            return this;
+        }
+
+        public OfferBuilder setExcludedCoinIds(List<String> coinIds) {
+            node.putPOJO("excluded_coin_ids", coinIds);
             return this;
         }
 
@@ -485,12 +495,12 @@ public class RequestUtils {
         }
 
         public SignedTransactionBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("exclude_coin_amounts", amounts);
+            node.putPOJO("excluded_coin_amounts", amounts);
             return this;
         }
 
         public SignedTransactionBuilder setExcludedCoins(List<Coin> coins) {
-            node.putPOJO("exclude_coins", coins);
+            node.putPOJO("excluded_coins", coins);
             return this;
         }
 
@@ -604,12 +614,12 @@ public class RequestUtils {
         }
 
         public TransactionBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("exclude_coin_amounts", amounts);
+            node.putPOJO("excluded_coin_amounts", amounts);
             return this;
         }
 
         public TransactionBuilder setExcludedCoinIds(List<Coin> coinIds) {
-            node.putPOJO("exclude_coins_ids", coinIds);
+            node.putPOJO("excluded_coins_ids", coinIds);
             return this;
         }
 
