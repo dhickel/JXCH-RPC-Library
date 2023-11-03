@@ -30,7 +30,7 @@ public class ChiaUtils {
         StringBuilder hexString = new StringBuilder();
         for (byte b : hash) {
             String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) hexString.append('0');
+            if (hex.length() == 1) { hexString.append('0'); }
             hexString.append(hex);
         }
         shaDigest.reset();
@@ -41,14 +41,13 @@ public class ChiaUtils {
         return getSha256(input.getBytes());
     }
 
-
     public static String getCoinId(Coin coin) {
         String pc = coin.parentCoinInfo();
         String ph = coin.puzzleHash();
 
         byte[] parentCoinBytes = Hex.decode(pc.length() == 66 ? pc.substring(2) : pc);
         byte[] puzzleHashBytes = Hex.decode(ph.length() == 66 ? ph.substring(2) : ph);
-        byte[] amountBytes =  BigInteger.valueOf(coin.amount()).toByteArray();
+        byte[] amountBytes = BigInteger.valueOf(coin.amount()).toByteArray();
 
         byte[] concatBuffer = new byte[parentCoinBytes.length + puzzleHashBytes.length + amountBytes.length];
         System.arraycopy(parentCoinBytes, 0, concatBuffer, 0, parentCoinBytes.length);
@@ -64,7 +63,8 @@ public class ChiaUtils {
 
     public static BigInteger xchToMojos(Double xch) {
         BigDecimal xc = new BigDecimal(xch);
-        return xc.multiply(MOJO_PER_XCH).setScale(0, RoundingMode.HALF_UP).toBigInteger();    }
+        return xc.multiply(MOJO_PER_XCH).setScale(0, RoundingMode.HALF_UP).toBigInteger();
+    }
 
     public static BigDecimal mojosToXch(BigDecimal mojos) {
         return mojos.divide(MOJO_PER_XCH, 12, RoundingMode.HALF_UP).stripTrailingZeros();
@@ -72,9 +72,8 @@ public class ChiaUtils {
 
     public static BigDecimal mojosToXch(Long mojos) {
         BigDecimal mj = new BigDecimal(mojos);
-        return mj.divide(MOJO_PER_XCH, 12,RoundingMode.HALF_UP).stripTrailingZeros();
+        return mj.divide(MOJO_PER_XCH, 12, RoundingMode.HALF_UP).stripTrailingZeros();
     }
-
 
     public static BigInteger catToMojos(BigDecimal cat) {
         return cat.multiply(MOJO_PER_CAT).toBigInteger();
@@ -94,6 +93,11 @@ public class ChiaUtils {
         return mj.divide(MOJO_PER_CAT, 4, RoundingMode.HALF_UP).stripTrailingZeros();
     }
 
-
+    public static String normalizeHex(String hexString) {
+        if (hexString.length() < 64 || hexString.length() > 66) {
+            throw new IllegalArgumentException("Hex mus be 64-66 length string");
+        }
+        return hexString.length() == 64 ? "0x" + hexString : hexString;
+    }
 
 }

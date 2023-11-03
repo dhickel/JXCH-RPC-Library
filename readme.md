@@ -57,7 +57,7 @@ Things like fully crafting spendbundles would benefit from BLS functionality, ma
 ## Donations
 
 If wishing to support/donate donations can be made to :
->xch1z9mpf55pfl75hv8q5nh02zkcvp57gxzzxmh50xlq9p8s6h4tcjrqucsffj
+>xch13ulqtx62s5j06v0tv3la2gchqk7mkp3xgz22yup9eesqgwpa2e4s2glmeg
 
 <br>
 <br>
