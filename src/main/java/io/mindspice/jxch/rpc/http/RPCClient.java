@@ -66,8 +66,7 @@ public class RPCClient {
                     .loadTrustMaterial(TrustAllStrategy.INSTANCE)
                     .build();
 
-            var clientBuilder = HttpClients
-                    .custom()
+            var clientBuilder = HttpClients.custom()
                     .setDefaultRequestConfig(requestConfig)
                     .setSSLContext(sslContext)
                     .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);

@@ -1,0 +1,27 @@
+[1mdiff --git a/src/main/java/io/mindspice/jxch/rpc/http/RPCClient.java b/src/main/java/io/mindspice/jxch/rpc/http/RPCClient.java[m
+[1mindex 544dd90..8608305 100644[m
+[1m--- a/src/main/java/io/mindspice/jxch/rpc/http/RPCClient.java[m
+[1m+++ b/src/main/java/io/mindspice/jxch/rpc/http/RPCClient.java[m
+[36m@@ -66,8 +66,7 @@[m [mpublic class RPCClient {[m
+                     .loadTrustMaterial(TrustAllStrategy.INSTANCE)[m
+                     .build();[m
+ [m
+[31m-            var clientBuilder = HttpClients[m
+[31m-                    .custom()[m
+[32m+[m[32m            var clientBuilder = HttpClients.custom()[m
+                     .setDefaultRequestConfig(requestConfig)[m
+                     .setSSLContext(sslContext)[m
+                     .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);[m
+[1mdiff --git a/src/main/java/io/mindspice/jxch/rpc/schemas/wallet/offers/Offer.java b/src/main/java/io/mindspice/jxch/rpc/schemas/wallet/offers/Offer.java[m
+[1mindex 5c0fc9e..58a2519 100644[m
+[1m--- a/src/main/java/io/mindspice/jxch/rpc/schemas/wallet/offers/Offer.java[m
+[1m+++ b/src/main/java/io/mindspice/jxch/rpc/schemas/wallet/offers/Offer.java[m
+[36m@@ -2,6 +2,8 @@[m [mpackage io.mindspice.jxch.rpc.schemas.wallet.offers;[m
+ [m
+ import com.fasterxml.jackson.annotation.JsonProperty;[m
+ [m
+[32m+[m
+[32m+[m[32m//FIXME this need to handle muultiple trade records[m
+ public record Offer([m
+ [m
+ 	@JsonProperty("offer") String offer,[m

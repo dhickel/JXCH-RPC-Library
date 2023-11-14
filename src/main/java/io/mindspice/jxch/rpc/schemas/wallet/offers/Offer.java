@@ -2,6 +2,8 @@ package io.mindspice.jxch.rpc.schemas.wallet.offers;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+
+//FIXME this need to handle muultiple trade records
 public record Offer(
 
 	@JsonProperty("offer") String offer,
