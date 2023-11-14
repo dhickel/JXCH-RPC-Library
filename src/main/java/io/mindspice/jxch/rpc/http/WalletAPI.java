@@ -2103,15 +2103,14 @@ public class WalletAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<SpendBundle> nftMintBulk(JsonNode bulkMintBuilder) throws RPCException {
+    public ApiResponse<NftBundle> nftMintBulk(JsonNode bulkMintBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftMintBulkAsBytes(bulkMintBuilder));
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, NFT_MINT_BULK);
+            return newResponse(jsonNode, NftBundle.class, Wallet.NFT_MINT_BULK);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
     }
-
     public byte[] nftMintNftAsBytes(JsonNode singleMintbuilder) throws RPCException {
         try {
             var req = new Request(NFT_MINT_NFT, JsonUtils.writeBytes(singleMintbuilder));
