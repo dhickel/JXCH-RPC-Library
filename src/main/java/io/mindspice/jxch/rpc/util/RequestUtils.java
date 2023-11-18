@@ -2,7 +2,7 @@ package io.mindspice.jxch.rpc.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
+import io.mindspice.jxch.rpc.enums.CoinType;
 import io.mindspice.jxch.rpc.schemas.object.Coin;
 import io.mindspice.jxch.rpc.schemas.object.CoinSpend;
 import io.mindspice.jxch.rpc.schemas.object.SpendBundle;
@@ -10,6 +10,7 @@ import io.mindspice.jxch.rpc.schemas.wallet.Addition;
 import io.mindspice.jxch.rpc.schemas.wallet.CoinAnnouncement;
 import io.mindspice.jxch.rpc.schemas.wallet.PuzzleAnnouncement;
 import io.mindspice.jxch.rpc.schemas.wallet.nft.MetaData;
+import org.apache.http.annotation.Experimental;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,12 +65,12 @@ public class RequestUtils {
         }
 
         public CatSpendBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("exclude_coin_amounts", amounts);
+            node.putPOJO("excluded_coin_amounts", amounts);
             return this;
         }
 
         public CatSpendBuilder setExcludedCoinIds(List<String> coinIds) {
-            node.putPOJO("exclude_coin_ids", coinIds);
+            node.putPOJO("excluded_coin_ids", coinIds);
             return this;
         }
 
@@ -110,17 +111,23 @@ public class RequestUtils {
         private final ObjectNode driverNode = JsonUtils.newEmptyNode();
         private ObjectNode solver;
 
-        public OfferBuilder putAsset(String asset, int value) {
+        public OfferBuilder addRequestedAsset(String asset, long value) {
+            if (value < 0) { throw new IllegalArgumentException("Value must be positive for requested assets."); }
             offerNode.put(asset, value);
             return this;
         }
 
-        public OfferBuilder putDriverDict(String prop, String value) {
+        public OfferBuilder addOfferedAsset(String asset, long value) {
+            offerNode.put(asset, value > 0 ? -value : value);
+            return this;
+        }
+
+        public OfferBuilder addDriverDict(String prop, String value) {
             driverNode.put(prop, value);
             return this;
         }
 
-        public <T> OfferBuilder putSolver(String prop, T value) {
+        public <T> OfferBuilder addSolver(String prop, T value) {
             if (solver == null) { solver = JsonUtils.newEmptyNode(); }
             solver.putPOJO(prop, value);
             return this;
@@ -141,6 +148,16 @@ public class RequestUtils {
             return this;
         }
 
+        public OfferBuilder setExcludedCoins(List<Coin> coins) {
+            node.putPOJO("excluded_coins", coins);
+            return this;
+        }
+
+        public OfferBuilder setExcludedCoinIds(List<String> coinIds) {
+            node.putPOJO("excluded_coin_ids", coinIds);
+            return this;
+        }
+
         public OfferBuilder setReusePuzzleHash(boolean bool) {
             node.put("reuse_puzhash", bool);
             return this;
@@ -148,6 +165,38 @@ public class RequestUtils {
 
         public OfferBuilder addFee(long fee) {
             node.put("fee", fee);
+            return this;
+        }
+
+        /**
+         * Not Implemented in chia client yet
+         **/
+        @Experimental
+        public OfferBuilder setMaxValidHeight(long height) {
+            node.put("max_height", height);
+            return this;
+        }
+
+        public OfferBuilder setMaxValidTime(long unixTime) {
+            node.put("max_time", unixTime);
+            return this;
+        }
+
+        /**
+         * Not Implemented in chia client yet
+         **/
+        @Experimental
+        public OfferBuilder setMinValidHeight(long height) {
+            node.put("min_height", height);
+            return this;
+        }
+
+        /**
+         * Not Implemented in chia client yet
+         **/
+        @Experimental
+        public OfferBuilder setMinValidTime(long unixTime) {
+            node.put("min_time", unixTime);
             return this;
         }
 
@@ -280,7 +329,7 @@ public class RequestUtils {
             return this;
         }
 
-        public <T> TakeOfferBuilder putSolver(String prop, T value) {
+        public <T> TakeOfferBuilder addSolver(String prop, T value) {
             if (solver == null) { solver = JsonUtils.newEmptyNode(); }
             solver.putPOJO(prop, value);
             return this;
@@ -448,12 +497,12 @@ public class RequestUtils {
         }
 
         public SignedTransactionBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("exclude_coin_amounts", amounts);
+            node.putPOJO("excluded_coin_amounts", amounts);
             return this;
         }
 
         public SignedTransactionBuilder setExcludedCoins(List<Coin> coins) {
-            node.putPOJO("exclude_coins", coins);
+            node.putPOJO("excluded_coins", coins);
             return this;
         }
 
@@ -567,12 +616,12 @@ public class RequestUtils {
         }
 
         public TransactionBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("exclude_coin_amounts", amounts);
+            node.putPOJO("excluded_coin_amounts", amounts);
             return this;
         }
 
         public TransactionBuilder setExcludedCoinIds(List<Coin> coinIds) {
-            node.putPOJO("exclude_coins_ids", coinIds);
+            node.putPOJO("excluded_coins_ids", coinIds);
             return this;
         }
 
@@ -1034,4 +1083,178 @@ public class RequestUtils {
             String nft_coin_id,
             int wallet_id
     ) { }
+
+
+    public static class CoinRecordBuilder {
+        final ObjectNode node = JsonUtils.newEmptyNode();
+
+        public CoinRecordBuilder setOffset(int offset) {
+            node.put("offset", offset);
+            return this;
+        }
+
+        public CoinRecordBuilder setLimit(int limit) {
+            node.put("limit", limit);
+            return this;
+        }
+
+        public CoinRecordBuilder setWalletId(int walletId) {
+            node.put("wallet_id", walletId);
+            return this;
+        }
+
+        public CoinRecordBuilder setCoinType(int coinType) {
+            node.put("coin_type", coinType);
+            return this;
+        }
+
+        public CoinRecordBuilder setCoinType(CoinType coinType) {
+            node.put("coin_type", coinType.enumValue);
+            return this;
+        }
+
+        public CoinRecordBuilder setCoinIdFilter(List<String> coinIds, boolean exclude) {
+            node.putPOJO("coin_id_filter",
+                    new JsonUtils.ObjectBuilder()
+                            .put("values", coinIds)
+                            .put("mode", exclude ? 2 : 1)
+                            .buildNode()
+            );
+            return this;
+        }
+
+        public CoinRecordBuilder setPuzzleHashFilter(List<String> puzzleHashes, boolean exclude) {
+            node.putPOJO("puzzle_hash_filter",
+                    new JsonUtils.ObjectBuilder()
+                            .put("values", puzzleHashes)
+                            .put("mode", exclude ? 2 : 1)
+                            .buildNode()
+            );
+            return this;
+        }
+
+        public CoinRecordBuilder setParentCoinIdFilter(List<String> parentCoinIds, boolean exclude) {
+            node.putPOJO("parent_coin_id_filter",
+                    new JsonUtils.ObjectBuilder()
+                            .put("values", parentCoinIds)
+                            .put("mode", exclude ? 2 : 1)
+                            .buildNode()
+            );
+            return this;
+        }
+
+        public CoinRecordBuilder setAmountFilter(List<Long> amounts, boolean exclude) {
+            node.putPOJO("amount_filter",
+                    new JsonUtils.ObjectBuilder()
+                            .put("values", amounts)
+                            .put("mode", exclude ? 2 : 1)
+                            .buildNode()
+            );
+            return this;
+        }
+
+        public CoinRecordBuilder setAmountRange(long start, long end) {
+            node.putPOJO("amount_range",
+                    new JsonUtils.ObjectBuilder()
+                            .put("start", start)
+                            .put("stop", end)
+                            .buildNode()
+            );
+            return this;
+        }
+
+        public CoinRecordBuilder setConfirmedRange(long start, long end) {
+            node.putPOJO("confirmed_range",
+                    new JsonUtils.ObjectBuilder()
+                            .put("start", start)
+                            .put("stop", end)
+                            .buildNode()
+            );
+            return this;
+        }
+
+        public CoinRecordBuilder setSpentRange(long start, long end) {
+            node.putPOJO("spent_range",
+                    new JsonUtils.ObjectBuilder()
+                            .put("start", start)
+                            .put("stop", end)
+                            .buildNode()
+            );
+            return this;
+        }
+
+        public CoinRecordBuilder orderByConfirmHeight() {
+            node.put("order", 1);
+            return this;
+        }
+
+        public CoinRecordBuilder orderBySpendHeight() {
+            node.put("order", 2);
+            return this;
+        }
+
+        public CoinRecordBuilder reversed(boolean reversed) {
+            node.put("reverse", reversed);
+            return this;
+        }
+
+        public CoinRecordBuilder includeTotalCount(boolean includeTotalCount) {
+            node.put("include_total_count", includeTotalCount);
+            return this;
+        }
+
+        public JsonNode build() {
+            return node;
+        }
+    }
+
+
+    public static class HarvesterConfigBuilder {
+        final ObjectNode node = JsonUtils.newEmptyNode();
+
+        public HarvesterConfigBuilder useGpuHarvesting(boolean bool) {
+            node.put("use_gpu_harvesting", bool);
+            return this;
+        }
+
+        public HarvesterConfigBuilder gpuIndex(int index) {
+            node.put("gpu_index", index);
+            return this;
+        }
+
+        public HarvesterConfigBuilder enforceGpuIndex(boolean bool) {
+            node.put("enforce_gpu_index", bool);
+            return this;
+        }
+
+        public HarvesterConfigBuilder disableCpuAffinity(boolean bool) {
+            node.put("disable_cpu_affinity", bool);
+            return this;
+        }
+
+        public HarvesterConfigBuilder parallelDecompressorCount(int count) {
+            node.put("parallel_decompressor_count", count);
+            return this;
+        }
+
+        public HarvesterConfigBuilder decompressorThreadCount(int count) {
+            node.put("decompressor_thread_count", count);
+            return this;
+        }
+
+        public HarvesterConfigBuilder recursivePlotScan(boolean bool) {
+            node.put("recursive_plot_scan", bool);
+            return this;
+        }
+
+        public HarvesterConfigBuilder refreshParameterIntervalCount(int count) {
+            node.put("refresh_parameter_interval_seconds", count);
+            return this;
+        }
+
+        public JsonNode build() {
+            return node;
+        }
+
+    }
 }

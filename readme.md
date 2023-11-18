@@ -3,7 +3,7 @@
 ***JXCH-RPC-Library is an unofficial third party library and has no relation to, or endorsement by Chia Network, Inc***
 
 # **About**
-***Currently implements Chia Blockchain RPC API up to 1.7.1, 1.8.2 coming soon. Datalayer support not currently implemented***
+***Currently implements Chia Blockchain RPC API up to 2.1.0. Datalayer support not currently implemented***
 
 <br>
 
@@ -31,7 +31,7 @@ Using the above outlined features the library can be used simply to load self-si
 ## **Current Project State**
 <br>
 
-Currently, the library provides implementations for all endpoints ***except for the Data Layer*** for the chia client as of 1.7. The library is still in a beta state, all implemented endpoints except for the ones introduced in version 1.7 of the client (Did not have a node on 1.7 when creating, but the new endpoints are implemented, just not tested) have been tested and should function as expected, but due to the nature of software development and the complexity of some of the endpoints and the associated return data, some latent bugs are to be expected. THe library will be updated and maintained as I use it in future projects, and I will try to keep it up to date as possible, but I cannot guarantee up to date full coverage of all endpoints. ***If any bugs are found please create an issue and I will investigate and fix them when time permits.*** I wll try my best to keep the every thing updated and fix any issues proactively, but I am only one person. I tried to architect the library to be fairly simple, and easy to maintainable/contribute to. ***Any contributions are welcome, even if it is just something little.***
+Currently, the library provides implementations for all endpoints ***except for the Data Layer*** for the chia client as of 2.1.0. The library is still in a beta state, all implemented endpoints except for the ones introduced in version 1.7 of the client (Did not have a node on 1.7 when creating, but the new endpoints are implemented, just not tested) have been tested and should function as expected, but due to the nature of software development and the complexity of some of the endpoints and the associated return data, some latent bugs are to be expected. THe library will be updated and maintained as I use it in future projects, and I will try to keep it up to date as possible, but I cannot guarantee up to date full coverage of all endpoints. ***If any bugs are found please create an issue and I will investigate and fix them when time permits.*** I wll try my best to keep the every thing updated and fix any issues proactively, but I am only one person. I tried to architect the library to be fairly simple, and easy to maintainable/contribute to. ***Any contributions are welcome, even if it is just something little.***
 
 <br>
 
@@ -57,49 +57,58 @@ Things like fully crafting spendbundles would benefit from BLS functionality, ma
 ## Donations
 
 If wishing to support/donate donations can be made to :
->xch1z9mpf55pfl75hv8q5nh02zkcvp57gxzzxmh50xlq9p8s6h4tcjrqucsffj
+>xch13ulqtx62s5j06v0tv3la2gchqk7mkp3xgz22yup9eesqgwpa2e4s2glmeg
 
 <br>
 <br>
 
 # Dependencies
-The library was developed using Java 17, but *should* be compatible with Java 14, though not for certain. Up to date dependencies can be found in the pom file. Depending the use case some can be avoid if not using all of the libraries features.
+The library was developed using Java 17. Up to date dependencies can be found in the pom file. Depending the use case some can be avoid if not using all of the libraries features.
 
 ```xml
          <!-- Needed for CertPairStore and loading self-signed .crt/.key pairs -->
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.70</version>
-        </dependency>
+<dependency>
+    <groupId>org.bouncycastle</groupId>
+    <artifactId>bcpkix-jdk15on</artifactId>
+    <version>1.70</version>
+</dependency>
 
         <!-- Needed if using the internal Api classes -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.14.2</version>
-        </dependency>
+<dependency>
+<groupId>com.fasterxml.jackson.core</groupId>
+<artifactId>jackson-databind</artifactId>
+<version>2.15.3</version>
+</dependency>
 
         <!-- Needed for loading config via .yaml -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.13.0</version>
-        </dependency>
+<dependency>
+<groupId>com.fasterxml.jackson.dataformat</groupId>
+<artifactId>jackson-dataformat-yaml</artifactId>
+<version>2.15.3</version>
+</dependency>
 
         <!-- Needed for making http request via RPCClient, and for the Api classes -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
-        </dependency>
+<dependency>
+<groupId>org.apache.httpcomponents</groupId>
+<artifactId>httpclient</artifactId>
+<version>4.5.13</version>
+</dependency>
 
-         <!-- @Nullable annotations -->
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-            <version>3.0.1</version>
-        </dependency>
+
+<dependency>
+<groupId>org.junit.jupiter</groupId>
+<artifactId>junit-jupiter-engine</artifactId>
+<version>5.9.2</version>
+<scope>test</scope>
+</dependency>
+
+        <!-- @Nullable annotations -->
+<dependency>
+<groupId>com.google.code.findbugs</groupId>
+<artifactId>annotations</artifactId>
+<version>3.0.1</version>
+</dependency>
+
 ```
 <br>
 
@@ -119,7 +128,7 @@ This will package the library and add it to you local maven repository, then you
 <dependency>
     <groupId>io.mindspice</groupId>
     <artifactId>jxch-rpc-library</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 
 ```
@@ -546,6 +555,10 @@ The provided builder methods are:
 - **SetDidBulkBuilder:** Used to bulk update NFTs with a DID.
 
 - **NftBulkTransferBuilder:** Used For bulk NFT transfers.
+- 
+- **CoinRecordBuilder:** Used for the coin record API in the wallet.
+- 
+- **HarvesterConfigBuilder:** Used for the new harvester configuration options.
 
 <br>
 
@@ -563,6 +576,23 @@ wallet.getSpendableCoins(req);
 
 
 ```
+
+<br>
+
+## **ChiaUtils**
+Chia Utils is a class containing various utility methods for various conversion. Includes static methods for converting amounts between chia/mojos/cats, also include a method to get the coin name/id for a coin object.
+
+<br>
+
+
+## **AddressUtils**
+Address utils is a small clas containing methods for encoding/decoding puzzlehashes.
+
+Credited to:
+
+* Credit: https://github.com/joelcho/
+* Repo: https://github.com/joelcho/chia-rpc-java
+
 
 <br>
 

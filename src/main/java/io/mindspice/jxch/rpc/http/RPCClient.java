@@ -14,6 +14,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 
@@ -33,18 +34,17 @@ import java.util.List;
 
 
 public class RPCClient {
-    private final CloseableHttpClient client;
-    private final NodeConfig config;
-    private final List<ChiaService> availableServices;
+    private CloseableHttpClient client;
+    private NodeConfig config;
+    private List<ChiaService> availableServices;
     private volatile boolean doDebug = false;
 
-    public RPCClient(NodeConfig config) throws IllegalStateException {
+    public RPCClient(NodeConfig config, int connectionTimeout, int requestTimeout, int socketTimeOut,
+            PoolingHttpClientConnectionManager poolingManager) throws IllegalStateException {
         this.config = config;
         var pairStore = new CertPairStore();
 
-
         var serviceList = new ArrayList<ChiaService>();
-
         for (var service : ChiaService.values()) {
             try {
                 pairStore.addKey(service.name(), config.getCertPair(service));
@@ -57,26 +57,32 @@ public class RPCClient {
         availableServices = Collections.unmodifiableList(serviceList);
         try {
             RequestConfig requestConfig = RequestConfig.custom()
-                    .setConnectTimeout(60_000)
-                    .setConnectionRequestTimeout(60_000)
-                    .setSocketTimeout(60_000)
-                    .setExpectContinueEnabled(true).build();
+                    .setConnectTimeout(connectionTimeout)
+                    .setConnectionRequestTimeout(requestTimeout)
+                    .setSocketTimeout(socketTimeOut).build();
 
             SSLContext sslContext = SSLContexts.custom()
                     .loadKeyMaterial(pairStore.getKeyStore(), "".toCharArray())
                     .loadTrustMaterial(TrustAllStrategy.INSTANCE)
                     .build();
 
-            client = HttpClients
-                    .custom()
+            var clientBuilder = HttpClients.custom()
                     .setDefaultRequestConfig(requestConfig)
                     .setSSLContext(sslContext)
-                    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE)
-                    .build();
+                    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+
+            if (poolingManager != null) { clientBuilder.setConnectionManager(poolingManager); }
+            client = clientBuilder.build();
+
         } catch (UnrecoverableKeyException | KeyManagementException | KeyStoreException | NoSuchAlgorithmException e) {
             throw new IllegalStateException("Failed to construct HttpClient.", e);
         }
     }
+
+    public RPCClient(NodeConfig config) {
+        this(config, 10_000, 60_000, 60_000, null);
+    }
+
 
     public void setDebug(boolean doDebug) {
         this.doDebug = doDebug;
@@ -90,11 +96,9 @@ public class RPCClient {
             httpPost.setEntity(new ByteArrayEntity(req.data));
             httpPost.setHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
 
-
             if (doDebug) {
                 System.out.println("Request | Uri: " + uri + " | data: " + new String(req.data, StandardCharsets.UTF_8));
             }
-
             try (CloseableHttpResponse response = client.execute(httpPost);
                  InputStream content = response.getEntity().getContent()) {
                 byte[] bytes = content.readAllBytes();
@@ -105,11 +109,12 @@ public class RPCClient {
                 return bytes;
             }
 
-        } catch (URISyntaxException e) {
 
+        } catch (URISyntaxException e) {
             throw new RPCException("URI error on RPC request", e);
         } catch (IOException e) {
             throw new RPCException("Byte read error on RPC request", e);
+
         }
     }
 

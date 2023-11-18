@@ -1,11 +1,13 @@
 package io.mindspice.jxch.rpc.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.mindspice.jxch.rpc.enums.ChiaService;
 import io.mindspice.jxch.rpc.enums.endpoints.Harvester;
 
 import io.mindspice.jxch.rpc.util.JsonUtils;
 import io.mindspice.jxch.rpc.schemas.ApiResponse;
+import io.mindspice.jxch.rpc.schemas.harvester.HarvesterConfig;
 import io.mindspice.jxch.rpc.schemas.harvester.HarvesterPlots;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;
 import io.mindspice.jxch.rpc.schemas.shared.Connection;
@@ -256,6 +258,45 @@ public class HarvesterAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(getPlotDirectoriesAsBytes());
             return newResponseList(jsonNode, "directories", TypeRefs.STRING_LIST, Harvester.GET_PLOT_DIRECTORIES);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getHarvesterConfigAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(Harvester.GET_HARVESTER_CONFIG, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<HarvesterConfig> getHarvesterConfig() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getPlotDirectoriesAsBytes());
+            return newResponse(jsonNode, HarvesterConfig.class, Harvester.GET_HARVESTER_CONFIG);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+
+    public byte[] updateHarvesterConfigAsBytes(JsonNode harvesterConfigBuilder) throws RPCException {
+        try {
+            var data = JsonUtils.writeBytes(harvesterConfigBuilder);
+            var req = new Request(Harvester.UPDATE_HARVESTER_CONFIG, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> updateHarvesterConfig(JsonNode harvesterConfigBuilder) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(updateHarvesterConfigAsBytes(harvesterConfigBuilder));
+            return newResponse(jsonNode, "success", Boolean.class, Harvester.UPDATE_HARVESTER_CONFIG);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }

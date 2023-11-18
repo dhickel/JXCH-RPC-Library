@@ -1,13 +1,13 @@
+
 package io.mindspice.jxch.rpc.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.mindspice.jxch.rpc.enums.ChiaService;
 import io.mindspice.jxch.rpc.enums.endpoints.FullNode;
-import io.mindspice.jxch.rpc.schemas.custom.CatSenderInfo;
 import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;
+import io.mindspice.jxch.rpc.schemas.custom.CatSenderInfo;
 import io.mindspice.jxch.rpc.schemas.custom.InclusionCost;
-import io.mindspice.jxch.rpc.schemas.custom.PushedTx;
 import io.mindspice.jxch.rpc.schemas.fullnode.*;
 import io.mindspice.jxch.rpc.schemas.object.*;
 import io.mindspice.jxch.rpc.schemas.shared.Connection;
@@ -561,11 +561,11 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<PushedTx> pushTx(SpendBundle spendBundle)
+    public ApiResponse<String> pushTx(SpendBundle spendBundle)
             throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(pushTxAsBytes(spendBundle));
-            return newResponse(jsonNode, PushedTx.class, FullNode.PUSH_TX);
+            return newResponse(jsonNode, "status", String.class, FullNode.PUSH_TX);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -706,6 +706,27 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
+    public byte[] getMempoolItemsByCoinNameAsBytes(String coinName) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("coin_name", coinName);
+            var req = new Request(FullNode.GET_MEMPOOL_ITEMS_BY_COIN_NAME, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<MempoolItem> getMempoolItemsByCoinName(String coinName) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getMempoolItemsByCoinNameAsBytes(coinName));
+            return newResponse(
+                    jsonNode, "mempool_items", MempoolItem.class, FullNode.GET_MEMPOOL_ITEMS_BY_COIN_NAME
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
     // TODO add multiple method sigs
     public byte[] getFeeEstimateForBundleAsBytes(SpendBundle spendBundle, List<Integer> targetTimes,
             int spendCount) throws RPCException {
@@ -749,9 +770,8 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    // Note fee estimate can also take spend_type, but it seems to not be used atm
-    public ApiResponse<FeeEstimate> getFeeEstimateForCost(long cost, List<Integer> targetTimes,
-            int spendCount) throws RPCException {
+    public ApiResponse<FeeEstimate> getFeeEstimateForCost(long cost, List<Integer> targetTimes, int spendCount)
+            throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getFeeEstimateForCostAsBytes(cost, targetTimes, spendCount));
             return newResponse(jsonNode, FeeEstimate.class, FullNode.GET_FEE_ESTIMATE);
@@ -760,12 +780,17 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
+    // Note fee estimate can also take spend_type, but it seems to not be used atm
+
 
     /* CUSTOM */
 
-    public byte[] getNftRecipientAddressAsBytes(String coinName) throws RPCException {
+    public byte[] getNftRecipientAddressAsBytes(String puzzleReveal, String solution) throws RPCException {
         try {
-            var data = JsonUtils.newSingleNodeAsBytes("coin_name", coinName);
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("puzzle_reveal", puzzleReveal)
+                    .put("solution", solution)
+                    .buildBytes();
             var req = new Request(FullNode.GET_NFT_RECIPIENT_ADDRESS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -773,10 +798,10 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<String> getNftRecipientAddress(String coinName) throws RPCException {
+    public ApiResponse<String> getNftRecipientAddress(String puzzleReveal, String solution) throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(getNftRecipientAddressAsBytes(coinName));
-            return newResponse(jsonNode, "recipient_puzzle_hash", String.class, FullNode.GET_NFT_RECIPIENT_ADDRESS);
+            var jsonNode = JsonUtils.readTree(getNftRecipientAddressAsBytes(puzzleReveal, solution));
+            return newResponse(jsonNode, "nft_recipient_address", String.class, FullNode.GET_NFT_RECIPIENT_ADDRESS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -839,5 +864,3 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 }
-
-

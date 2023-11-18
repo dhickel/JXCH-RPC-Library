@@ -5,13 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.mindspice.jxch.rpc.enums.ChiaService;
 import io.mindspice.jxch.rpc.enums.NftDataKey;
 import io.mindspice.jxch.rpc.enums.endpoints.Wallet;
-
-import io.mindspice.jxch.rpc.util.JsonUtils;
 import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;
-import io.mindspice.jxch.rpc.schemas.custom.NftBundle;
-import io.mindspice.jxch.rpc.enums.endpoints.Wallet;
-
+import io.mindspice.jxch.rpc.schemas.clawback.AutoClaim;
 import io.mindspice.jxch.rpc.schemas.fullnode.Network;
 import io.mindspice.jxch.rpc.schemas.object.Coin;
 import io.mindspice.jxch.rpc.schemas.object.CoinRecord;
@@ -24,6 +20,7 @@ import io.mindspice.jxch.rpc.schemas.wallet.cat.StrayCat;
 import io.mindspice.jxch.rpc.schemas.wallet.did.*;
 import io.mindspice.jxch.rpc.schemas.wallet.nft.*;
 import io.mindspice.jxch.rpc.schemas.wallet.offers.*;
+import io.mindspice.jxch.rpc.util.JsonUtils;
 import io.mindspice.jxch.rpc.util.RPCException;
 
 import javax.annotation.Nullable;
@@ -2262,6 +2259,27 @@ public class WalletAPI extends ChiaAPI {
     /* Coins */
     ///////////
 
+    public byte[] getCoinRecordsAsBytes(JsonNode coinRecordBuilder) throws RPCException {
+        try {
+            var data = JsonUtils.writeBytes(coinRecordBuilder);
+            var req = new Request(Wallet.GET_COIN_RECORDS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<CoinRecord>> getCoinRecords(JsonNode coinRecordBuilder) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getCoinRecordsAsBytes(coinRecordBuilder));
+            return newResponseList(
+                    jsonNode, "coin_records", TypeRefs.COIN_RECORD_LIST, Wallet.GET_COIN_RECORDS
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
     public byte[] getCoinRecordsByNamesAsBytes(List<String> names, int startHeight, int endHeight,
             boolean includeSpent) throws RPCException {
         try {
@@ -2292,6 +2310,81 @@ public class WalletAPI extends ChiaAPI {
         }
     }
 
+    //////////////
+    // Clawback //
+    //////////////
+
+    public byte[] spendClawbackCoinsAsBytes(List<String> coinIds, long fee, int batchSize) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("coin_ids", coinIds)
+                    .put("fee", fee)
+                    .put("batch_size", batchSize)
+                    .buildBytes();
+            var req = new Request(SPEND_CLAWBACK_COINS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<String>> spendClawbackCoins(List<String> coinIds, long fee, int batchSize)
+            throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(spendClawbackCoinsAsBytes(coinIds, fee, batchSize));
+            return newResponseList(
+                    jsonNode, "transaction_ids", TypeRefs.STRING_LIST, Wallet.SPEND_CLAWBACK_COINS
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] getAutoClaimAsBytes() throws RPCException {
+        try {
+            var data = JsonUtils.newEmptyNodeAsBytes();
+            var req = new Request(GET_AUTO_CLAIM, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<AutoClaim> getAutoClaim() throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getAutoClaimAsBytes());
+            return newResponse(jsonNode, AutoClaim.class, Wallet.GET_AUTO_CLAIM);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] setAutoClaimAsBytes(boolean enabled, long txFee, long minAmount, int batchSize)
+            throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("enabled", enabled)
+                    .put("tx_fee", txFee)
+                    .put("min_amount", minAmount)
+                    .put("batch_size", batchSize)
+                    .buildBytes();
+            var req = new Request(SET_AUTO_CLAIM, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<AutoClaim> setAutoClaim(boolean enabled, long txFee, long minAmount, int batchSize)
+            throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(setAutoClaimAsBytes(enabled, txFee, minAmount, batchSize));
+            return newResponse(jsonNode, AutoClaim.class, Wallet.SET_AUTO_CLAIM);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
     ////////////
     // CUSTOM //
     ////////////
@@ -2309,7 +2402,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<SpendBundle> aggregateSpends(List<SpendBundle> spends) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(aggregateSpendsAsBytes(spends));
-            return newResponse(jsonNode, "agg_bundle", SpendBundle.class , Wallet.AGGREGATE_SPENDS);
+            return newResponse(jsonNode, "agg_bundle", SpendBundle.class, Wallet.AGGREGATE_SPENDS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -2327,7 +2420,7 @@ public class WalletAPI extends ChiaAPI {
     public ApiResponse<SpendBundle> catSpendBundleOnly(JsonNode catSpendBuilder) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(catSpendBundleOnlyAsBytes(catSpendBuilder));
-            return newResponse(jsonNode, "spend_bundle", SpendBundle.class , Wallet.CAT_SPEND_BUNDLE_ONLY);
+            return newResponse(jsonNode, "spend_bundle", SpendBundle.class, Wallet.CAT_SPEND_BUNDLE_ONLY);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
