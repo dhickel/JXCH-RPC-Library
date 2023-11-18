@@ -786,12 +786,9 @@ public class FullNodeAPI extends ChiaAPI {
 
     /* CUSTOM */
 
-    public byte[] getNftRecipientAddressAsBytes(String puzzleReveal, String solution) throws RPCException {
+    public byte[] getNftRecipientAddressAsBytes(String coinName) throws RPCException {
         try {
-            var data = new JsonUtils.ObjectBuilder()
-                    .put("puzzle_reveal", puzzleReveal)
-                    .put("solution", solution)
-                    .buildBytes();
+            var data = JsonUtils.newSingleNodeAsBytes("coin_name", coinName);
             var req = new Request(FullNode.GET_NFT_RECIPIENT_ADDRESS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
@@ -799,10 +796,10 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<String> getNftRecipientAddress(String puzzleReveal, String solution) throws RPCException {
+    public ApiResponse<String> getNftRecipientAddress(String coinName) throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(getNftRecipientAddressAsBytes(puzzleReveal, solution));
-            return newResponse(jsonNode, "nft_recipient_address", String.class, FullNode.GET_NFT_RECIPIENT_ADDRESS);
+            var jsonNode = JsonUtils.readTree(getNftRecipientAddressAsBytes(coinName));
+            return newResponse(jsonNode, "recipient_puzzle_hash", String.class, FullNode.GET_NFT_RECIPIENT_ADDRESS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
