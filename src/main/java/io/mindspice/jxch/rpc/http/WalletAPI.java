@@ -2112,9 +2112,9 @@ public class WalletAPI extends ChiaAPI {
         }
     }
 
-    public byte[] nftMintNftAsBytes(JsonNode singleMintbuilder) throws RPCException {
+    public byte[] nftMintNftAsBytes(JsonNode singleMintBuilder) throws RPCException {
         try {
-            var req = new Request(NFT_MINT_NFT, JsonUtils.writeBytes(singleMintbuilder));
+            var req = new Request(NFT_MINT_NFT, JsonUtils.writeBytes(singleMintBuilder));
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
