@@ -15,6 +15,7 @@ public class Addition {
     @JsonProperty("memos")
     private List<String> memos;
 
+
     public Addition(String puzzleHash, long amount) {
         this.puzzleHash = puzzleHash;
         this.amount = amount;
@@ -24,6 +25,9 @@ public class Addition {
         this.puzzleHash = puzzleHash;
         this.amount = amount;
         this.memos = memos;
+    }
+
+    public Addition() {
     }
 
     public String puzzleHash() {
