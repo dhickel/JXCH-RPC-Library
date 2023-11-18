@@ -8,6 +8,7 @@ import io.mindspice.jxch.rpc.schemas.ApiResponse;
 import io.mindspice.jxch.rpc.schemas.TypeRefs;
 import io.mindspice.jxch.rpc.schemas.custom.CatSenderInfo;
 import io.mindspice.jxch.rpc.schemas.custom.InclusionCost;
+import io.mindspice.jxch.rpc.schemas.custom.PushedTx;
 import io.mindspice.jxch.rpc.schemas.fullnode.*;
 import io.mindspice.jxch.rpc.schemas.object.*;
 import io.mindspice.jxch.rpc.schemas.shared.Connection;
@@ -561,11 +562,11 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<String> pushTx(SpendBundle spendBundle)
+    public ApiResponse<PushedTx> pushTx(SpendBundle spendBundle)
             throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(pushTxAsBytes(spendBundle));
-            return newResponse(jsonNode, "status", String.class, FullNode.PUSH_TX);
+            return newResponse(jsonNode, PushedTx.class, FullNode.PUSH_TX);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
