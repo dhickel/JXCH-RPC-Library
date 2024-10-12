@@ -2,6 +2,7 @@ package io.mindspice.jxch.rpc.schemas;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.mindspice.jxch.rpc.schemas.farmer.*;
+import io.mindspice.jxch.rpc.schemas.fullnode.SpendWithConditions;
 import io.mindspice.jxch.rpc.schemas.object.*;
 import io.mindspice.jxch.rpc.schemas.shared.Connection;
 import io.mindspice.jxch.rpc.schemas.wallet.Notification;
@@ -21,7 +22,8 @@ public class TypeRefs {
     public static final TypeReference<List<BlockRecord>> BLOCK_RECORD_LIST = new TypeReference<>() { };
     public static final TypeReference<List<Block>> BLOCK_LIST = new TypeReference<>() { };
     public static final TypeReference<List<CoinRecord>> COIN_RECORD_LIST = new TypeReference<>() { };
-    public static final TypeReference<List<CoinSolution>> COIN_SOLUTION_LIST = new TypeReference<>() { };
+    public static final TypeReference<List<CoinSpend>> COIN_SPEND_LIST = new TypeReference<>() { };
+    public static final TypeReference<List<SpendWithConditions>> SPEND_WITH_COND_LIST = new TypeReference<>() { };
     public static final TypeReference<List<BlockHeader>> BLOCK_HEADER_LIST = new TypeReference<>() { };
     public static final TypeReference<List<String>> STRING_LIST = new TypeReference<>() { };
     public static final TypeReference<Map<String, MempoolItem>> MEMPOOL_MAP = new TypeReference<>() { };

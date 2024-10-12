@@ -279,11 +279,11 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<List<CoinSolution>> getBlockSpends(String headerHash) throws RPCException {
+    public ApiResponse<List<CoinSpend>> getBlockSpends(String headerHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getBlockSpendsAsBytes(headerHash));
             return newResponseList(
-                    jsonNode, "block_spends", TypeRefs.COIN_SOLUTION_LIST, FullNode.GET_BLOCK_SPENDS
+                    jsonNode, "block_spends", TypeRefs.COIN_SPEND_LIST, FullNode.GET_BLOCK_SPENDS
             );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -539,10 +539,10 @@ public class FullNodeAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<CoinSolution> getPuzzleAndSolution(String coinId, int height) throws RPCException {
+    public ApiResponse<CoinSpend> getPuzzleAndSolution(String coinId, int height) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(getPuzzleAndSolutionAsBytes(coinId, height));
-            return newResponse(jsonNode, "coin_solution", CoinSolution.class, FullNode.GET_PUZZLE_AND_SOLUTION);
+            return newResponse(jsonNode, "coin_solution", CoinSpend.class, FullNode.GET_PUZZLE_AND_SOLUTION);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -778,6 +778,28 @@ public class FullNodeAPI extends ChiaAPI {
     }
 
     // Note fee estimate can also take spend_type, but it seems to not be used atm
+
+    public byte[] getBlockSpendsWithConditionsAsBytes(String headerHash) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("header_hash", headerHash);
+            var req = new Request(FullNode.GET_BLOCK_SPENDS_WITH_CONDITIONS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<SpendWithConditions>> getBlockSpendsWithConditions(String headerHash) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(getBlockSpendsAsBytes(headerHash));
+            return newResponseList(
+                    jsonNode, "block_spends_with_conditions", TypeRefs.SPEND_WITH_COND_LIST, FullNode.GET_BLOCK_SPENDS_WITH_CONDITIONS
+            );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
 }
 
 

@@ -638,6 +638,14 @@ public class WalletAPI extends ChiaAPI {
         }
     }
 
+
+    ////////////////////
+    /* CR CATS WALLET */
+    ////////////////////
+
+
+
+
     ////////////////
     /* DID WALLET */
     ////////////////
