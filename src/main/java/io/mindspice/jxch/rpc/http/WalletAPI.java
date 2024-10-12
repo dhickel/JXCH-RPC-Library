@@ -638,14 +638,6 @@ public class WalletAPI extends ChiaAPI {
         }
     }
 
-
-    ////////////////////
-    /* CR CATS WALLET */
-    ////////////////////
-
-
-
-
     ////////////////
     /* DID WALLET */
     ////////////////
@@ -2119,6 +2111,7 @@ public class WalletAPI extends ChiaAPI {
             throw new RPCException("Error reading response JSON", e);
         }
     }
+
     public byte[] nftMintNftAsBytes(JsonNode singleMintbuilder) throws RPCException {
         try {
             var req = new Request(NFT_MINT_NFT, JsonUtils.writeBytes(singleMintbuilder));
@@ -2317,8 +2310,6 @@ public class WalletAPI extends ChiaAPI {
         }
     }
 
-
-
     //////////////
     // Clawback //
     //////////////
@@ -2389,6 +2380,36 @@ public class WalletAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(setAutoClaimAsBytes(enabled, txFee, minAmount, batchSize));
             return newResponse(jsonNode, AutoClaim.class, Wallet.SET_AUTO_CLAIM);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    ////////////////////
+    /* CR CATS WALLET */
+    ////////////////////
+
+    public byte[] crcatApprovePendingAsBytes(int walletId, long minClaimAmount, long fee) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("min_amount_to_claim", minClaimAmount)
+                    .put("fee", fee)
+                    .buildBytes();
+            var req = new Request(CRCAT_APPROVE_PENDING, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<List<Transaction>> crcatApprovePending(int walletId, long minClaimAmount, long fee)
+            throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(crcatApprovePendingAsBytes(walletId, minClaimAmount, fee));
+            return newResponseList(
+                    jsonNode, "transactions", TypeRefs.TRANSACTIONS_LIST, CRCAT_APPROVE_PENDING
+            );
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }

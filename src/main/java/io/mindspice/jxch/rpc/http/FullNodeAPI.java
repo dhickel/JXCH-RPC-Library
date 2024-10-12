@@ -791,7 +791,7 @@ public class FullNodeAPI extends ChiaAPI {
 
     public ApiResponse<List<SpendWithConditions>> getBlockSpendsWithConditions(String headerHash) throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(getBlockSpendsAsBytes(headerHash));
+            var jsonNode = JsonUtils.readTree(getBlockSpendsWithConditionsAsBytes(headerHash));
             return newResponseList(
                     jsonNode, "block_spends_with_conditions", TypeRefs.SPEND_WITH_COND_LIST, FullNode.GET_BLOCK_SPENDS_WITH_CONDITIONS
             );
