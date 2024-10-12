@@ -382,11 +382,11 @@ public class FarmerAPI extends ChiaAPI {
         }
     }
 
-    public ApiResponse<RewardTarget> setRewardTargets(String farmerTarget, String poolTarget)
+    public ApiResponse<Boolean> setRewardTargets(String farmerTarget, String poolTarget)
             throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(setRewardTargetsAsBytes(farmerTarget, poolTarget));
-            return newResponse(jsonNode, RewardTarget.class, Farmer.SET_REWARD_TARGETS);
+            return newResponse(jsonNode, "success", Boolean.class, Farmer.SET_REWARD_TARGETS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
@@ -428,6 +428,29 @@ public class FarmerAPI extends ChiaAPI {
             return newResponseList(
                     jsonNode, "signage_points", TypeRefs.SIGNAGE_POINT_BUNDLE_LIST, Farmer.GET_SIGNAGE_POINTS
             );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] setPayoutInstructionsAsBytes(String launcherId, String payoutInstructions) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("launcher_id", launcherId)
+                    .put("payout_instructions", payoutInstructions)
+                    .buildBytes();
+            var req = new Request(Farmer.SET_PAYOUT_INSTRUCTIONS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Boolean> setPayoutInstructions(String launcherId, String payoutInstructions)
+            throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(setPayoutInstructionsAsBytes(launcherId, payoutInstructions));
+            return newResponse(jsonNode, "success", Boolean.class, Farmer.SET_PAYOUT_INSTRUCTIONS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }

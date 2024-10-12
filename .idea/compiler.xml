@@ -8,10 +8,8 @@
         <outputRelativeToContentRoot value="true" />
         <module name="chia-java-rpc-lib" />
         <module name="jxch-rpc-library" />
+        <module name="jxch-rpc-library-custom" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="jxch-rpc-library-custom" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>
