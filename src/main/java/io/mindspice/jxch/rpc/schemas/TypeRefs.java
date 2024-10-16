@@ -10,6 +10,7 @@ import io.mindspice.jxch.rpc.schemas.wallet.WalletBalance;
 import io.mindspice.jxch.rpc.schemas.wallet.cat.Cat;
 import io.mindspice.jxch.rpc.schemas.wallet.cat.StrayCat;
 import io.mindspice.jxch.rpc.schemas.wallet.Transaction;
+import io.mindspice.jxch.rpc.schemas.wallet.dao.DAOProposal;
 import io.mindspice.jxch.rpc.schemas.wallet.nft.NftInfo;
 import io.mindspice.jxch.rpc.schemas.wallet.nft.NftWallet;
 import io.mindspice.jxch.rpc.schemas.wallet.nft.RoyaltyCalculation;
@@ -45,5 +46,9 @@ public class TypeRefs {
     public static final TypeReference<List<Connection>> CONNECTION_LIST = new TypeReference<>() { };
     public static final TypeReference<List<WalletBalance>> WALLET_BALANCE_LIST = new TypeReference<>() { };
     public static final TypeReference<List<Map<String, Coin>>> PARENT_INFO_LIST = new TypeReference<>() {};
+    public static final TypeReference<List<Long>> LONG_LIST = new TypeReference<>() {};
+    public static final TypeReference<Map<String, Long>> BALANCE_MAP = new TypeReference<>(){};
+    public static final TypeReference<Map<String, DAOProposal>> PROPOSAL_MAP = new TypeReference<>(){};
+
 }
 

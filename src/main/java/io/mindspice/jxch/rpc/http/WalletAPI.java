@@ -17,9 +17,7 @@ import io.mindspice.jxch.rpc.schemas.wallet.*;
 import io.mindspice.jxch.rpc.schemas.wallet.cat.Cat;
 import io.mindspice.jxch.rpc.schemas.wallet.cat.CatAssetInfo;
 import io.mindspice.jxch.rpc.schemas.wallet.cat.StrayCat;
-import io.mindspice.jxch.rpc.schemas.wallet.dao.DAOInfo;
-import io.mindspice.jxch.rpc.schemas.wallet.dao.DAOCreatePropResponse;
-import io.mindspice.jxch.rpc.schemas.wallet.dao.DAOResponse;
+import io.mindspice.jxch.rpc.schemas.wallet.dao.*;
 import io.mindspice.jxch.rpc.schemas.wallet.did.*;
 import io.mindspice.jxch.rpc.schemas.wallet.nft.*;
 import io.mindspice.jxch.rpc.schemas.wallet.offers.*;
@@ -646,7 +644,7 @@ public class WalletAPI extends ChiaAPI {
     ////////////////
 
     public byte[] didCreateAttestAsBytes(int walletId, String coinName, String pubKey,
-            String puzHash) throws RPCException {
+                                         String puzHash) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -662,7 +660,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<DIDAttest> didCreateAttestAs(int walletId, String coinName, String pubKey,
-            String puzHash) throws RPCException {
+                                                    String puzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didCreateAttestAsBytes(walletId, coinName, pubKey, puzHash));
             return newResponse(jsonNode, DIDAttest.class, DID_CREATE_ATTEST);
@@ -805,7 +803,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] didUpdateMetaDataAsBytes(int walletId, JsonNode metaData, long fee,
-            boolean reusePuzHash) throws RPCException {
+                                           boolean reusePuzHash) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -821,7 +819,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<SpendBundle> didUpdateMetaData(int walletId, JsonNode metaData, long fee,
-            boolean reusePuzHash) throws RPCException {
+                                                      boolean reusePuzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didUpdateMetaDataAsBytes(walletId, metaData, fee, reusePuzHash));
             return newResponse(jsonNode, "spend_bundle", SpendBundle.class, DID_UPDATE_METADATA);
@@ -888,7 +886,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] didMessageSpendAsBytes(int walletId, List<String> coinAnnouncements,
-            List<String> puzzleAnnouncements) throws RPCException {
+                                         List<String> puzzleAnnouncements) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -903,7 +901,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<SpendBundle> didMessageSpendAs(int walletId, List<String> coinAnnouncements,
-            List<String> puzzleAnnouncements) throws RPCException {
+                                                      List<String> puzzleAnnouncements) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(
                     didMessageSpendAsBytes(walletId, coinAnnouncements, puzzleAnnouncements)
@@ -915,7 +913,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] didRecoverySpendAsBytes(int walletId, List<String> attestData, String pubKey,
-            String puzHash) throws RPCException {
+                                          String puzHash) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -931,7 +929,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<SpendBundle> didRecoverySpend(int walletId, List<String> attestData,
-            String pubKey, String puzHash) throws RPCException {
+                                                     String pubKey, String puzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(didRecoverySpendAsBytes(walletId, attestData, pubKey, puzHash));
             return newResponse(jsonNode, "spend_bundle", SpendBundle.class, DID_RECOVERY_SPEND);
@@ -963,7 +961,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] didTransferDIDAsBytes(int walletId, String address, long fee, boolean withRecoveryInfo,
-            boolean reusePuzHash) throws RPCException {
+                                        boolean reusePuzHash) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -979,7 +977,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<TransactionStatus> didTransferDID(int walletId, String address, long fee,
-            boolean withRecoveryInfo, boolean reusePuzHash) throws RPCException {
+                                                         boolean withRecoveryInfo, boolean reusePuzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(
                     didTransferDIDAsBytes(walletId, address, fee, withRecoveryInfo, reusePuzHash)
@@ -991,7 +989,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] didUpdateRecoveryIdsAsBytes(int walletId, List<String> newIds,
-            int numVerificationsReq, boolean reusePuzHash) throws RPCException {
+                                              int numVerificationsReq, boolean reusePuzHash) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -1011,7 +1009,7 @@ public class WalletAPI extends ChiaAPI {
     ////////////////////
 
     public ApiResponse<Boolean> didUpdateRecoveryIds(int walletId, List<String> newIds,
-            int numVerificationsReq, boolean reusePuzHash) throws RPCException {
+                                                     int numVerificationsReq, boolean reusePuzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(
                     didUpdateRecoveryIdsAsBytes(walletId, newIds, numVerificationsReq, reusePuzHash)
@@ -1180,7 +1178,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] verifySignatureAsBytes(String pubKey, String message, String signature,
-            String address) throws RPCException {
+                                         String address) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("pubkey", pubKey)
@@ -1196,7 +1194,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<Boolean> verifySignature(String pubKey, String message, String signature,
-            String address) throws RPCException {
+                                                String address) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(verifySignatureAsBytes(pubKey, message, signature, address));
             return newResponse(jsonNode, "isValid", Boolean.class, VERIFY_SIGNATURE);
@@ -1248,7 +1246,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] pwJoinPoolAsBytes(int walletId, String targetPuzHash, String poolURL, int lockHeight,
-            int fee) throws RPCException {
+                                    int fee) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -1265,7 +1263,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<Transaction> pwJoinPool(int walletId, String targetPuzHash, String poolURL,
-            int lockHeight, int fee) throws RPCException {
+                                               int lockHeight, int fee) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(
                     pwJoinPoolAsBytes(walletId, targetPuzHash, poolURL, lockHeight, fee)
@@ -1343,7 +1341,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] sendNotificationAsBytes(String address, String message, long amount,
-            long fee) throws RPCException {
+                                          long fee) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("address", address)
@@ -1359,7 +1357,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<Transaction> sendNotification(String address, String message, long amount,
-            long fee) throws RPCException {
+                                                     long fee) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(sendNotificationAsBytes(address, message, amount, fee));
             return newResponse(jsonNode, "tx", Transaction.class, SEND_NOTIFICATION);
@@ -1384,7 +1382,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<SignedMessage> signMessageByAddress(String address, String message,
-            boolean isHex) throws RPCException {
+                                                           boolean isHex) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(signMessageByAddressAsBytes(address, message, isHex));
             return newResponse(jsonNode, SignedMessage.class, SIGN_MESSAGE_BY_ADDRESS);
@@ -1580,7 +1578,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] getTransactionsAsBytes(int walletId, int start, int end, boolean reversed,
-            String sortKey) throws RPCException {
+                                         String sortKey) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -1597,7 +1595,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<Transaction> getTransactions(int walletId, int start, int end, boolean reversed,
-            String sortKey) throws RPCException {
+                                                    String sortKey) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(
                     getTransactionsAsBytes(walletId, start, end, reversed, sortKey)
@@ -1913,7 +1911,7 @@ public class WalletAPI extends ChiaAPI {
     ////////////////
 
     public byte[] nftAddUriAsBytes(int walletId, String uri, NftDataKey dataKey, String nftCoinId, long fee,
-            boolean reusePuzHash) throws RPCException {
+                                   boolean reusePuzHash) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -1931,7 +1929,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<SpendBundle> nftAddUri(int walletId, String uri, NftDataKey dataKey, String nftCoinId, long fee,
-            boolean reusePuzHash) throws RPCException {
+                                              boolean reusePuzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftAddUriAsBytes(
                     walletId, uri, dataKey, nftCoinId, fee, reusePuzHash)
@@ -1943,7 +1941,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] nftCalculateRoyaltiesAsBytes(@Nullable List<RoyaltyAsset> royaltyAssets,
-            @Nullable List<FungibleAsset> fungibleAssets) throws RPCException {
+                                               @Nullable List<FungibleAsset> fungibleAssets) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder().buildNode();
             if (royaltyAssets != null) { data.putPOJO("royalty_assets", royaltyAssets); }
@@ -2154,7 +2152,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] nftSetNftDidAsBytes(int walletId, String nftCoinId, String did, long fee,
-            boolean reusePuzHash) throws RPCException {
+                                      boolean reusePuzHash) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -2171,7 +2169,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<SpendBundle> nftSetNftDid(int walletId, String nftCoinId, String did, long fee,
-            boolean reusePuzHash) throws RPCException {
+                                                 boolean reusePuzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftSetNftDidAsBytes(
                     walletId, nftCoinId, did, fee, reusePuzHash)
@@ -2229,7 +2227,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] nftTransferNftAsBytes(int walletId, String nftCoinId, String targetAddress, long fee,
-            boolean reusePuzHash) throws RPCException {
+                                        boolean reusePuzHash) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("wallet_id", walletId)
@@ -2246,7 +2244,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<SpendBundle> nftTransferNft(int walletId, String nftCoinId, String targetAddress, long fee,
-            boolean reusePuzHash) throws RPCException {
+                                                   boolean reusePuzHash) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(nftTransferNftAsBytes(
                     walletId, nftCoinId, targetAddress, fee, reusePuzHash)
@@ -2284,7 +2282,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public byte[] getCoinRecordsByNamesAsBytes(List<String> names, int startHeight, int endHeight,
-            boolean includeSpent) throws RPCException {
+                                               boolean includeSpent) throws RPCException {
         try {
             var data = new JsonUtils.ObjectBuilder()
                     .put("names", names)
@@ -2300,7 +2298,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<List<CoinRecord>> getCoinRecordsByNames(List<String> names, int startHeight, int endHeight,
-            boolean includeSpent) throws RPCException {
+                                                               boolean includeSpent) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(
                     getCoinRecordsByNamesAsBytes(names, startHeight, endHeight, includeSpent)
@@ -2441,7 +2439,7 @@ public class WalletAPI extends ChiaAPI {
     }
 
     public ApiResponse<Transaction> daoAddFundsToTreasury(int walletId, int fundingWalletId, long amount,
-            long fee) throws RPCException {
+                                                          long fee) throws RPCException {
         try {
             var jsonNode = JsonUtils.readTree(
                     daoAddFundsToTreasuryAsBytes(walletId, fundingWalletId, amount, fee)
@@ -2596,6 +2594,85 @@ public class WalletAPI extends ChiaAPI {
         try {
             var jsonNode = JsonUtils.readTree(daoGetProposalsAsBytes(walletId, includeClosed));
             return newResponse(jsonNode, DAOResponse.class, DAO_GET_PROPOSALS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoGetRulesAsBytes(int walletId) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
+            var req = new Request(DAO_GET_RULES, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<DAORules> daoGetRules(int walletId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoGetRulesAsBytes(walletId));
+            return newResponse(jsonNode, "rules", DAORules.class, DAO_GET_RULES);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoGetTreasuryBalanceAsBytes(int walletId) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
+            var req = new Request(DAO_GET_TREASURY_BALANCE, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Map<String, Long>> daoGetTreasuryBalance(int walletId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoGetTreasuryBalanceAsBytes(walletId));
+            return newResponseMap(jsonNode, "balances", TypeRefs.BALANCE_MAP, DAO_GET_TREASURY_BALANCE);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoGetTreasuryIdAsBytes(int walletId) throws RPCException {
+        try {
+            var data = JsonUtils.newSingleNodeAsBytes("wallet_id", walletId);
+            var req = new Request(DAO_GET_TREASURY_ID, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<String> daoGetTreasuryId(int walletId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoGetTreasuryIdAsBytes(walletId));
+            return newResponse(jsonNode, "treasury_id", String.class, DAO_GET_TREASURY_ID);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoParseProposalsAsBytes(int walletId, String proposalId) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("proposal_id", proposalId)
+                    .buildBytes();
+            var req = new Request(DAO_PARSE_PROPOSAL, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<Map<String, DAOProposal>> daoParseProposals(int walletId, String proposalId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoParseProposalsAsBytes(walletId, proposalId));
+            return newResponseMap(jsonNode, "proposal_dictionary", TypeRefs.PROPOSAL_MAP, DAO_PARSE_PROPOSAL);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }
