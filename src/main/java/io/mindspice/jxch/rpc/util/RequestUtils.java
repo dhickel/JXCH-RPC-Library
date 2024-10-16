@@ -102,7 +102,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class OfferBuilder {
         private final ObjectNode node = JsonUtils.newEmptyNode();
         private final ObjectNode offerNode = JsonUtils.newEmptyNode();
@@ -206,7 +205,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class OfferSearchBuilder {
         private final ObjectNode node = JsonUtils.newEmptyNode();
 
@@ -255,7 +253,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class SelectCoinBuilder {
         private final ObjectNode node = JsonUtils.newEmptyNode();
 
@@ -296,7 +293,6 @@ public class RequestUtils {
             return node;
         }
     }
-
 
     public static class TakeOfferBuilder {
         private final ObjectNode node = JsonUtils.newEmptyNode();
@@ -341,7 +337,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class CatWalletBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
 
@@ -375,7 +370,6 @@ public class RequestUtils {
             return node;
         }
     }
-
 
     public static class DIDWalletBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
@@ -433,7 +427,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class NFTWalletBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
 
@@ -457,7 +450,6 @@ public class RequestUtils {
             return node;
         }
     }
-
 
     public static class SignedTransactionBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
@@ -541,7 +533,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class SpendableCoinBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
 
@@ -583,7 +574,6 @@ public class RequestUtils {
             return node;
         }
     }
-
 
     public static class TransactionBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
@@ -642,7 +632,6 @@ public class RequestUtils {
             return node;
         }
     }
-
 
     public static class MultiTransactionBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
@@ -706,7 +695,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class SpendBundleBuilder {
         final List<CoinSpend> coinSpends = new ArrayList<>();
         String aggregatedSignature;
@@ -754,7 +742,6 @@ public class RequestUtils {
             );
         }
     }
-
 
     public static class BulkMintBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
@@ -869,7 +856,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class MetaDataBuilder {
         final List<String> uris = new ArrayList<>();
         final List<String> metaUris = new ArrayList<>();
@@ -953,7 +939,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class SingleMintBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
         MetaData metaData;
@@ -1007,7 +992,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class SetDidBulkBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
         final List<NftCoin> nftCoins = new ArrayList<>();
@@ -1039,9 +1023,7 @@ public class RequestUtils {
             return node;
         }
 
-
     }
-
 
     public static class NftBulkTransferBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
@@ -1076,12 +1058,10 @@ public class RequestUtils {
 
     }
 
-
     private record NftCoin(
             String nft_coin_id,
             int wallet_id
     ) { }
-
 
     public static class CoinRecordBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
@@ -1206,7 +1186,6 @@ public class RequestUtils {
         }
     }
 
-
     public static class HarvesterConfigBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
 
@@ -1253,6 +1232,89 @@ public class RequestUtils {
         public JsonNode build() {
             return node;
         }
-
     }
+
+    public static class DAOCloseProposalBuilder {
+        final ObjectNode node = JsonUtils.newEmptyNode();
+
+        public DAOCloseProposalBuilder setWalletId(int walletId) {
+            node.put("wallet_id", walletId);
+            return this;
+        }
+
+        public DAOCloseProposalBuilder setProposalId(String proposalId) {
+            node.put("proposal_id", proposalId);
+            return this;
+        }
+
+        public DAOCloseProposalBuilder setGenesisId(String genesisId) {
+            node.put("genesis_id", genesisId);
+            return this;
+        }
+
+        public DAOCloseProposalBuilder setSelfDestruct(String selfDestructString) {
+            node.put("self_destruct", selfDestructString);
+            return this;
+        }
+
+        public DAOCloseProposalBuilder addFee(long fee) {
+            node.put("fee", fee);
+            return this;
+        }
+
+        public JsonNode build() {
+            return node;
+        }
+    }
+
+    public static class DAOCreateProposalBuilder {
+        final ObjectNode node = JsonUtils.newEmptyNode();
+        final List<Addition> additions = new ArrayList<>();
+
+        public DAOCreateProposalBuilder setWalletId(int walletId) {
+            node.put("wallet_id", walletId);
+            return this;
+        }
+
+        public DAOCreateProposalBuilder setProposalType(String proposalType) {
+            node.put("proposal_type", proposalType);
+            return this;
+        }
+
+        public DAOCreateProposalBuilder addAddition(String coinPuzzleHash, long amount) {
+            additions.add(new Addition(coinPuzzleHash, amount));
+            return this;
+        }
+
+        public DAOCreateProposalBuilder addAddition(String coinPuzzleHash, long amount, List<String> memos) {
+            additions.add(new Addition(coinPuzzleHash, amount, memos));
+            return this;
+        }
+
+        public DAOCreateProposalBuilder addAdditions(List<Addition> additions) {
+            this.additions.addAll(additions);
+            return this;
+        }
+
+        public DAOCreateProposalBuilder setAmount(long amount) {
+            node.put("amount", amount);
+            return this;
+        }
+
+        public DAOCreateProposalBuilder setInnerAddress(String innerAddress) {
+            node.put("inner_address", innerAddress);
+            return this;
+        }
+
+        public DAOCreateProposalBuilder setAssetId(String assetId) {
+            node.put("asset_id", assetId);
+            return this;
+        }
+
+        public JsonNode build() {
+            node.putPOJO("additions", this.additions);
+            return node;
+        }
+    }
+
 }

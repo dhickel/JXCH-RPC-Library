@@ -44,5 +44,6 @@ public class TypeRefs {
     public static final TypeReference<Map<String, List<RoyaltyCalculation>>> ROYALTY_MAP = new TypeReference<>() { };
     public static final TypeReference<List<Connection>> CONNECTION_LIST = new TypeReference<>() { };
     public static final TypeReference<List<WalletBalance>> WALLET_BALANCE_LIST = new TypeReference<>() { };
+    public static final TypeReference<List<Map<String, Coin>>> PARENT_INFO_LIST = new TypeReference<>() {};
 }
 

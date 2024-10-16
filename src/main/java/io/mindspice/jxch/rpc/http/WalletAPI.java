@@ -17,6 +17,9 @@ import io.mindspice.jxch.rpc.schemas.wallet.*;
 import io.mindspice.jxch.rpc.schemas.wallet.cat.Cat;
 import io.mindspice.jxch.rpc.schemas.wallet.cat.CatAssetInfo;
 import io.mindspice.jxch.rpc.schemas.wallet.cat.StrayCat;
+import io.mindspice.jxch.rpc.schemas.wallet.dao.DAOInfo;
+import io.mindspice.jxch.rpc.schemas.wallet.dao.DAOCreatePropResponse;
+import io.mindspice.jxch.rpc.schemas.wallet.dao.DAOResponse;
 import io.mindspice.jxch.rpc.schemas.wallet.did.*;
 import io.mindspice.jxch.rpc.schemas.wallet.nft.*;
 import io.mindspice.jxch.rpc.schemas.wallet.offers.*;
@@ -516,8 +519,8 @@ public class WalletAPI extends ChiaAPI {
             var data = new JsonUtils.ObjectBuilder()
                     .put("offer", offer)
                     .put("advanced", showAdvanced)
-                    .buildNode();
-            var req = new Request(GET_OFFER_SUMMARY, JsonUtils.writeBytes(data));
+                    .buildBytes();
+            var req = new Request(GET_OFFER_SUMMARY, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -2410,6 +2413,189 @@ public class WalletAPI extends ChiaAPI {
             return newResponseList(
                     jsonNode, "transactions", TypeRefs.TRANSACTIONS_LIST, CRCAT_APPROVE_PENDING
             );
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    ////////////////
+    /* DAO WALLET */
+    ////////////////
+
+    public byte[] daoAddFundsToTreasuryAsBytes(int walletId, int fundingWalletId, long amount, long fee)
+            throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("funding_wallet_id", fundingWalletId)
+                    .put("amount", amount)
+                    .put("fee", fee)
+                    .buildBytes();
+
+            var req = new Request(DAO_ADD_FUNDS_TO_TREASURY, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException | RPCException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+
+    }
+
+    public ApiResponse<Transaction> daoAddFundsToTreasury(int walletId, int fundingWalletId, long amount,
+            long fee) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(
+                    daoAddFundsToTreasuryAsBytes(walletId, fundingWalletId, amount, fee)
+            );
+            return newResponse(jsonNode, "tx", Transaction.class, DAO_ADD_FUNDS_TO_TREASURY);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoAdjustFilterLevelAsBytes(int walletId, long filterLevel) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("filter_level", filterLevel)
+                    .buildBytes();
+            var req = new Request(DAO_ADJUST_FILTER_LEVEL, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException | RPCException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<DAOInfo> daoAdjustFilterLevel(int walletId, long filterLevel) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoAdjustFilterLevelAsBytes(walletId, filterLevel));
+            return newResponse(jsonNode, "dao_info", DAOInfo.class, DAO_ADJUST_FILTER_LEVEL);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoCloseProposalAsBytes(JsonNode daoCloseProposalBuilder) throws RPCException {
+        try {
+            var data = JsonUtils.writeBytes(daoCloseProposalBuilder);
+            var req = new Request(DAO_CLOSE_PROPOSAL, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<DAOResponse> daoCloseProposal(JsonNode daoCloseProposalBuilder) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoCloseProposalAsBytes(daoCloseProposalBuilder));
+            return newResponse(jsonNode, DAOResponse.class, DAO_CLOSE_PROPOSAL);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoCreateProposalAsBytes(JsonNode daoCloseProposalBuilder) throws RPCException {
+        try {
+            var data = JsonUtils.writeBytes(daoCloseProposalBuilder);
+            var req = new Request(DAO_CREATE_PROPOSAL, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<DAOCreatePropResponse> daoCreateProposal(JsonNode daoCloseProposalBuilder) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoCreateProposalAsBytes(daoCloseProposalBuilder));
+            return newResponse(jsonNode, DAOCreatePropResponse.class, DAO_CREATE_PROPOSAL);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoExitLockupAsBytes(int walletId, List<Coin> coins, long fee) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("coins", coins)
+                    .put("fee", fee)
+                    .buildBytes();
+            var req = new Request(DAO_EXIT_LOCKUP, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<DAOResponse> daoExitLockup(int walletId, List<Coin> coins, long fee) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoExitLockupAsBytes(walletId, coins, fee));
+            return newResponse(jsonNode, DAOResponse.class, DAO_EXIT_LOCKUP);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoFreeCoinsFromFinishedProposalsAsBytes(int walletId, long fee) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("fee", fee)
+                    .buildBytes();
+            var req = new Request(DAO_FREE_COINS_FROM_FINISHED_PROPOSALS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<DAOResponse> daoFreeCoinsFromFinishedProposals(int walletId, long fee) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoFreeCoinsFromFinishedProposalsAsBytes(walletId, fee));
+            return newResponse(jsonNode, DAOResponse.class, DAO_FREE_COINS_FROM_FINISHED_PROPOSALS);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoGetProposalStateAsBytes(int walletId, String proposalId) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("proposal_id", proposalId)
+                    .buildBytes();
+            var req = new Request(DAO_GET_PROPOSAL_STATE, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<DAOResponse> daoGetProposalState(int walletId, String proposalId) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoGetProposalStateAsBytes(walletId, proposalId));
+            return newResponse(jsonNode, DAOResponse.class, DAO_GET_PROPOSAL_STATE);
+        } catch (IOException e) {
+            throw new RPCException("Error reading response JSON", e);
+        }
+    }
+
+    public byte[] daoGetProposalsAsBytes(int walletId, boolean includeClosed) throws RPCException {
+        try {
+            var data = new JsonUtils.ObjectBuilder()
+                    .put("wallet_id", walletId)
+                    .put("include_closed", includeClosed)
+                    .buildBytes();
+            var req = new Request(DAO_GET_PROPOSALS, data);
+            return client.makeRequest(req);
+        } catch (JsonProcessingException e) {
+            throw new RPCException("Error writing request JSON", e);
+        }
+    }
+
+    public ApiResponse<DAOResponse> daoGetProposals(int walletId, boolean includeClosed) throws RPCException {
+        try {
+            var jsonNode = JsonUtils.readTree(daoGetProposalsAsBytes(walletId, includeClosed));
+            return newResponse(jsonNode, DAOResponse.class, DAO_GET_PROPOSALS);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
         }

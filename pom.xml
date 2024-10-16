@@ -6,7 +6,7 @@
 
     <groupId>io.mindspice</groupId>
     <artifactId>jxch-rpc-library</artifactId>
-    <version>0.2.0</version>
+    <version>0.8.0</version>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

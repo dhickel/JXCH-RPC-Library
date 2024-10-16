@@ -2,10 +2,12 @@ package io.mindspice.jxch.rpc.schemas.wallet;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import io.mindspice.jxch.rpc.enums.TransactionType;
 import io.mindspice.jxch.rpc.schemas.object.Coin;
 import io.mindspice.jxch.rpc.schemas.object.SpendBundle;
 
@@ -22,20 +24,23 @@ public record Transaction(
         @JsonProperty("additions") List<Coin> additions,
         @JsonProperty("removals") List<Coin> removals,
         @JsonProperty("wallet_id") int walletId,
-       // @JsonDeserialize(using = StringListDeserializer.class)
+        // @JsonDeserialize(using = StringListDeserializer.class)
         @JsonProperty("sent_to")
         List<List<String>> sentTo, //Fixme Not sure if this sometimes just returns an unested array? if so flatted with serializer?
         @JsonAlias({"to_address", "send_to"})
         @JsonProperty("to_address") String toAddress,
         @JsonProperty("trade_id") String tradeId,
-        @JsonProperty("type") int type,
+        @JsonProperty("type") TransactionType type,
         @JsonProperty("name") String name,
         @JsonProperty("memos") JsonNode memos,
-        @JsonProperty("transaction_id") String transactionId
+        @JsonProperty("transaction_id") String transactionId,
+        @JsonProperty("valid_times") ValidTimes validTimes
 ) {
     public Transaction {
         additions = additions != null ? Collections.unmodifiableList(additions) : List.of();
         sentTo = sentTo != null ? Collections.unmodifiableList(sentTo) : List.of();
         removals = removals != null ? Collections.unmodifiableList(removals) : List.of();
     }
+
+
 }
