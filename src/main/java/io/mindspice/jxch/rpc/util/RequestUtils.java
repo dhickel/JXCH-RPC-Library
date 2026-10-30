@@ -10,8 +10,8 @@ import io.mindspice.jxch.rpc.schemas.wallet.Addition;
 import io.mindspice.jxch.rpc.schemas.wallet.CoinAnnouncement;
 import io.mindspice.jxch.rpc.schemas.wallet.PuzzleAnnouncement;
 import io.mindspice.jxch.rpc.schemas.wallet.nft.MetaData;
-import org.apache.http.annotation.Experimental;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,20 +19,48 @@ import java.util.Map;
 
 public class RequestUtils {
 
+    private static <T> void setValue(ObjectNode node, String field, T value) {
+        node.set(field, JsonUtils.getMapper().valueToTree(value));
+    }
+
+    private static ObjectNode snapshot(ObjectNode node) {
+        return node.deepCopy();
+    }
+
+    private static void putAnnouncements(ObjectNode node, String field, List<?> announcements) {
+        var array = JsonUtils.getMapper().createArrayNode();
+        for (Object announcement : announcements) {
+            ObjectNode entry = JsonUtils.getMapper().valueToTree(announcement);
+            JsonNode morphBytes = entry.remove("morph_bytes");
+            if (morphBytes != null && !morphBytes.isNull()) {
+                if (node.hasNonNull("morph_bytes") && !node.get("morph_bytes").equals(morphBytes)) {
+                    throw new IllegalArgumentException("All announcements must use the same morph_bytes");
+                }
+                node.set("morph_bytes", morphBytes);
+            }
+            array.add(entry);
+        }
+        node.set(field, array);
+    }
+
     public static class CatSpendBuilder {
         private final ObjectNode node = JsonUtils.newEmptyNode();
 
-        public CatSpendBuilder setWalletId(int walletId) {
+        public CatSpendBuilder setWalletId(long walletId) {
             node.put("wallet_id", walletId);
             return this;
         }
 
         public CatSpendBuilder setAdditions(List<Addition> additions) {
-            node.putPOJO("additions", additions);
+            setValue(node, "additions", additions);
             return this;
         }
 
         public CatSpendBuilder setAmount(long amount) {
+            return setAmount(BigInteger.valueOf(amount));
+        }
+
+        public CatSpendBuilder setAmount(BigInteger amount) {
             node.put("amount", amount);
             return this;
         }
@@ -43,36 +71,48 @@ public class RequestUtils {
         }
 
         public CatSpendBuilder setMemos(List<String> memos) {
-            node.putPOJO("memos", memos);
+            setValue(node, "memos", memos);
             return this;
         }
 
         public CatSpendBuilder setCoins(List<Coin> coins) {
-            node.putPOJO("coins", coins);
+            setValue(node, "coins", coins);
             return this;
         }
 
         public CatSpendBuilder setMinCoinAmount(long amount) {
+            return setMinCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public CatSpendBuilder setMinCoinAmount(BigInteger amount) {
             node.put("min_coin_amount", amount);
             return this;
         }
 
         public CatSpendBuilder setMaxCoinAmount(long amount) {
+            return setMaxCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public CatSpendBuilder setMaxCoinAmount(BigInteger amount) {
             node.put("max_coin_amount", amount);
             return this;
         }
 
-        public CatSpendBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("excluded_coin_amounts", amounts);
+        public CatSpendBuilder setExcludedCoinAmounts(List<? extends Number> amounts) {
+            setValue(node, "excluded_coin_amounts", amounts);
             return this;
         }
 
         public CatSpendBuilder setExcludedCoinIds(List<String> coinIds) {
-            node.putPOJO("excluded_coin_ids", coinIds);
+            setValue(node, "excluded_coin_ids", coinIds);
             return this;
         }
 
         public CatSpendBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public CatSpendBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
@@ -98,7 +138,18 @@ public class RequestUtils {
         }
 
         public JsonNode build() {
-            return node;
+            if (!node.hasNonNull("wallet_id")) { throw new IllegalStateException("Must set a wallet ID"); }
+            boolean additions = node.hasNonNull("additions");
+            boolean single = node.hasNonNull("amount") || node.hasNonNull("inner_address") || node.hasNonNull("memos");
+            if (additions == single || (!additions && (!node.hasNonNull("amount") || !node.hasNonNull("inner_address")))) {
+                throw new IllegalStateException("Specify additions or amount and inner_address, but not both");
+            }
+            int discrepancyFields = (node.hasNonNull("extra_delta") ? 1 : 0)
+                    + (node.hasNonNull("tail_reveal") ? 1 : 0) + (node.hasNonNull("tail_solution") ? 1 : 0);
+            if (discrepancyFields != 0 && discrepancyFields != 3) {
+                throw new IllegalStateException("Specify extra_delta, tail_reveal and tail_solution together");
+            }
+            return snapshot(node);
         }
     }
 
@@ -110,24 +161,48 @@ public class RequestUtils {
         private ObjectNode solver;
 
         public OfferBuilder addRequestedAsset(String asset, long value) {
-            if (value < 0) { throw new IllegalArgumentException("Value must be positive for requested assets."); }
-            offerNode.put(asset, value);
+            return addRequestedAsset(asset, BigInteger.valueOf(value));
+        }
+
+        public OfferBuilder addRequestedAsset(String asset, BigInteger value) {
+            if (value.signum() <= 0) { throw new IllegalArgumentException("Value must be positive for requested assets."); }
+            offerNode.put(asset, value.toString());
             return this;
         }
 
         public OfferBuilder addOfferedAsset(String asset, long value) {
-            offerNode.put(asset, value > 0 ? -value : value);
+            return addOfferedAsset(asset, BigInteger.valueOf(value));
+        }
+
+        public OfferBuilder addOfferedAsset(String asset, BigInteger value) {
+            if (value.signum() == 0) { throw new IllegalArgumentException("Offered amount cannot be zero"); }
+            offerNode.put(asset, value.abs().negate().toString());
             return this;
         }
 
         public OfferBuilder addDriverDict(String prop, String value) {
-            driverNode.put(prop, value);
+            try {
+                return addDriverDict(prop, JsonUtils.readTree(value));
+            } catch (java.io.IOException e) {
+                throw new IllegalArgumentException("Driver information must be a JSON object", e);
+            }
+        }
+
+        public OfferBuilder addDriverDict(String prop, JsonNode value) {
+            if (value == null || !value.isObject()) {
+                throw new IllegalArgumentException("Driver information must be a JSON object");
+            }
+            driverNode.set(prop, value.deepCopy());
             return this;
+        }
+
+        public OfferBuilder addDriverDict(String prop, Map<String, ?> value) {
+            return addDriverDict(prop, JsonUtils.toNode(value));
         }
 
         public <T> OfferBuilder addSolver(String prop, T value) {
             if (solver == null) { solver = JsonUtils.newEmptyNode(); }
-            solver.putPOJO(prop, value);
+            setValue(solver, prop, value);
             return this;
         }
 
@@ -137,22 +212,30 @@ public class RequestUtils {
         }
 
         public OfferBuilder setMinCoinAmount(long amount) {
+            return setMinCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public OfferBuilder setMinCoinAmount(BigInteger amount) {
             node.put("min_coin_amount", amount);
             return this;
         }
 
         public OfferBuilder setMaxCoinAmount(long amount) {
+            return setMaxCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public OfferBuilder setMaxCoinAmount(BigInteger amount) {
             node.put("max_coin_amount", amount);
             return this;
         }
 
         public OfferBuilder setExcludedCoins(List<Coin> coins) {
-            node.putPOJO("excluded_coins", coins);
+            setValue(node, "excluded_coins", coins);
             return this;
         }
 
         public OfferBuilder setExcludedCoinIds(List<String> coinIds) {
-            node.putPOJO("excluded_coin_ids", coinIds);
+            setValue(node, "excluded_coin_ids", coinIds);
             return this;
         }
 
@@ -162,47 +245,48 @@ public class RequestUtils {
         }
 
         public OfferBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public OfferBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
 
-        /**
-         * Not Implemented in chia client yet
-         **/
-        @Experimental
         public OfferBuilder setMaxValidHeight(long height) {
             node.put("max_height", height);
             return this;
         }
 
         public OfferBuilder setMaxValidTime(long unixTime) {
+            return setMaxValidTime(BigInteger.valueOf(unixTime));
+        }
+
+        public OfferBuilder setMaxValidTime(BigInteger unixTime) {
             node.put("max_time", unixTime);
             return this;
         }
 
-        /**
-         * Not Implemented in chia client yet
-         **/
-        @Experimental
         public OfferBuilder setMinValidHeight(long height) {
             node.put("min_height", height);
             return this;
         }
 
-        /**
-         * Not Implemented in chia client yet
-         **/
-        @Experimental
         public OfferBuilder setMinValidTime(long unixTime) {
+            return setMinValidTime(BigInteger.valueOf(unixTime));
+        }
+
+        public OfferBuilder setMinValidTime(BigInteger unixTime) {
             node.put("min_time", unixTime);
             return this;
         }
 
         public JsonNode build() {
-            node.putPOJO("offer", offerNode);
-            node.putPOJO("driver_dict", driverNode);
-            if (solver != null) { node.putPOJO("solver", solver); }
-            return node;
+            if (offerNode.isEmpty()) { throw new IllegalStateException("Must specify an offer"); }
+            node.set("offer", offerNode.deepCopy());
+            if (!driverNode.isEmpty()) { node.set("driver_dict", driverNode.deepCopy()); }
+            if (solver != null) { node.set("solver", solver.deepCopy()); }
+            return snapshot(node);
         }
     }
 
@@ -210,12 +294,12 @@ public class RequestUtils {
     public static class OfferSearchBuilder {
         private final ObjectNode node = JsonUtils.newEmptyNode();
 
-        public OfferSearchBuilder setStart(int start) {
+        public OfferSearchBuilder setStart(long start) {
             node.put("start", start);
             return this;
         }
 
-        public OfferSearchBuilder setEnd(int end) {
+        public OfferSearchBuilder setEnd(long end) {
             node.put("end", end);
             return this;
         }
@@ -235,7 +319,15 @@ public class RequestUtils {
             return this;
         }
 
+        @Deprecated
         public OfferSearchBuilder setSortKey(int sortKey) {
+            throw new IllegalArgumentException("Chia requires a named sort key; use setSortKey(String)");
+        }
+
+        public OfferSearchBuilder setSortKey(String sortKey) {
+            if (!"CONFIRMED_AT_HEIGHT".equals(sortKey) && !"RELEVANCE".equals(sortKey)) {
+                throw new IllegalArgumentException("Unknown offer sort key: " + sortKey);
+            }
             node.put("sort_key", sortKey);
             return this;
         }
@@ -251,7 +343,7 @@ public class RequestUtils {
         }
 
         public JsonNode build() {
-            return node;
+            return snapshot(node);
         }
     }
 
@@ -259,33 +351,45 @@ public class RequestUtils {
     public static class SelectCoinBuilder {
         private final ObjectNode node = JsonUtils.newEmptyNode();
 
-        public SelectCoinBuilder setWalletId(int walletId) {
+        public SelectCoinBuilder setWalletId(long walletId) {
             node.put("wallet_id", walletId);
             return this;
         }
 
         public SelectCoinBuilder setAmount(long amount) {
+            return setAmount(BigInteger.valueOf(amount));
+        }
+
+        public SelectCoinBuilder setAmount(BigInteger amount) {
             node.put("amount", amount);
             return this;
         }
 
         public SelectCoinBuilder setMinCoinAmount(long amount) {
+            return setMinCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public SelectCoinBuilder setMinCoinAmount(BigInteger amount) {
             node.put("min_coin_amount", amount);
             return this;
         }
 
         public SelectCoinBuilder setMaxCoinAmount(long amount) {
+            return setMaxCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public SelectCoinBuilder setMaxCoinAmount(BigInteger amount) {
             node.put("max_coin_amount", amount);
             return this;
         }
 
-        public SelectCoinBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("excluded_coin_amounts", amounts);
+        public SelectCoinBuilder setExcludedCoinAmounts(List<? extends Number> amounts) {
+            setValue(node, "excluded_coin_amounts", amounts);
             return this;
         }
 
         public SelectCoinBuilder setExcludedCoins(List<Coin> coins) {
-            node.putPOJO("excluded_coins", coins);
+            setValue(node, "excluded_coins", coins);
             return this;
         }
 
@@ -293,7 +397,7 @@ public class RequestUtils {
             if (!node.has("wallet_id") || !node.has("amount")) {
                 throw new IllegalStateException("Must have both wallet id and amount");
             }
-            return node;
+            return snapshot(node);
         }
     }
 
@@ -308,16 +412,28 @@ public class RequestUtils {
         }
 
         public TakeOfferBuilder setMinCoinAmount(long amount) {
+            return setMinCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public TakeOfferBuilder setMinCoinAmount(BigInteger amount) {
             node.put("min_coin_amount", amount);
             return this;
         }
 
         public TakeOfferBuilder setMaxCoinAmount(long amount) {
+            return setMaxCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public TakeOfferBuilder setMaxCoinAmount(BigInteger amount) {
             node.put("max_coin_amount", amount);
             return this;
         }
 
         public TakeOfferBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public TakeOfferBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
@@ -329,7 +445,7 @@ public class RequestUtils {
 
         public <T> TakeOfferBuilder addSolver(String prop, T value) {
             if (solver == null) { solver = JsonUtils.newEmptyNode(); }
-            solver.putPOJO(prop, value);
+            setValue(solver, prop, value);
             return this;
         }
 
@@ -337,7 +453,8 @@ public class RequestUtils {
             if (!node.has("offer")) {
                 throw new IllegalStateException("Must include an offer");
             }
-            return node;
+            if (solver != null) { node.set("solver", solver.deepCopy()); }
+            return snapshot(node);
         }
     }
 
@@ -346,6 +463,10 @@ public class RequestUtils {
         final ObjectNode node = JsonUtils.newEmptyNode();
 
         public CatWalletBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public CatWalletBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
@@ -361,7 +482,16 @@ public class RequestUtils {
         }
 
         public CatWalletBuilder setAmount(long amount) {
+            return setAmount(BigInteger.valueOf(amount));
+        }
+
+        public CatWalletBuilder setAmount(BigInteger amount) {
             node.put("amount", amount);
+            return this;
+        }
+
+        public CatWalletBuilder setTest(boolean test) {
+            node.put("test", test);
             return this;
         }
 
@@ -371,8 +501,23 @@ public class RequestUtils {
         }
 
         public JsonNode build() {
+            String mode = node.path("mode").asText();
+            if ("new".equals(mode)) {
+                if (!node.path("test").asBoolean()) {
+                    throw new IllegalStateException("New CAT issuance requires explicit test mode; use the CAT Admin Tool in production");
+                }
+                if (!node.hasNonNull("amount") || node.hasNonNull("asset_id")) {
+                    throw new IllegalStateException("New CAT wallets require amount and cannot specify asset_id");
+                }
+            } else if ("existing".equals(mode)) {
+                if (!node.hasNonNull("asset_id") || node.hasNonNull("amount")) {
+                    throw new IllegalStateException("Existing CAT wallets require asset_id and cannot specify amount");
+                }
+            } else {
+                throw new IllegalStateException("Must set new or existing CAT wallet mode");
+            }
             node.put("wallet_type", "cat_wallet");
-            return node;
+            return snapshot(node);
         }
     }
 
@@ -381,6 +526,10 @@ public class RequestUtils {
         final ObjectNode node = JsonUtils.newEmptyNode();
 
         public DIDWalletBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public DIDWalletBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
@@ -391,33 +540,52 @@ public class RequestUtils {
         }
 
         public DIDWalletBuilder isRecovery(boolean bool) {
-            node.put("did_type", bool);
+            return isNewWallet(!bool);
+        }
+
+        public DIDWalletBuilder setBackupData(String backupData) {
+            node.put("backup_data", backupData);
             return this;
         }
 
+        @Deprecated
         public DIDWalletBuilder setBackupDIDS(List<String> dids) {
-            if (dids.isEmpty()) { throw new IllegalArgumentException("Empty backup did list"); }
-            node.putPOJO("backup_dids", dids);
+            if (!dids.isEmpty()) {
+                throw new IllegalArgumentException("Chia 2.7.5 no longer supports DID recovery lists");
+            }
             return this;
         }
 
         public <T, U> DIDWalletBuilder setMetaData(Map<T, U> metaDict) {
-            node.putPOJO("meta_data", metaDict);
-            return this;
+            return setMetaData(JsonUtils.toNode(metaDict));
         }
 
         public DIDWalletBuilder setMetaData(JsonNode metaDict) {
-            node.putPOJO("meta_data", metaDict);
+            if (metaDict == null || !metaDict.isObject()) {
+                throw new IllegalArgumentException("DID metadata must be a string-to-string object");
+            }
+            metaDict.fields().forEachRemaining(entry -> {
+                if (!entry.getValue().isTextual()) {
+                    throw new IllegalArgumentException("DID metadata values must be strings");
+                }
+            });
+            node.set("metadata", metaDict.deepCopy());
             return this;
         }
 
+        @Deprecated
         public DIDWalletBuilder setNumOfBackUpsNeeded(int num) {
-            if (num < 1) { throw new IllegalArgumentException("Backups needed must be more than 0"); }
-            node.put("num_of_backup_ids_needed", num);
+            if (num != 0) {
+                throw new IllegalArgumentException("Chia 2.7.5 no longer supports DID recovery thresholds");
+            }
             return this;
         }
 
         public DIDWalletBuilder setAmount(long amount) {
+            return setAmount(BigInteger.valueOf(amount));
+        }
+
+        public DIDWalletBuilder setAmount(BigInteger amount) {
             node.put("amount", amount);
             return this;
         }
@@ -428,8 +596,21 @@ public class RequestUtils {
         }
 
         public JsonNode build() {
+            String type = node.path("did_type").asText();
+            if ("new".equals(type)) {
+                if (!node.hasNonNull("amount") || node.hasNonNull("backup_data")) {
+                    throw new IllegalStateException("New DIDs require amount and cannot specify backup_data");
+                }
+            } else if ("recovery".equals(type)) {
+                if (!node.hasNonNull("backup_data") || node.hasNonNull("amount")
+                        || (node.has("metadata") && !node.get("metadata").isEmpty())) {
+                    throw new IllegalStateException("DID recovery requires backup_data without amount or metadata");
+                }
+            } else {
+                throw new IllegalStateException("Must set new or recovery DID wallet type");
+            }
             node.put("wallet_type", "did_wallet");
-            return node;
+            return snapshot(node);
         }
     }
 
@@ -438,6 +619,10 @@ public class RequestUtils {
         final ObjectNode node = JsonUtils.newEmptyNode();
 
         public NFTWalletBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public NFTWalletBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
@@ -454,7 +639,7 @@ public class RequestUtils {
 
         public JsonNode build() {
             node.put("wallet_type", "nft_wallet");
-            return node;
+            return snapshot(node);
         }
     }
 
@@ -464,47 +649,68 @@ public class RequestUtils {
         final List<Addition> additions = new ArrayList<>();
         final List<Coin> coins = new ArrayList<>();
 
-        public SignedTransactionBuilder setWalletId(int walletId) {
+        public SignedTransactionBuilder setWalletId(long walletId) {
             node.put("wallet_id", walletId);
             return this;
         }
 
         public SignedTransactionBuilder addAddition(String coinPuzzleHash, long amount) {
+            return addAddition(coinPuzzleHash, BigInteger.valueOf(amount));
+        }
+
+        public SignedTransactionBuilder addAddition(String coinPuzzleHash, BigInteger amount) {
             additions.add(new Addition(coinPuzzleHash, amount));
             return this;
         }
 
         public SignedTransactionBuilder addAddition(String coinPuzzleHash, long amount, List<String> memos) {
+            return addAddition(coinPuzzleHash, BigInteger.valueOf(amount), memos);
+        }
+
+        public SignedTransactionBuilder addAddition(String coinPuzzleHash, BigInteger amount, List<String> memos) {
             additions.add(new Addition(coinPuzzleHash, amount, memos));
             return this;
         }
 
         public SignedTransactionBuilder addAdditions(List<Addition> additions) {
-            this.additions.addAll(additions);
+            additions.forEach(addition -> this.additions.add(new Addition(
+                    addition.puzzleHash(), addition.amount(), addition.memos())));
             return this;
         }
 
         public SignedTransactionBuilder setMinCoinAmount(long amount) {
+            return setMinCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public SignedTransactionBuilder setMinCoinAmount(BigInteger amount) {
             node.put("min_coin_amount", amount);
             return this;
         }
 
         public SignedTransactionBuilder setMaxCoinAmount(long amount) {
+            return setMaxCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public SignedTransactionBuilder setMaxCoinAmount(BigInteger amount) {
             node.put("max_coin_amount", amount);
             return this;
         }
 
-        public SignedTransactionBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("excluded_coin_amounts", amounts);
+        public SignedTransactionBuilder setExcludedCoinAmounts(List<? extends Number> amounts) {
+            setValue(node, "excluded_coin_amounts", amounts);
             return this;
         }
 
         public SignedTransactionBuilder setExcludedCoins(List<Coin> coins) {
-            node.putPOJO("excluded_coins", coins);
+            setValue(node, "excluded_coins", coins);
             return this;
         }
 
         public SignedTransactionBuilder addCoin(String coinPuzzleHash, String parentPuzzleHash, long amount) {
+            return addCoin(coinPuzzleHash, parentPuzzleHash, BigInteger.valueOf(amount));
+        }
+
+        public SignedTransactionBuilder addCoin(String coinPuzzleHash, String parentPuzzleHash, BigInteger amount) {
             coins.add(new Coin(parentPuzzleHash, coinPuzzleHash, amount));
             return this;
         }
@@ -520,24 +726,29 @@ public class RequestUtils {
         }
 
         public SignedTransactionBuilder addCoinAnnouncements(List<CoinAnnouncement> coinAnnouncements) {
-            node.putPOJO("coin_announcements", coinAnnouncements);
+            putAnnouncements(node, "coin_announcements", coinAnnouncements);
             return this;
         }
 
         public SignedTransactionBuilder addPuzzleAnnouncements(List<PuzzleAnnouncement> puzzleAnnouncements) {
-            node.putPOJO("puzzle_announcements", puzzleAnnouncements);
+            putAnnouncements(node, "puzzle_announcements", puzzleAnnouncements);
             return this;
         }
 
         public SignedTransactionBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public SignedTransactionBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
 
         public JsonNode build() {
-            node.putPOJO("additions", additions);
-            node.putPOJO("coins", coins);
-            return node;
+            if (additions.isEmpty()) { throw new IllegalStateException("Must add at least one addition"); }
+            setValue(node, "additions", additions);
+            if (!coins.isEmpty()) { setValue(node, "coins", coins); }
+            return snapshot(node);
         }
     }
 
@@ -545,33 +756,41 @@ public class RequestUtils {
     public static class SpendableCoinBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
 
-        public SpendableCoinBuilder setWalletId(int walletId) {
+        public SpendableCoinBuilder setWalletId(long walletId) {
             node.put("wallet_id", walletId);
             return this;
         }
 
         public SpendableCoinBuilder setMinCoinAmount(long amount) {
+            return setMinCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public SpendableCoinBuilder setMinCoinAmount(BigInteger amount) {
             node.put("min_coin_amount", amount);
             return this;
         }
 
         public SpendableCoinBuilder setMaxCoinAmount(long amount) {
+            return setMaxCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public SpendableCoinBuilder setMaxCoinAmount(BigInteger amount) {
             node.put("max_coin_amount", amount);
             return this;
         }
 
-        public SpendableCoinBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("excluded_coin_amounts", amounts);
+        public SpendableCoinBuilder setExcludedCoinAmounts(List<? extends Number> amounts) {
+            setValue(node, "excluded_coin_amounts", amounts);
             return this;
         }
 
         public SpendableCoinBuilder setExcludedCoins(List<Coin> coins) {
-            node.putPOJO("excluded_coins", coins);
+            setValue(node, "excluded_coins", coins);
             return this;
         }
 
         public SpendableCoinBuilder setExcludedCoinIds(List<String> coinIds) {
-            node.putPOJO("excluded_coin_ids", coinIds);
+            setValue(node, "excluded_coin_ids", coinIds);
             return this;
         }
 
@@ -580,7 +799,7 @@ public class RequestUtils {
                 throw new IllegalStateException("Must set a wallet id");
             }
 
-            return node;
+            return snapshot(node);
         }
     }
 
@@ -588,12 +807,16 @@ public class RequestUtils {
     public static class TransactionBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
 
-        public TransactionBuilder setWalletId(int walletId) {
+        public TransactionBuilder setWalletId(long walletId) {
             node.put("wallet_id", walletId);
             return this;
         }
 
         public TransactionBuilder setMinCoinAmount(long amount) {
+            return setMinCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public TransactionBuilder setMinCoinAmount(BigInteger amount) {
             node.put("min_coin_amount", amount);
             return this;
         }
@@ -604,22 +827,36 @@ public class RequestUtils {
         }
 
         public TransactionBuilder setAmount(long amount) {
+            return setAmount(BigInteger.valueOf(amount));
+        }
+
+        public TransactionBuilder setAmount(BigInteger amount) {
             node.put("amount", amount);
             return this;
         }
 
         public TransactionBuilder setMaxCoinAmount(long amount) {
+            return setMaxCoinAmount(BigInteger.valueOf(amount));
+        }
+
+        public TransactionBuilder setMaxCoinAmount(BigInteger amount) {
             node.put("max_coin_amount", amount);
             return this;
         }
 
-        public TransactionBuilder setExcludedCoinAmounts(List<Long> amounts) {
-            node.putPOJO("excluded_coin_amounts", amounts);
+        public TransactionBuilder setExcludedCoinAmounts(List<? extends Number> amounts) {
+            setValue(node, "excluded_coin_amounts", amounts);
             return this;
         }
 
-        public TransactionBuilder setExcludedCoinIds(List<Coin> coinIds) {
-            node.putPOJO("excluded_coins_ids", coinIds);
+        public TransactionBuilder setExcludedCoinIds(List<?> coinIds) {
+            if (coinIds.stream().allMatch(String.class::isInstance)) {
+                setValue(node, "excluded_coin_ids", coinIds);
+            } else if (coinIds.stream().allMatch(Coin.class::isInstance)) {
+                setValue(node, "excluded_coins", coinIds);
+            } else {
+                throw new IllegalArgumentException("Expected coin IDs or Coin objects, not mixed values");
+            }
             return this;
         }
 
@@ -629,17 +866,24 @@ public class RequestUtils {
         }
 
         public TransactionBuilder addMemos(List<String> memos) {
-            node.putPOJO("memos", memos);
+            setValue(node, "memos", memos);
             return this;
         }
 
         public TransactionBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public TransactionBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
 
         public JsonNode build() {
-            return node;
+            if (!node.hasNonNull("wallet_id") || !node.hasNonNull("amount") || !node.hasNonNull("address")) {
+                throw new IllegalStateException("Must set wallet_id, amount and address");
+            }
+            return snapshot(node);
         }
     }
 
@@ -649,27 +893,40 @@ public class RequestUtils {
         final List<Addition> additions = new ArrayList<>();
         final List<Coin> coins = new ArrayList<>();
 
-        public MultiTransactionBuilder setWalletId(int walletId) {
+        public MultiTransactionBuilder setWalletId(long walletId) {
             node.put("wallet_id", walletId);
             return this;
         }
 
         public MultiTransactionBuilder addAddition(String coinPuzzleHash, long amount) {
+            return addAddition(coinPuzzleHash, BigInteger.valueOf(amount));
+        }
+
+        public MultiTransactionBuilder addAddition(String coinPuzzleHash, BigInteger amount) {
             additions.add(new Addition(coinPuzzleHash, amount));
             return this;
         }
 
         public MultiTransactionBuilder addAddition(String coinPuzzleHash, long amount, List<String> memos) {
+            return addAddition(coinPuzzleHash, BigInteger.valueOf(amount), memos);
+        }
+
+        public MultiTransactionBuilder addAddition(String coinPuzzleHash, BigInteger amount, List<String> memos) {
             additions.add(new Addition(coinPuzzleHash, amount, memos));
             return this;
         }
 
         public MultiTransactionBuilder addAdditions(List<Addition> additions) {
-            this.additions.addAll(additions);
+            additions.forEach(addition -> this.additions.add(new Addition(
+                    addition.puzzleHash(), addition.amount(), addition.memos())));
             return this;
         }
 
         public MultiTransactionBuilder addCoin(String coinPuzzleHash, String parentPuzzleHash, long amount) {
+            return addCoin(coinPuzzleHash, parentPuzzleHash, BigInteger.valueOf(amount));
+        }
+
+        public MultiTransactionBuilder addCoin(String coinPuzzleHash, String parentPuzzleHash, BigInteger amount) {
             coins.add(new Coin(parentPuzzleHash, coinPuzzleHash, amount));
             return this;
         }
@@ -685,24 +942,30 @@ public class RequestUtils {
         }
 
         public MultiTransactionBuilder addCoinAnnouncements(List<CoinAnnouncement> coinAnnouncements) {
-            node.putPOJO("coin_announcements", coinAnnouncements);
+            putAnnouncements(node, "coin_announcements", coinAnnouncements);
             return this;
         }
 
         public MultiTransactionBuilder addPuzzleAnnouncements(List<PuzzleAnnouncement> puzzleAnnouncements) {
-            node.putPOJO("puzzle_announcements", puzzleAnnouncements);
+            putAnnouncements(node, "puzzle_announcements", puzzleAnnouncements);
             return this;
         }
 
         public MultiTransactionBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public MultiTransactionBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
 
         public JsonNode build() {
-            node.putPOJO("additions", additions);
-            node.putPOJO("coins", coins);
-            return node;
+            if (!node.has("wallet_id")) { throw new IllegalStateException("Must set a wallet ID"); }
+            if (additions.isEmpty()) { throw new IllegalStateException("Must add at least one addition"); }
+            setValue(node, "additions", additions);
+            if (!coins.isEmpty()) { setValue(node, "coins", coins); }
+            return snapshot(node);
         }
     }
 
@@ -710,8 +973,6 @@ public class RequestUtils {
     public static class SpendBundleBuilder {
         final List<CoinSpend> coinSpends = new ArrayList<>();
         String aggregatedSignature;
-        String solution;
-        String puzzleReveal;
 
         public SpendBundleBuilder addCoinSpend(CoinSpend coinSpend) {
             coinSpends.add(coinSpend);
@@ -723,14 +984,14 @@ public class RequestUtils {
             return this;
         }
 
+        @Deprecated
         public SpendBundleBuilder addPuzzleReveal(String puzzleReveal) {
-            this.puzzleReveal = puzzleReveal;
-            return this;
+            throw new IllegalArgumentException("Set puzzle_reveal on each CoinSpend, not on SpendBundle");
         }
 
+        @Deprecated
         public SpendBundleBuilder addSolution(String solution) {
-            this.solution = solution;
-            return this;
+            throw new IllegalArgumentException("Set solution on each CoinSpend, not on SpendBundle");
         }
 
         public SpendBundleBuilder addAggregatedSignature(String aggSig) {
@@ -739,18 +1000,15 @@ public class RequestUtils {
         }
 
         public SpendBundle build() {
-            if (coinSpends.isEmpty() || aggregatedSignature == null
-                    || solution == null || puzzleReveal == null) {
-                throw new IllegalStateException(
-                        "Must set all fields: coinSpends, puzzleReveal, solution and aggregatedSignature"
-                );
+            if (aggregatedSignature == null) {
+                throw new IllegalStateException("Must set aggregatedSignature");
             }
 
             return new SpendBundle(
                     aggregatedSignature,
-                    coinSpends,
-                    puzzleReveal,
-                    solution
+                    List.copyOf(coinSpends),
+                    null,
+                    null
             );
         }
     }
@@ -760,9 +1018,9 @@ public class RequestUtils {
         final ObjectNode node = JsonUtils.newEmptyNode();
         final List<MetaData> metaList = new ArrayList<>();
         final List<String> targetList = new ArrayList<>();
-        final List<String> coinList = new ArrayList<>();
+        final List<Coin> coinList = new ArrayList<>();
 
-        public BulkMintBuilder setWalletId(int walletId) {
+        public BulkMintBuilder setWalletId(long walletId) {
             node.put("wallet_id", walletId);
             return this;
         }
@@ -802,23 +1060,31 @@ public class RequestUtils {
             return this;
         }
 
-        public BulkMintBuilder setMintNumberStart(int start) {
+        public BulkMintBuilder setMintNumberStart(long start) {
             node.put("mint_number_start", start);
             return this;
         }
 
-        public BulkMintBuilder setMintTotal(int total) {
+        public BulkMintBuilder setMintTotal(long total) {
             node.put("mint_total", total);
             return this;
         }
 
+        @Deprecated
         public BulkMintBuilder addXchCoin(String coinId) {
-            coinList.add(coinId);
+            throw new IllegalArgumentException("Chia 2.7.5 requires full Coin objects; use addXchCoin(Coin)");
+        }
+
+        public BulkMintBuilder addXchCoin(Coin coin) {
+            coinList.add(coin);
             return this;
         }
 
-        public BulkMintBuilder addXchCoin(List<String> coinIds) {
-            coinList.addAll(coinIds);
+        public BulkMintBuilder addXchCoin(List<?> coins) {
+            if (!coins.stream().allMatch(Coin.class::isInstance)) {
+                throw new IllegalArgumentException("Chia 2.7.5 requires full Coin objects, not coin IDs");
+            }
+            coins.forEach(coin -> coinList.add((Coin) coin));
             return this;
         }
 
@@ -838,17 +1104,21 @@ public class RequestUtils {
         }
 
         public BulkMintBuilder addDidCoin(Coin coin) {
-            node.putPOJO("did_coin_dict", coin);
+            setValue(node, "did_coin", coin);
             node.put("mint_from_did", true);
             return this;
         }
 
         public BulkMintBuilder setDidLinageParent(String linageParentHex) {
-            node.put("did_lineage_parent_hex", linageParentHex);
+            node.put("did_lineage_parent", linageParentHex);
             return this;
         }
 
         public BulkMintBuilder addFee(long amont) {
+            return addFee(BigInteger.valueOf(amont));
+        }
+
+        public BulkMintBuilder addFee(BigInteger amont) {
             node.put("fee", amont);
             return this;
         }
@@ -861,11 +1131,11 @@ public class RequestUtils {
         public JsonNode build() {
             if (!node.has("wallet_id")) { throw new IllegalStateException("Must Set Wallet Id"); }
             if (metaList.isEmpty()) { throw new IllegalStateException("Must Add Meta Data To Mint"); }
-            node.putPOJO("metadata_list", metaList);
-            if (!targetList.isEmpty()) { node.putPOJO("target_list", targetList); }
-            if (!coinList.isEmpty()) { node.putPOJO("xch_coin_list", coinList); }
+            setValue(node, "metadata_list", metaList);
+            if (!targetList.isEmpty()) { setValue(node, "target_list", targetList); }
+            if (!coinList.isEmpty()) { setValue(node, "xch_coins", coinList); }
 
-            return node;
+            return snapshot(node);
         }
     }
 
@@ -877,8 +1147,8 @@ public class RequestUtils {
         String hash;
         String metaHash;
         String licenseHash;
-        int editionNumber = 1;
-        int editionTotal = 1;
+        BigInteger editionNumber = BigInteger.ONE;
+        BigInteger editionTotal = BigInteger.ONE;
 
         public MetaDataBuilder addUri(String uri) {
             uris.add(uri);
@@ -926,6 +1196,14 @@ public class RequestUtils {
         }
 
         public MetaDataBuilder setEditionNumber(int edition, int total) {
+            return setEditionNumber((long) edition, total);
+        }
+
+        public MetaDataBuilder setEditionNumber(long edition, long total) {
+            return setEditionNumber(BigInteger.valueOf(edition), BigInteger.valueOf(total));
+        }
+
+        public MetaDataBuilder setEditionNumber(BigInteger edition, BigInteger total) {
             editionNumber = edition;
             editionTotal = total;
             return this;
@@ -957,9 +1235,9 @@ public class RequestUtils {
     public static class SingleMintBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
         MetaData metaData;
-        int walletId = -1;
+        long walletId = -1;
 
-        public SingleMintBuilder setWalletId(int id) {
+        public SingleMintBuilder setWalletId(long id) {
             walletId = id;
             return this;
         }
@@ -990,6 +1268,10 @@ public class RequestUtils {
         }
 
         public SingleMintBuilder addFee(long amount) {
+            return addFee(BigInteger.valueOf(amount));
+        }
+
+        public SingleMintBuilder addFee(BigInteger amount) {
             node.put("fee", amount);
             return this;
         }
@@ -1003,7 +1285,11 @@ public class RequestUtils {
             if (metaData == null) { throw new IllegalStateException("Must Set Meta Data"); }
             if (walletId == -1) { throw new IllegalStateException("Must Set Wallet Id"); }
             node.put("wallet_id", walletId);
-            return JsonUtils.merge(node, JsonUtils.getMapper().valueToTree(metaData));
+            if (!node.has("royalty_address")) { node.putNull("royalty_address"); }
+            if (!node.has("target_address")) { node.putNull("target_address"); }
+            ObjectNode result = node.deepCopy();
+            result.setAll((ObjectNode) JsonUtils.getMapper().valueToTree(metaData));
+            return snapshot(result);
         }
     }
 
@@ -1012,7 +1298,7 @@ public class RequestUtils {
         final ObjectNode node = JsonUtils.newEmptyNode();
         final List<NftCoin> nftCoins = new ArrayList<>();
 
-        public SetDidBulkBuilder addNft(String coinId, int walletId) {
+        public SetDidBulkBuilder addNft(String coinId, long walletId) {
             nftCoins.add(new NftCoin(coinId, walletId));
             return this;
         }
@@ -1023,6 +1309,10 @@ public class RequestUtils {
         }
 
         public SetDidBulkBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public SetDidBulkBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
@@ -1033,10 +1323,9 @@ public class RequestUtils {
         }
 
         public JsonNode build() {
-            if (!node.has("did_id")) { throw new IllegalStateException("Must Set a DID"); }
             if (nftCoins.isEmpty()) { throw new IllegalStateException("Must Add NFTs"); }
-            node.putPOJO("nft_coin_list", nftCoins);
-            return node;
+            setValue(node, "nft_coin_list", nftCoins);
+            return snapshot(node);
         }
 
 
@@ -1047,7 +1336,7 @@ public class RequestUtils {
         final ObjectNode node = JsonUtils.newEmptyNode();
         final List<NftCoin> nftCoins = new ArrayList<>();
 
-        public NftBulkTransferBuilder addNft(String coinId, int walletId) {
+        public NftBulkTransferBuilder addNft(String coinId, long walletId) {
             nftCoins.add(new NftCoin(coinId, walletId));
             return this;
         }
@@ -1058,6 +1347,10 @@ public class RequestUtils {
         }
 
         public NftBulkTransferBuilder addFee(long fee) {
+            return addFee(BigInteger.valueOf(fee));
+        }
+
+        public NftBulkTransferBuilder addFee(BigInteger fee) {
             node.put("fee", fee);
             return this;
         }
@@ -1070,8 +1363,8 @@ public class RequestUtils {
         public JsonNode build() {
             if (nftCoins.isEmpty()) { throw new IllegalStateException("Must Add NFT Coins"); }
             if (!node.has("target_address")) { throw new IllegalStateException("Must Set Target Address"); }
-            node.putPOJO("nft_coin_list", nftCoins);
-            return node;
+            setValue(node, "nft_coin_list", nftCoins);
+            return snapshot(node);
         }
 
     }
@@ -1079,24 +1372,24 @@ public class RequestUtils {
 
     private record NftCoin(
             String nft_coin_id,
-            int wallet_id
+            long wallet_id
     ) { }
 
 
     public static class CoinRecordBuilder {
         final ObjectNode node = JsonUtils.newEmptyNode();
 
-        public CoinRecordBuilder setOffset(int offset) {
+        public CoinRecordBuilder setOffset(long offset) {
             node.put("offset", offset);
             return this;
         }
 
-        public CoinRecordBuilder setLimit(int limit) {
+        public CoinRecordBuilder setLimit(long limit) {
             node.put("limit", limit);
             return this;
         }
 
-        public CoinRecordBuilder setWalletId(int walletId) {
+        public CoinRecordBuilder setWalletId(long walletId) {
             node.put("wallet_id", walletId);
             return this;
         }
@@ -1112,7 +1405,7 @@ public class RequestUtils {
         }
 
         public CoinRecordBuilder setCoinIdFilter(List<String> coinIds, boolean exclude) {
-            node.putPOJO("coin_id_filter",
+            setValue(node, "coin_id_filter",
                     new JsonUtils.ObjectBuilder()
                             .put("values", coinIds)
                             .put("mode", exclude ? 2 : 1)
@@ -1122,7 +1415,7 @@ public class RequestUtils {
         }
 
         public CoinRecordBuilder setPuzzleHashFilter(List<String> puzzleHashes, boolean exclude) {
-            node.putPOJO("puzzle_hash_filter",
+            setValue(node, "puzzle_hash_filter",
                     new JsonUtils.ObjectBuilder()
                             .put("values", puzzleHashes)
                             .put("mode", exclude ? 2 : 1)
@@ -1132,7 +1425,7 @@ public class RequestUtils {
         }
 
         public CoinRecordBuilder setParentCoinIdFilter(List<String> parentCoinIds, boolean exclude) {
-            node.putPOJO("parent_coin_id_filter",
+            setValue(node, "parent_coin_id_filter",
                     new JsonUtils.ObjectBuilder()
                             .put("values", parentCoinIds)
                             .put("mode", exclude ? 2 : 1)
@@ -1141,8 +1434,8 @@ public class RequestUtils {
             return this;
         }
 
-        public CoinRecordBuilder setAmountFilter(List<Long> amounts, boolean exclude) {
-            node.putPOJO("amount_filter",
+        public CoinRecordBuilder setAmountFilter(List<? extends Number> amounts, boolean exclude) {
+            setValue(node, "amount_filter",
                     new JsonUtils.ObjectBuilder()
                             .put("values", amounts)
                             .put("mode", exclude ? 2 : 1)
@@ -1152,7 +1445,11 @@ public class RequestUtils {
         }
 
         public CoinRecordBuilder setAmountRange(long start, long end) {
-            node.putPOJO("amount_range",
+            return setAmountRange(BigInteger.valueOf(start), BigInteger.valueOf(end));
+        }
+
+        public CoinRecordBuilder setAmountRange(BigInteger start, BigInteger end) {
+            setValue(node, "amount_range",
                     new JsonUtils.ObjectBuilder()
                             .put("start", start)
                             .put("stop", end)
@@ -1162,7 +1459,7 @@ public class RequestUtils {
         }
 
         public CoinRecordBuilder setConfirmedRange(long start, long end) {
-            node.putPOJO("confirmed_range",
+            setValue(node, "confirmed_range",
                     new JsonUtils.ObjectBuilder()
                             .put("start", start)
                             .put("stop", end)
@@ -1172,7 +1469,7 @@ public class RequestUtils {
         }
 
         public CoinRecordBuilder setSpentRange(long start, long end) {
-            node.putPOJO("spent_range",
+            setValue(node, "spent_range",
                     new JsonUtils.ObjectBuilder()
                             .put("start", start)
                             .put("stop", end)
@@ -1202,7 +1499,7 @@ public class RequestUtils {
         }
 
         public JsonNode build() {
-            return node;
+            return snapshot(node);
         }
     }
 

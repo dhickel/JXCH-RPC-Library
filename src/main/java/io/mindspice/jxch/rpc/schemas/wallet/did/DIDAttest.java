@@ -6,6 +6,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
+@Deprecated(since = "2.7.5")
 public record DIDAttest(
         @JsonProperty("attest_data") String attestData,
         @JsonProperty("success") boolean success,
