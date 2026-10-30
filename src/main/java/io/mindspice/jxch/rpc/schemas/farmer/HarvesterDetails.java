@@ -1,6 +1,8 @@
 package io.mindspice.jxch.rpc.schemas.farmer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import io.mindspice.jxch.rpc.schemas.shared.ExactIntegerDeserializer;
 
 import java.math.BigInteger;
 import java.util.Collections;
@@ -10,12 +12,14 @@ import java.util.List;
 public record HarvesterDetails(
         @JsonProperty("failed_to_open_filenames") List<String> failedToOpenFilenames,
         @JsonProperty("duplicates") List<String> duplicates,
-        @JsonProperty("total_plot_size") BigInteger totalPlotSize,
+        @JsonProperty("total_plot_size") @JsonDeserialize(using = ExactIntegerDeserializer.class) BigInteger totalPlotSize,
         @JsonProperty("syncing") Syncing syncing,
         @JsonProperty("no_key_filenames") List<String> noKeyFilenames,
-        @JsonProperty("last_sync_time") double lastSyncTime,
+        @JsonProperty("last_sync_time") Double lastSyncTime,
         @JsonProperty("connection") HarvesterConnection harvesterConnection,
-        @JsonProperty("plots") List<Plot> plots
+        @JsonProperty("plots") List<Plot> plots,
+        @JsonProperty("total_effective_plot_size") @JsonDeserialize(using = ExactIntegerDeserializer.class) BigInteger totalEffectivePlotSize,
+        @JsonProperty("harvesting_mode") @JsonDeserialize(using = ExactIntegerDeserializer.class) Integer harvestingMode
 ) {
     public HarvesterDetails {
         failedToOpenFilenames = failedToOpenFilenames != null ? Collections.unmodifiableList(failedToOpenFilenames) : List.of();

@@ -15,7 +15,7 @@ public record PoolWalletStatus(
 ) {
 
     public PoolWalletStatus {
-        unconfirmedTransactions = unconfirmedTransactions() != null
+        unconfirmedTransactions = unconfirmedTransactions != null
                 ? Collections.unmodifiableList(unconfirmedTransactions)
                 : List.of();
     }
@@ -23,10 +23,10 @@ public record PoolWalletStatus(
     public record State(
             @JsonProperty("current") PoolInfo poolInfo,
             @JsonProperty("launcher_coin") Coin launcherCoin,
-            @JsonProperty("current_inner") String currentInner,
+            @Deprecated @JsonProperty(value = "current_inner", access = JsonProperty.Access.WRITE_ONLY) String currentInner,
             @JsonProperty("launcher_id") String launcherId,
             @JsonProperty("p2_singleton_puzzle_hash") String p2SingletonPuzzleHash,
-            @JsonProperty("singleton_block_height") int singletonBlockHeight,
+            @JsonProperty("singleton_block_height") long singletonBlockHeight,
             @JsonProperty("tip_singleton_coin_id") String tipSingletonCoinId,
             @JsonProperty("target") PoolInfo target
     ) { }
@@ -36,7 +36,7 @@ public record PoolWalletStatus(
             @JsonProperty("target_puzzle_hash") String targetPuzzleHash,
             @JsonProperty("owner_pubkey") String ownerPubkey,
             @JsonProperty("state") int state,
-            @JsonProperty("relative_lock_height") int relativeLockHeight,
+            @JsonProperty("relative_lock_height") long relativeLockHeight,
             @JsonProperty("pool_url") String poolUrl,
             @JsonProperty("version") int version
     ) { }

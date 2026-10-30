@@ -17,6 +17,7 @@ public enum Farmer implements Endpoint{
     GET_HARVESTER_PLOTS_KEYS_MISSING,
     GET_HARVESTER_PLOTS_DUPLICATES,
     GET_POOL_LOGIN_LINK,
+    CONNECT_TO_SOLVER,
     // SHARED
     CLOSE_CONNECTION,
     GET_CONNECTIONS,
@@ -34,6 +35,6 @@ public enum Farmer implements Endpoint{
 
     @Override
     public String getPath() {
-        return "/" + name().toLowerCase();
+        return "/" + name().toLowerCase(java.util.Locale.ROOT);
     }
 }

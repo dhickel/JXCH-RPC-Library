@@ -19,7 +19,7 @@ import java.util.List;
 public class HarvesterAPI extends ChiaAPI {
 
     public HarvesterAPI(RPCClient client) {
-        super(client, ChiaService.FARMER);
+        super(client, ChiaService.HARVESTER);
     }
     
     ////////////
@@ -103,16 +103,7 @@ public class HarvesterAPI extends ChiaAPI {
     }
 
     public byte[] openConnectionAsBytes(String ip, int port) throws RPCException {
-        try {
-            var data = new JsonUtils.ObjectBuilder()
-                    .put("ip", ip)
-                    .put("port", port)
-                    .buildBytes();
-            var req = new Request(Harvester.OPEN_CONNECTION, data);
-            return client.makeRequest(req);
-        } catch (JsonProcessingException e) {
-            throw new RPCException("Error writing request JSON", e);
-        }
+        return super.openConnectionAsBytes(ip, port);
     }
 
     public ApiResponse<Boolean> openConnection(String ip, int port) throws RPCException {
@@ -136,7 +127,7 @@ public class HarvesterAPI extends ChiaAPI {
 
     public ApiResponse<Boolean> stopNode() throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(healthzAsBytes());
+            var jsonNode = JsonUtils.readTree(stopNodeAsBytes());
             return newResponse(jsonNode, "success", Boolean.class, Harvester.STOP_NODE);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -169,7 +160,7 @@ public class HarvesterAPI extends ChiaAPI {
     public byte[] refreshPlotsAsBytes() throws RPCException {
         try {
             var data = JsonUtils.newEmptyNodeAsBytes();
-            var req = new Request(Harvester.GET_PLOTS, data);
+            var req = new Request(Harvester.REFRESH_PLOTS, data);
             return client.makeRequest(req);
         } catch (JsonProcessingException e) {
             throw new RPCException("Error writing request JSON", e);
@@ -273,7 +264,7 @@ public class HarvesterAPI extends ChiaAPI {
 
     public ApiResponse<HarvesterConfig> getHarvesterConfig() throws RPCException {
         try {
-            var jsonNode = JsonUtils.readTree(getPlotDirectoriesAsBytes());
+            var jsonNode = JsonUtils.readTree(getHarvesterConfigAsBytes());
             return newResponse(jsonNode, HarvesterConfig.class, Harvester.GET_HARVESTER_CONFIG);
         } catch (IOException e) {
             throw new RPCException("Error reading response JSON", e);
@@ -284,9 +275,23 @@ public class HarvesterAPI extends ChiaAPI {
     public byte[] updateHarvesterConfigAsBytes(JsonNode harvesterConfigBuilder) throws RPCException {
         try {
             var data = JsonUtils.writeBytes(harvesterConfigBuilder);
+            var payload = JsonUtils.readTree(data);
+            if (payload == null || !payload.isObject()) {
+                throw new IllegalArgumentException("Harvester configuration must be an object");
+            }
+            for (var key : List.of("gpu_index", "parallel_decompressor_count", "decompressor_thread_count",
+                    "refresh_parameter_interval_seconds")) {
+                var value = payload.get(key);
+                if (value == null) continue;
+                if (!value.isIntegralNumber()) throw new IllegalArgumentException(key + " must be an integer");
+                if (key.equals("refresh_parameter_interval_seconds")
+                        && (!value.canConvertToLong() || value.longValue() < 3 || value.longValue() > 0xffffffffL)) {
+                    throw new IllegalArgumentException(key + " must be in 3..4294967295");
+                }
+            }
             var req = new Request(Harvester.UPDATE_HARVESTER_CONFIG, data);
             return client.makeRequest(req);
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RPCException("Error writing request JSON", e);
         }
     }

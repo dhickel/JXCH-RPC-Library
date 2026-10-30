@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@Deprecated(since = "2.7.5")
 public record DIDRecoveryList(
 	@JsonProperty("wallet_id") int walletId,
 	@JsonProperty("success") boolean success,

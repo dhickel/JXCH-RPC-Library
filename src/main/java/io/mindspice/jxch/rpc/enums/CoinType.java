@@ -1,6 +1,8 @@
 package io.mindspice.jxch.rpc.enums;
 
 import java.util.Arrays;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 
 public enum CoinType {
@@ -15,6 +17,12 @@ public enum CoinType {
         this.enumValue = value;
     }
 
+    @JsonValue
+    public int value() {
+        return enumValue;
+    }
+
+    @JsonCreator
     public static CoinType fromEnumValue(int value) {
         return Arrays.stream(CoinType.values())
                 .filter(wt -> wt.enumValue == value).findFirst()

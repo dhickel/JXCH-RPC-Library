@@ -13,8 +13,12 @@ public record Offers(
 	@JsonProperty("error") String error,
 	@JsonProperty("trade_records") List<TradeRecord> tradeRecord1s
 ) {
+	public List<TradeRecord> tradeRecords() {
+		return tradeRecord1s;
+	}
+
 	public Offers {
-		offers = offers != null ? Collections.unmodifiableList(offers) : List.of();
+		offers = offers != null ? Collections.unmodifiableList(offers) : null;
 		tradeRecord1s = tradeRecord1s != null ? Collections.unmodifiableList(tradeRecord1s) : List.of();
 	}
 }

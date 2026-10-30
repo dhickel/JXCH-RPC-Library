@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@Deprecated(since = "2.7.5")
 public record DIDRecoveryInfo(
 	@JsonProperty("newpuzhash") String newpuzhash,
 	@JsonProperty("wallet_id") int walletId,

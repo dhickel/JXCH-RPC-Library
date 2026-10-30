@@ -4,6 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 
 public record PoolTarget(
-        @JsonProperty("max_height") int maxHeight,
+        @JsonProperty("max_height") long maxHeight,
         @JsonProperty("puzzle_hash") String puzzleHash
 ) { }

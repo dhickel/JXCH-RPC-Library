@@ -3,7 +3,7 @@
 ***JXCH-RPC-Library is an unofficial third party library and has no relation to, or endorsement by Chia Network, Inc***
 
 # **About**
-***Currently implements Chia Blockchain RPC API up to 2.1.0. Datalayer support not currently implemented***
+***Targets the Chia Blockchain 2.7.5 stable RPC contracts, including Data Layer.***
 
 <br>
 
@@ -18,12 +18,12 @@ The Goals of the library are as follows:
 - Provide API classes that provide a higher level implementation of methods for making RPC request.
 - Provide the option to manually handle response json.
 - Provide immutable java records that correspond to the schemas of the response json.
-- Ensure immutability of all response data.
+- Use defensive collection snapshots in typed records where supported.
 - Provide the ability to easily communicate to various nodes, with the ability to pool the responses and differentiate between requests.
 
 <br>
 
-Using the above outlined features the library can be used simply to load self-signed certificate/key pairs (which can be a challenge with java), be used simply as a RPCClient to make a process requests/response json manually or be used as a full abstraction for making RPC calls with requests returned as predefined immutable java records that map 1:1 with response data. Due to the nature of blockchains being immutable, and immutability being generally preferable whenever possible, all data relating to responses is contained in immutable records, and all collections that returned are also wrapped immutably. As such this library can provide a solid backbone for interfacing via RPC in a simple and safe manner, allowing for thread safe high performance processing of RPC requests across multiple nodes/wallets.
+The library can load self-signed certificate/key pairs, send RPC requests with manual JSON handling, or parse responses into typed records and collections. Some typed record collections are defensive snapshots; response data is not necessarily deeply immutable. Raw Jackson `JsonNode` values are mutable and caller-managed.
 
 <br>
 
@@ -31,7 +31,20 @@ Using the above outlined features the library can be used simply to load self-si
 ## **Current Project State**
 <br>
 
-Currently, the library provides implementations for all endpoints ***except for the Data Layer*** for the chia client as of 2.1.0. The library is still in a beta state, all implemented endpoints except for the ones introduced in version 1.7 of the client (Did not have a node on 1.7 when creating, but the new endpoints are implemented, just not tested) have been tested and should function as expected, but due to the nature of software development and the complexity of some of the endpoints and the associated return data, some latent bugs are to be expected. THe library will be updated and maintained as I use it in future projects, and I will try to keep it up to date as possible, but I cannot guarantee up to date full coverage of all endpoints. ***If any bugs are found please create an issue and I will investigate and fix them when time permits.*** I wll try my best to keep the every thing updated and fix any issues proactively, but I am only one person. I tried to architect the library to be fairly simple, and easy to maintainable/contribute to. ***Any contributions are welcome, even if it is just something little.***
+The compatibility baseline is Chia 2.7.5, commit `ff71448437a137c7092775923d5ecbbe104433e7`. RPC contracts are checked deterministically against that source; this is not live-node, simulator, or end-to-end verification. The library remains beta software, and contributions and bug reports are welcome.
+
+The stable source has 122 wallet, 35 Data Layer, 29 full-node, 14 farmer, 8 harvester, 2 crawler, 1 solver, and 0 timelord service-specific routes, plus 11 shared routes per service. Unreleased main-branch routes such as `plotnft_transfer` and `plotnft_melt` are not part of this baseline. Deprecated DID recovery routes removed from the stable service cannot be called successfully against it.
+
+Daemon commands use WebSocket rather than HTTP. The existing HTTP transport does not support them and rejects daemon requests explicitly; this library does not implement a WebSocket transport.
+
+### Upgrading from 2.1 compatibility
+
+- Wallet `createNewWallet` returns `ApiResponse<CreateWalletResult>` for wallet variants; its `coinList` contains `JsonNode` values. `getPublicKeys` returns `PublicKeys` with a fingerprint list and keyring lock state, not `KeyInfo`.
+- Wallet `getCoinRecords` returns `WalletCoinRecords`, containing a list of wallet coin records and an optional `totalCount`. `getOfferSummary` returns `OfferSummaryResult`, with separate asset and Data Layer summary fields. The sorted `getTransactions` overload returns a list of transactions.
+- Full-node `getMempoolItemsByCoinName` returns a list. Wallet and full-node requests support wide unsigned values. Full-node fee estimate `targetTimes` lists accept non-negative `Byte`, `Short`, `Integer`, `Long`, or `BigInteger` values, not floating-point or decimal numbers.
+- Precision-sensitive response accessors use `BigInteger` for full unsigned 64- and 128-bit values and `long` where appropriate. Farmer `Plot.fileSize()` and `Plot.timeModified()` also return `BigInteger`. Sub-epoch summaries are objects and mempool condition shapes have been corrected. Legacy primitive calls and constructors remain where possible, but accessor types and some signatures require migration.
+- Removed DID recovery methods are deprecated and fail before transport. The deprecated `pushTransactions(List<SimpleTransaction>)` also fails before transport: use the `JsonNode` overload with complete transaction records instead.
+- Farmer `setRewardTargets` returns an acknowledgement, `ApiResponse<Boolean>`. Network information supports genesis challenge metadata.
 
 <br>
 
@@ -39,16 +52,15 @@ Currently, the library provides implementations for all endpoints ***except for 
 
 <br>
 
-- Add DataLayer Endpoints
 - Add JavaDocs mirroring RPC documentation for all the Api member methods
-- Add Unit Tests
+- Expand contract regression coverage
 - Implement BLS functionalities,  (https://github.com/chiachat/kbls is a good existing one wtih aggregation if needed)
 
 <br>
 
-When writing the library I didn't have any experience with using the data layer and didn't implement any of those endpoints, this is something I plan to do in the future, or if anyone has experience with the datalayer and runs one would like to contribute to these that would be great. I also plan on adding JavaDocs to better document where builder methods are used and to mirror the details from the official documentation for the api related methods so there is no need to reference it and it can be read in the IDE when calling the associated methods.
+JavaDocs can be expanded to document builder methods and mirror details from the official RPC documentation.
 
-Unit tests are not the easiest to implement due to the complexity of some of the api parameters and their response, but it still would be a great benefits for regression testing, proper validation, and will be indispensable for endpoint changes. There was a lot of ground to cover when writing all of the endpoint methods, so I didn't implement any unit tests while writing. I did test all the endpoints while implementing and manually validated them, but this not a valid or maintainable metric to go by.
+Additional unit tests can improve regression coverage as endpoint contracts change.
 
 Things like fully crafting spendbundles would benefit from BLS functionality, mainly aggregation, and it would also be nice to provide the ability to do puzzlehash <-> address conversion. KBLS(https://github.com/chiachat/kbls ) is a nice java library for this if you need BLS for your project. I wanted to keep the first release simple so I didn't approach  BLS. But the goal is to have the library provide all functionality needed to interface with the blockchain, and BLS signature aggregation is needed for this.
 
@@ -128,7 +140,7 @@ This will package the library and add it to you local maven repository, then you
 <dependency>
     <groupId>io.mindspice</groupId>
     <artifactId>jxch-rpc-library</artifactId>
-    <version>0.2.0</version>
+    <version>1.0.0</version>
 </dependency>
 
 ```
@@ -172,12 +184,14 @@ A default empty config file is provided in the repo, and the config schema is:
 ```yaml
 address: "127.0.0.1"
 crawlerPort: 8561
-dataLayerPort: 8561
+dataLayerPort: 8562
 daemonPort: 55400
 fullNodePort: 8555
 farmerPort: 8559
 harvesterPort: 8560
 walletPort: 9256
+solverPort: 8667
+timelordPort: 8557
 crawlerCrt: "/home/<user>/.chia_certs/crawler/private_crawler.crt"
 crawlerKey: "/home/<user>/.chia_certs/crawler/private_crawler.key"
 dataLayerCrt: "/home/<user>/.chia_certs/data_layer/private_data_layer.crt"
@@ -192,11 +206,15 @@ harvesterCrt: "/home/<user>/.chia_certs/harvester/private_harvester.crt"
 harvesterKey: "/home/<user>/.chia_certs/harvester/private_harvester.key"
 walletCrt: "/home/<user>/.chia_certs/wallet/private_wallet.crt"
 walletKey: "/home/<user>/.chia_certs/wallet/private_wallet.key"
+solverCrt: "/home/<user>/.chia_certs/solver/private_solver.crt"
+solverKey: "/home/<user>/.chia_certs/solver/private_solver.key"
+timelordCrt: "/home/<user>/.chia_certs/timelord/private_timelord.crt"
+timelordKey: "/home/<user>/.chia_certs/timelord/private_timelord.key"
 
 ```
 
 
-If you chose not to load certificates for all endpoints, either comment out or remove those fields, attempting to make requests to those endpoints will then throw an IllegalStateException.
+If you do not use every service, comment out or remove the unused certificate fields. Configure a valid certificate pair for each service you intend to call.
 
 <br>
 
@@ -215,7 +233,9 @@ A builder method is provided for config initialization via code the process of d
         FARMER,
         FULL_NODE,
         HARVESTER,
-        WALLET;
+        WALLET,
+        SOLVER,
+        TIMELORD;
 
 * The following builder methods are provide for constructing a config:
 
@@ -290,6 +310,26 @@ FullNodeAPI node = new FullNodeAPI(rpcClient);
 
 
 
+### **Data Layer**
+
+Configure the Data Layer certificate and key for `ChiaService.DATA_LAYER`. Requests are routed to the configured Data Layer service, on port 8562 by default:
+
+```java
+NodeConfig config = new NodeConfig.Builder()
+        .setAddress("127.0.0.1")
+        .addServiceCert(ChiaService.DATA_LAYER,
+                "/path/to/private_data_layer.crt", "/path/to/private_data_layer.key")
+        .build();
+RPCClient client = new RPCClient(config);
+DataLayerAPI dataLayer = new DataLayerAPI(client);
+var stores = dataLayer.getOwnedStores();
+byte[] rawStores = dataLayer.getOwnedStoresAsBytes();
+```
+
+The regular method returns an `ApiResponse`; its data type depends on the endpoint. Complex schemas may be returned as Jackson `JsonNode`. The `AsBytes` variant returns the raw response for callers that prefer their own JSON handling.
+
+Data Layer fee parameters accept exact integer `Number` values (`Byte`, `Short`, `Integer`, `Long`, or `BigInteger`) in the uint64 range. In Chia 2.7.5, a null or omitted fee defaults to zero, not the configured fee; this differs from current official documentation. Callers who need a nonzero fee must choose and pass it explicitly.
+
 ## **Making requests**
 
 <br>
@@ -321,7 +361,7 @@ All requests return an instance of the generic record class APIResponse, this em
 
 Optional was chosen here as to be able to properly handle the lack of a value on some responses in the context of the generic response class. The rationale for using a generic response class and an optional data value was to provide robust support for more functional modern java approaches and stream compatibility.
 
-The response object is an immutable record class consisting of the follow fields:
+The response object is a record class consisting of the follow fields; its contained data is not necessarily deeply immutable:
 
 ```java
 Optional<T> data, 
@@ -331,7 +371,7 @@ String requestURI,
 Endpoint endpoint
 ```
 
-- **data:** The data returned by the endpoint, this either relates to an object mirroring the return schema of the endpoint, a single built-in type(Integer, String ect.), A collection of custom or built-in types or Optional.empty for the absence of value. All data object/types returned are immutable.
+- **data:** The endpoint data, which may be a schema object, scalar, collection, or `JsonNode`, or `Optional.empty` when no data is available. Jackson `JsonNode` values are mutable.
 
 - **success:** Contains the success boolean returned by the endpoint.
 
@@ -368,7 +408,7 @@ ApiResponse also contains the method
 
 <br>
 
-Complex response data is represented by immutable record classes containing a 1:1 mapping of the response json, but with the field names in camelCase as is the naming convention with java. In the case of more complex queries there will be nested schemas. Object representations of response data was designed with modularity and reuse in mind to avoid redundant code.
+Response data may use immutable record classes with Java-style field names, typed collections or scalar values, or Jackson `JsonNode` for complex schemas. Nested response schemas may contain nested objects.
 
 In the case of single return values, the data object of ApiResponse will be just a single built-in types, im most cases this is an Integer/Long value(fees, heights etc.), or a String(block headers, puzzlehash, etc.)
 
@@ -459,7 +499,7 @@ a more modern functional approach to java.
 
 <br>
 
-For every API endpoint two request method, the "default" method that will return a parsed data object, and secondary ``<method>AsBytes`` methods that will return the request exactly as received from the endpoint as an array of bytes. This secondary method can be used if you would prefer to parse the json with a different library and/or work directly with the json itself without having it returned as a data object.
+API methods generally provide a parsed `ApiResponse<T>` and a corresponding `<method>AsBytes` method returning the raw response bytes. Use the latter to parse JSON independently; parsed complex responses can use `JsonNode` rather than a dedicated record.
 
 <br>
 
@@ -497,11 +537,14 @@ public class Request {
 ```
 
 The enums classes containing the enums of the endpoints are:
-- Daemon
+- Crawler
+- DataLayer
+- Daemon (unsupported over HTTP)
 - Farmer
 - FullNode
 - Harvester
 - Shared
+- Solver
 - Wallet
 
 <br>
@@ -510,7 +553,7 @@ The enums classes containing the enums of the endpoints are:
 
 <br>
 
-Any of the API endpoints that directly take a JsonNode, have an associated builder method that can be found in ```io.mindspice.jxch.rpc.util.RequestUtils```. These will later be documented in the JavaDocs for the project, but currently are not, which can be slightly confusing and was an oversight. JavaDocs for all the the API methods, will be added soon and should clear things up more. ***When encountering a method that takes a parameter of type JsonNode, the parameter name is the name of the builder you should use.*** These are used for endpoints that have a lot of parameters and/or optional parameters. If a method take a JsonNode (The builders actually return an ObjectNode, but these are interchangeable in this context) type parameter, then there is a related builder method. There is also a builder method for crafting spendbundles.
+Some API endpoints that directly take a JsonNode have an associated builder method that can be found in ```io.mindspice.jxch.rpc.util.RequestUtils```. These will later be documented in the JavaDocs for the project, but currently are not, which can be slightly confusing and was an oversight. JavaDocs for all the the API methods, will be added soon and should clear things up more. Consult the method signature and Chia RPC documentation for the expected JSON structure. These are used for endpoints that have a lot of parameters and/or optional parameters. Builders return an ObjectNode, which can be passed where a JsonNode is expected. There is also a builder method for crafting spendbundles.
 
 To identify what parameters are required for your use case, and what is optional or not, its best to consult the RPC documentation at: https://docs.chia.net/rpc
 

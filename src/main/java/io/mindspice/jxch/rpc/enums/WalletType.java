@@ -1,6 +1,8 @@
 package io.mindspice.jxch.rpc.enums;
 
 import java.util.Arrays;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 
 public enum WalletType {
@@ -11,13 +13,18 @@ public enum WalletType {
     CUSTODY(5),
     CAT(6),
     RECOVERABLE(7),
+    DECENTRALIZED_ID(8),
+    @Deprecated
     DISTRIBUTED_ID(8),
     POOLING_WALLET(9),
     NFT(10),
     DATA_LAYER(11),
     DATA_LAYER_OFFER(12),
     VC(13),
-    CRCAT(57);
+    CRCAT(57),
+    RCAT(132),
+    REMOTE(205),
+    PLOTNFT_2(209);
 
     public final int enumValue;
 
@@ -25,6 +32,12 @@ public enum WalletType {
         this.enumValue = value;
     }
 
+    @JsonValue
+    public int value() {
+        return enumValue;
+    }
+
+    @JsonCreator
     public static WalletType fromValue(int value) {
         return Arrays.stream(WalletType.values())
                 .filter(wt -> wt.enumValue == value).findFirst()

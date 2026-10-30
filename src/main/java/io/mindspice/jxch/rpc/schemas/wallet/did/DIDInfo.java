@@ -18,8 +18,16 @@ public record DIDInfo(
         @JsonProperty("full_puzzle") String fullPuzzle,
         @JsonProperty("recovery_list_hash") String recoveryListHash,
         @JsonProperty("latest_coin") String latestCoin,
-        @JsonProperty("num_verification") int numVerification
+        @JsonProperty("num_verification") int numVerification,
+        @JsonProperty("did_id") String didId
 ) {
+
+    public DIDInfo(String publicKey, String p2Address, JsonNode metadata, JsonNode solution,
+            List<String> hints, String launcherId, boolean success, String fullPuzzle,
+            String recoveryListHash, String latestCoin, int numVerification) {
+        this(publicKey, p2Address, metadata, solution, hints, launcherId, success, fullPuzzle,
+                recoveryListHash, latestCoin, numVerification, null);
+    }
 
     public DIDInfo {
         hints = hints != null ? Collections.unmodifiableList(hints) : List.of();

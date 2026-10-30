@@ -47,7 +47,7 @@ public class ChiaUtils {
 
         byte[] parentCoinBytes = Hex.decode(pc.length() == 66 ? pc.substring(2) : pc);
         byte[] puzzleHashBytes = Hex.decode(ph.length() == 66 ? ph.substring(2) : ph);
-        byte[] amountBytes = BigInteger.valueOf(coin.amount()).toByteArray();
+        byte[] amountBytes = coin.amount().signum() == 0 ? new byte[0] : coin.amount().toByteArray();
 
         byte[] concatBuffer = new byte[parentCoinBytes.length + puzzleHashBytes.length + amountBytes.length];
         System.arraycopy(parentCoinBytes, 0, concatBuffer, 0, parentCoinBytes.length);

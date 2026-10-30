@@ -93,14 +93,19 @@ public enum Wallet implements Endpoint {
     NFT_TRANSFER_BULK,
     DID_SET_WALLET_NAME,
     DID_GET_WALLET_NAME,
+    @Deprecated(since = "2.7.5", forRemoval = true)
     DID_UPDATE_RECOVERY_IDS,
     DID_UPDATE_METADATA,
     DID_GET_PUBKEY,
     DID_GET_DID,
+    @Deprecated(since = "2.7.5", forRemoval = true)
     DID_RECOVERY_SPEND,
+    @Deprecated(since = "2.7.5", forRemoval = true)
     DID_GET_RECOVERY_LIST,
     DID_GET_METADATA,
+    @Deprecated(since = "2.7.5", forRemoval = true)
     DID_CREATE_ATTEST,
+    @Deprecated(since = "2.7.5", forRemoval = true)
     DID_GET_INFORMATION_NEEDED_FOR_RECOVERY,
     DID_GET_CURRENT_COIN_INFO,
     DID_CREATE_BACKUP_FILE,
@@ -113,6 +118,25 @@ public enum Wallet implements Endpoint {
     SET_AUTO_CLAIM,
     GET_AUTO_CLAIM,
     GET_COIN_RECORDS,
+    GET_FULL_NODE_PEER_COUNT,
+    GET_FEE_ESTIMATE,
+    GET_PUZZLE_AND_SOLUTION,
+    SPLIT_COINS,
+    COMBINE_COINS,
+    REGISTER_REMOTE_COINS,
+    DL_VERIFY_PROOF,
+    VC_MINT,
+    VC_GET,
+    VC_GET_LIST,
+    VC_SPEND,
+    VC_ADD_PROOFS,
+    VC_GET_PROOFS_FOR_ROOT,
+    VC_REVOKE,
+    CRCAT_APPROVE_PENDING,
+    GATHER_SIGNING_INFO,
+    APPLY_SIGNATURES,
+    SUBMIT_TRANSACTIONS,
+    EXECUTE_SIGNING_INSTRUCTIONS,
     // SHARED
     CLOSE_CONNECTION,
     GET_CONNECTIONS,
@@ -130,6 +154,6 @@ public enum Wallet implements Endpoint {
 
     @Override
     public String getPath() {
-        return "/" + name().toLowerCase();
+        return "/" + name().toLowerCase(java.util.Locale.ROOT);
     }
 }

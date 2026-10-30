@@ -3,6 +3,7 @@ package io.mindspice.jxch.rpc.schemas.wallet;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
+import java.math.BigInteger;
 import java.util.Objects;
 import java.util.StringJoiner;
 
@@ -11,20 +12,27 @@ public class Addition {
     @JsonProperty("puzzle_hash")
     private String puzzleHash;
     @JsonProperty("amount")
-    private long amount;
+    private BigInteger amount;
     @JsonProperty("memos")
     private List<String> memos;
 
 
     public Addition(String puzzleHash, long amount) {
-        this.puzzleHash = puzzleHash;
-        this.amount = amount;
+        this(puzzleHash, BigInteger.valueOf(amount), null);
+    }
+
+    public Addition(String puzzleHash, BigInteger amount) {
+        this(puzzleHash, amount, null);
     }
 
     public Addition(String puzzleHash, long amount, List<String> memos) {
+        this(puzzleHash, BigInteger.valueOf(amount), memos);
+    }
+
+    public Addition(String puzzleHash, BigInteger amount, List<String> memos) {
         this.puzzleHash = puzzleHash;
         this.amount = amount;
-        this.memos = memos;
+        this.memos = memos == null ? null : List.copyOf(memos);
     }
 
     public Addition() {
@@ -34,7 +42,7 @@ public class Addition {
         return puzzleHash;
     }
 
-    public long amount() {
+    public BigInteger amount() {
         return amount;
     }
 
@@ -47,7 +55,8 @@ public class Addition {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Addition addition = (Addition) o;
-        return amount == addition.amount && puzzleHash.equals(addition.puzzleHash) && memos.equals(addition.memos);
+        return Objects.equals(amount, addition.amount) && Objects.equals(puzzleHash, addition.puzzleHash)
+                && Objects.equals(memos, addition.memos);
     }
 
     @Override
