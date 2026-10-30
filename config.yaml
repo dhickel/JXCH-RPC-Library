@@ -1,11 +1,13 @@
 address: "127.0.0.1"
 crawlerPort: 8561
-dataLayerPort: 8561
+dataLayerPort: 8562
 daemonPort: 55400
 fullNodePort: 8555
 farmerPort: 8559
 harvesterPort: 8560
 walletPort: 9256
+solverPort: 8667
+timelordPort: 8557
 crawlerCrt: "/home/<user>/.chia_certs/crawler/private_crawler.crt"
 crawlerKey: "/home/<user>/.chia_certs/crawler/private_crawler.key"
 dataLayerCrt: "/home/<user>/.chia_certs/data_layer/private_data_layer.crt"
@@ -20,3 +22,7 @@ harvesterCrt: "/home/<user>/.chia_certs/harvester/private_harvester.crt"
 harvesterKey: "/home/<user>/.chia_certs/harvester/private_harvester.key"
 walletCrt: "/home/<user>/.chia_certs/wallet/private_wallet.crt"
 walletKey: "/home/<user>/.chia_certs/wallet/private_wallet.key"
+solverCrt: "/home/<user>/.chia_certs/solver/private_solver.crt"
+solverKey: "/home/<user>/.chia_certs/solver/private_solver.key"
+timelordCrt: "/home/<user>/.chia_certs/timelord/private_timelord.crt"
+timelordKey: "/home/<user>/.chia_certs/timelord/private_timelord.key"

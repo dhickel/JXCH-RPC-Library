@@ -41,7 +41,7 @@ class FullNodeContractTest {
             else if (types[i] == int.class) args[i] = 2;
             else if (types[i] == long.class) args[i] = 3L;
             else if (types[i] == boolean.class) args[i] = true;
-            else if (types[i] == BigInteger.class) args[i] = BigInteger.TEN;
+            else if (types[i] == BigInteger.class || types[i] == Number.class || types[i] == Object.class) args[i] = BigInteger.TEN;
             else if (types[i] == List.class) args[i] = method.getName().contains("FeeEstimate") ? List.of(30, 60) : List.of("aa");
             else if (types[i] == SpendBundle.class) args[i] = new SpendBundle("cc", List.of(), null, null);
             else fail("Uncovered parameter " + types[i]);
