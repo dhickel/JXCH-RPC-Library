@@ -12,12 +12,18 @@ import java.io.IOException;
 public class NodeConfig {
     private String address = "localhost";
     private int crawlerPort = 8561;
-    private int dataLayerPort = 8561;
+    private int dataLayerPort = 8562;
     private int daemonPort = 55400;
     private int fullNodePort = 8555;
     private int farmerPort = 8559;
     private int harvesterPort = 8560;
     private int walletPort = 9256;
+    private int solverPort = 8667;
+    private int timelordPort = 8557;
+    private String solverCrt;
+    private String solverKey;
+    private String timelordCrt;
+    private String timelordKey;
     /* Certs */
     private String crawlerCrt;
     private String crawlerKey;
@@ -44,6 +50,12 @@ public class NodeConfig {
         this.farmerPort = b.farmerPort;
         this.harvesterPort = b.harvesterPort;
         this.walletPort = b.walletPort;
+        this.solverPort = b.solverPort;
+        this.timelordPort = b.timelordPort;
+        this.solverCrt = b.solverCrt;
+        this.solverKey = b.solverKey;
+        this.timelordCrt = b.timelordCrt;
+        this.timelordKey = b.timelordKey;
         this.crawlerCrt = b.crawlerCrt;
         this.crawlerKey = b.crawlerKey;
         this.dataLayerCrt = b.dataLayerCrt;
@@ -80,6 +92,8 @@ public class NodeConfig {
             case FULL_NODE -> certPair = new String[]{fullNodeCrt, fullNodeKey};
             case HARVESTER -> certPair = new String[]{harvesterCrt, harvesterKey};
             case WALLET -> certPair = new String[]{walletCrt, walletKey};
+            case SOLVER -> certPair = new String[]{solverCrt, solverKey};
+            case TIMELORD -> certPair = new String[]{timelordCrt, timelordKey};
         }
         if (certPair == null || certPair[0] == null || certPair[1] == null) {
             throw new IllegalStateException("Null string in certificate pair, ensure certificate " +
@@ -99,6 +113,8 @@ public class NodeConfig {
             case HARVESTER -> addr += harvesterPort;
             case WALLET -> addr += walletPort;
             case FARMER -> addr += farmerPort;
+            case SOLVER -> addr += solverPort;
+            case TIMELORD -> addr += timelordPort;
         }
         return addr;
     }
@@ -117,6 +133,8 @@ public class NodeConfig {
                 ",\n  farmerPort: " + farmerPort +
                 ",\n  harvesterPort: " + harvesterPort +
                 ",\n  walletPort: " + walletPort +
+                ",\n  solverPort: " + solverPort +
+                ",\n  timelordPort: " + timelordPort +
                 ",\n  crawlerCrt: \"" + crawlerCrt + '\"' +
                 ",\n  crawlerKey: \"" + crawlerKey + '\"' +
                 ",\n  dataLayerCrt: \"" + dataLayerCrt + '\"' +
@@ -131,6 +149,10 @@ public class NodeConfig {
                 ",\n  harvesterKey: \"" + harvesterKey + '\"' +
                 ",\n  walletCrt: \"" + walletCrt + '\"' +
                 ",\n  walletKey: \"" + walletKey + '\"' +
+                ",\n  solverCrt: \"" + solverCrt + '\"' +
+                ",\n  solverKey: \"" + solverKey + '\"' +
+                ",\n  timelordCrt: \"" + timelordCrt + '\"' +
+                ",\n  timelordKey: \"" + timelordKey + '\"' +
                 "\n";
         return sb;
     }
@@ -139,12 +161,18 @@ public class NodeConfig {
     public static class Builder {
         private String address = "localhost";
         private int crawlerPort = 8561;
-        private int dataLayerPort = 8561;
+        private int dataLayerPort = 8562;
         private int daemonPort = 55400;
         private int fullNodePort = 8555;
         private int farmerPort = 8559;
         private int harvesterPort = 8560;
         private int walletPort = 9256;
+        private int solverPort = 8667;
+        private int timelordPort = 8557;
+        private String solverCrt;
+        private String solverKey;
+        private String timelordCrt;
+        private String timelordKey;
         /* Certs */
         private String crawlerCrt;
         private String crawlerKey;
@@ -201,6 +229,14 @@ public class NodeConfig {
                     walletCrt = crtPath;
                     walletKey = keyPath;
                 }
+                case SOLVER -> {
+                    solverCrt = crtPath;
+                    solverKey = keyPath;
+                }
+                case TIMELORD -> {
+                    timelordCrt = crtPath;
+                    timelordKey = keyPath;
+                }
             }
             return this;
         }
@@ -215,6 +251,8 @@ public class NodeConfig {
                 case HARVESTER -> harvesterPort = port;
                 case WALLET -> walletPort = port;
                 case FARMER -> farmerPort = port;
+                case SOLVER -> solverPort = port;
+                case TIMELORD -> timelordPort = port;
             }
             return this;
         }

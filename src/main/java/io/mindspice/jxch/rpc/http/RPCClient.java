@@ -89,7 +89,9 @@ public class RPCClient {
     }
 
     public byte[] makeRequest(Request req) throws RPCException {
-
+        if (req.service == ChiaService.DAEMON) {
+            throw new RPCException("The Chia daemon requires WebSocket transport; HTTP RPC is not supported");
+        }
         try {
             var uri = new URI(config.getAddressOf(req.service) + req.endpoint);
             var httpPost = new HttpPost(uri);

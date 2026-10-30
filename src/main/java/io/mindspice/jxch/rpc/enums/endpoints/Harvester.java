@@ -29,7 +29,7 @@ public enum Harvester implements Endpoint {
 
     @Override
     public String getPath() {
-        return "/" + name().toLowerCase();
+        return "/" + name().toLowerCase(java.util.Locale.ROOT);
     }
 
 
