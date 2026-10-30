@@ -1,11 +1,8 @@
 package io.mindspice.jxch.rpc.schemas.object;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Collections;
 import java.util.List;
-
 
 public record Block(
         @JsonProperty("header_hash") String headerHash,
@@ -19,16 +16,26 @@ public record Block(
         @JsonProperty("reward_chain_ip_proof") Proof rewardChainIpProof,
         @JsonProperty("reward_chain_sp_proof") Proof rewardChainSpProof,
         @JsonProperty("transactions_generator") String transactionsGenerator,
-        @JsonProperty("transactions_generator_ref_list") List<String> transactionsGeneratorRefList,
-        @JsonProperty("transactions_info") TransactionInfo transactionsInfo
+        @JsonProperty("transactions_generator_ref_list") List<Long> transactionsGeneratorRefList,
+        @JsonProperty("transactions_info") TransactionInfo transactionsInfo,
+        @JsonProperty("transactions_generator_buffer") String transactionsGeneratorBuffer,
+        @JsonProperty("version") int version
 ) {
     public Block {
-        finishedSubSlots = finishedSubSlots != null
-                ? Collections.unmodifiableList(finishedSubSlots)
-                : List.of();
+        finishedSubSlots = finishedSubSlots == null ? List.of() : List.copyOf(finishedSubSlots);
+        transactionsGeneratorRefList = transactionsGeneratorRefList == null ? List.of() : List.copyOf(transactionsGeneratorRefList);
+    }
 
-        transactionsGeneratorRefList = transactionsGeneratorRefList != null
-                ? Collections.unmodifiableList(transactionsGeneratorRefList)
-                : List.of();
+    @Deprecated
+    public Block(String headerHash, Proof challengeChainIpProof, Proof challengeChainSpProof,
+                 List<SubSlot> finishedSubSlots, Foliage foliage, FoliageTransactionBlock foliageTransactionBlock,
+                 Proof infusedChallengeChainIpProof, RewardChainBlock rewardChainBlock, Proof rewardChainIpProof,
+                 Proof rewardChainSpProof, String transactionsGenerator, List<String> transactionsGeneratorRefList,
+                 TransactionInfo transactionsInfo) {
+        this(headerHash, challengeChainIpProof, challengeChainSpProof, finishedSubSlots, foliage,
+                foliageTransactionBlock, infusedChallengeChainIpProof, rewardChainBlock, rewardChainIpProof,
+                rewardChainSpProof, transactionsGenerator,
+                transactionsGeneratorRefList == null ? List.of() : transactionsGeneratorRefList.stream().map(Long::valueOf).toList(),
+                transactionsInfo, null, 0);
     }
 }

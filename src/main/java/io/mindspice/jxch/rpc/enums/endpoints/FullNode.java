@@ -11,6 +11,10 @@ public enum FullNode implements Endpoint {
     GET_BLOCK_RECORD_BY_HEIGHT,
     GET_BLOCK_RECORDS,
     GET_BLOCK_SPENDS,
+    GET_BLOCK_SPENDS_WITH_CONDITIONS,
+    GET_AGGSIG_ADDITIONAL_DATA,
+    GET_CONSTANTS,
+    CREATE_BLOCK_GENERATOR,
     GET_BLOCKS,
     GET_RECENT_SIGNAGE_POINT_OR_EOS,
     GET_UNFINISHED_BLOCK_HEADERS,
@@ -31,6 +35,10 @@ public enum FullNode implements Endpoint {
     GET_FEE_ESTIMATE,
     GET_MEMPOOL_ITEMS_BY_COIN_NAME,
     // SHARED
+    GET_VERSION,
+    GET_LOG_LEVEL,
+    SET_LOG_LEVEL,
+    RESET_LOG_LEVEL,
     CLOSE_CONNECTION,
     GET_CONNECTIONS,
     GET_ROUTES,
@@ -48,6 +56,6 @@ public enum FullNode implements Endpoint {
 
     @Override
     public String getPath() {
-        return "/" + name().toLowerCase();
+        return "/" + name().toLowerCase(java.util.Locale.ROOT);
     }
 }

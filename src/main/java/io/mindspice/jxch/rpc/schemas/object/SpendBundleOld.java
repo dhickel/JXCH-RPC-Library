@@ -2,10 +2,10 @@ package io.mindspice.jxch.rpc.schemas.object;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Collections;
 import java.util.List;
 
 
+@Deprecated
 public record SpendBundleOld(
         @JsonProperty("aggregated_signature") String aggregatedSignature,
         @JsonProperty("coin_solutions") List<CoinSpend> coinSolutions,
@@ -13,7 +13,7 @@ public record SpendBundleOld(
         @JsonProperty("solution") String solution
 ) {
     public SpendBundleOld {
-        coinSolutions = coinSolutions != null ? Collections.unmodifiableList(coinSolutions) : List.of();
+        coinSolutions = coinSolutions == null ? List.of() : List.copyOf(coinSolutions);
     }
 
 
